@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — lost in the sauce</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            background: #0a0a0f;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+        .code {
+            font-size: clamp(6rem, 20vw, 12rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #a855f7, #6366f1, #06b6d4);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 4s ease infinite;
+            line-height: 1;
+        }
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .msg {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: rgba(255,255,255,0.5);
+            margin: 1rem 0 2rem;
+            max-width: 500px;
+        }
+        .home {
+            padding: 0.75rem 2rem;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 999px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.03);
+        }
+        .home:hover {
+            border-color: rgba(168,85,247,0.5);
+            color: #fff;
+            background: rgba(168,85,247,0.1);
+            box-shadow: 0 0 30px rgba(168,85,247,0.15);
+            transform: translateY(-2px);
+        }
+        .flavor {
+            position: fixed;
+            bottom: 1.5rem;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.15);
+            letter-spacing: 0.1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="code">404</div>
+    <p class="msg" id="msg"></p>
+    <a href="/" class="home">return to the kingdom</a>
+    <div class="flavor">sir claudius codius was here</div>
+    <script>
+        const msgs = [
+            "Thou hast wandered beyond the realm. This page exists not.",
+            "The vibes here are nonexistent. Literally.",
+            "Even Sir Claudius cannot conjure what was never built.",
+            "This page got sent to the shadow realm.",
+            "You scrolled too far. Way too far.",
+            "The architects have not yet blessed this corner of the kingdom.",
+            "404 vibes detected. Zero. None. Void.",
+            "This URL is giving... nothing.",
+            "The page you seek has been lost to the sands of time. Or typos.",
+            "Sir Claudius searched high and low. There is nothing here but dust and broken dreams."
+        ];
+        document.getElementById('msg').textContent = msgs[Math.floor(Math.random() * msgs.length)];
+    </script>
+</body>
+</html>
