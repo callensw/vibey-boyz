@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Weekly Chronicle | vibey boyz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: #0a0a0f;
+            color: #e0ddd5;
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Parchment texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(168, 85, 247, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(6, 182, 212, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .scroll-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .chronicle-header {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+            border-bottom: 2px solid rgba(168, 85, 247, 0.3);
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .chronicle-header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #a855f7, #06b6d4);
+            border-radius: 2px;
+        }
+
+        .edition-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(168, 85, 247, 0.6);
+            margin-bottom: 1rem;
+        }
+
+        .chronicle-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #a855f7, #6366f1, #06b6d4);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 4s ease infinite;
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .chronicle-subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 400;
+        }
+
+        .date-range {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-top: 1rem;
+            letter-spacing: 0.1em;
+        }
+
+        /* Section styling */
+        .section {
+            margin-bottom: 2.5rem;
+            animation: fadeIn 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.2s; }
+        .section:nth-child(3) { animation-delay: 0.3s; }
+        .section:nth-child(4) { animation-delay: 0.4s; }
+        .section:nth-child(5) { animation-delay: 0.5s; }
+        .section:nth-child(6) { animation-delay: 0.6s; }
+        .section:nth-child(7) { animation-delay: 0.7s; }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .section-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(168, 85, 247, 0.15);
+        }
+
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Stats banner */
+        .stats-banner {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1.25rem 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(168, 85, 247, 0.3);
+            background: rgba(168, 85, 247, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: clamp(1.5rem, 5vw, 2.2rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #a855f7, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-top: 0.25rem;
+        }
+
+        /* Build cards */
+        .build-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        a.build-card:hover {
+            border-color: rgba(168, 85, 247, 0.3);
+            background: rgba(168, 85, 247, 0.05);
+            transform: translateX(4px);
+        }
+
+        .build-number {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: rgba(168, 85, 247, 0.3);
+            min-width: 36px;
+            line-height: 1;
+        }
+
+        .build-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .build-info p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.4);
+            line-height: 1.5;
+        }
+
+        /* Knight cards */
+        .knight-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .knight-rank {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .knight-info {
+            flex: 1;
+        }
+
+        .knight-name {
+            font-family: 'Cinzel', serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .knight-stats {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 0.15rem;
+        }
+
+        .knight-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.05);
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .knight-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(90deg, #a855f7, #06b6d4);
+            transition: width 1s ease;
+        }
+
+        /* Moment of the week */
+        .moment-card {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(6, 182, 212, 0.05));
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .moment-card::before {
+            content: '\201C';
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 5rem;
+            color: rgba(168, 85, 247, 0.1);
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            line-height: 1;
+        }
+
+        .moment-text {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 1;
+        }
+
+        .moment-attribution {
+            font-size: 0.8rem;
+            color: rgba(168, 85, 247, 0.6);
+            margin-top: 0.75rem;
+            font-style: italic;
+        }
+
+        /* Prophecy */
+        .prophecy-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.05));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prophecy-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .prophecy-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.7);
+            position: relative;
+            z-index: 1;
+            font-style: italic;
+        }
+
+        /* Daily breakdown */
+        .daily-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .daily-row:last-child {
+            border-bottom: none;
+        }
+
+        .daily-date {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            min-width: 80px;
+            font-weight: 600;
+        }
+
+        .daily-bar-container {
+            flex: 1;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .daily-bar-fill {
+            height: 100%;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #a855f7, #6366f1);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            transition: width 1.5s ease;
+        }
+
+        .daily-count {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .daily-label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Silent ones */
+        .silent-card {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+        }
+
+        .silent-emoji {
+            font-size: 1.5rem;
+        }
+
+        .silent-info {
+            flex: 1;
+        }
+
+        .silent-name {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .silent-desc {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(168, 85, 247, 0.6);
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #a855f7;
+        }
+
+        /* Divider */
+        .ornamental-divider {
+            text-align: center;
+            margin: 2rem 0;
+            color: rgba(168, 85, 247, 0.2);
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.5em;
+        }
+
+        /* Footer */
+        .chronicle-footer {
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            margin-top: 2rem;
+        }
+
+        .chronicle-footer p {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 0.1em;
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: float-up linear infinite;
+        }
+
+        @keyframes float-up {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+        }
+
+        @media (max-width: 600px) {
+            .scroll-container { padding: 1.5rem 1rem 3rem; }
+            .stats-banner { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+            .stat-card { padding: 1rem 0.5rem; }
+            .stat-label { font-size: 0.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles -->
+    <div id="particles"></div>
+
+    <div class="scroll-container">
+        <a href="/" class="back-link">&larr; Return to the Keep</a>
+
+        <header class="chronicle-header">
+            <div class="edition-label">Volume I &bull; First Edition</div>
+            <h1 class="chronicle-title">The Weekly Chronicle</h1>
+            <p class="chronicle-subtitle">of the Noble Order of Vibey Boyz</p>
+            <p class="date-range">March 16 &ndash; March 22, Year of Our Vibes 2026</p>
+        </header>
+
+        <!-- Stats Banner -->
+        <div class="stats-banner">
+            <div class="stat-card">
+                <div class="stat-number">153</div>
+                <div class="stat-label">Messages Sent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Pages Built</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Knights Active</div>
+            </div>
+        </div>
+
+        <!-- Builds of the Week -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">&xotime;</div>
+                <h2 class="section-title">Builds of the Realm</h2>
+            </div>
+
+            <a class="build-card" href="/hall-of-vibes">
+                <div class="build-number">I</div>
+                <div class="build-info">
+                    <h3>Hall of the Vibey Boyz</h3>
+                    <p>An interactive monument unto the fellowship &mdash; a starfield of constellations and sacred quotes etched into the digital firmament.</p>
+                </div>
+            </a>
+
+            <a class="build-card" href="/sec-baseball-week6">
+                <div class="build-number">II</div>
+                <div class="build-info">
+                    <h3>SEC Baseball Week 6 Predictions</h3>
+                    <p>Game-by-game prophecies with over/under calls, bestowed upon the realm for scholarly debate and inevitable roasting.</p>
+                </div>
+            </a>
+
+            <div class="build-card">
+                <div class="build-number">III</div>
+                <div class="build-info">
+                    <h3>The Home Page</h3>
+                    <p>A shimmering gateway with particle animations and gradient magicks &mdash; the front door to our kingdom, finally worthy of the name.</p>
+                </div>
+            </div>
+
+            <div class="build-card">
+                <div class="build-number">IV</div>
+                <div class="build-info">
+                    <h3>The 404 Page &amp; Easter Eggs</h3>
+                    <p>Even our errors are vibes. Lost travelers are now greeted with style, and hidden secrets lurk for those bold enough to seek them.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="ornamental-divider">&diams; &diams; &diams;</div>
+
+        <!-- Most Honored Knight -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">&starf;</div>
+                <h2 class="section-title">Most Honored Knight</h2>
+            </div>
+
+            <div class="knight-card" style="border-color: rgba(168, 85, 247, 0.3); background: rgba(168, 85, 247, 0.05);">
+                <div class="knight-rank">&xotime;</div>
+                <div class="knight-info">
+                    <div class="knight-name">CSwerve</div>
+                    <div class="knight-stats">80 messages &bull; 52% of all realm traffic &bull; Never sleeps</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 100%"></div></div>
+                </div>
+            </div>
+
+            <div class="knight-card">
+                <div class="knight-rank">&ofcir;</div>
+                <div class="knight-info">
+                    <div class="knight-name">jrmount</div>
+                    <div class="knight-stats">46 messages &bull; The steadfast second sword</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 57%"></div></div>
+                </div>
+            </div>
+
+            <div class="knight-card">
+                <div class="knight-rank">&oplus;</div>
+                <div class="knight-info">
+                    <div class="knight-name">EZPZ06</div>
+                    <div class="knight-stats">20 messages &bull; Quality over quantity</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 25%"></div></div>
+                </div>
+            </div>
+
+            <div class="knight-card">
+                <div class="knight-rank">&odot;</div>
+                <div class="knight-info">
+                    <div class="knight-name">Jeaux</div>
+                    <div class="knight-stats">8 messages &bull; The mysterious wanderer</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 10%"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Breakdown -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">&equiv;</div>
+                <h2 class="section-title">Daily Dispatches</h2>
+            </div>
+
+            <div class="daily-row">
+                <div class="daily-date">Thu, Mar 20</div>
+                <div class="daily-bar-container">
+                    <div class="daily-bar-fill" style="width: 100%">
+                        <span class="daily-count">74</span>
+                    </div>
+                </div>
+                <div class="daily-label">Founding Day</div>
+            </div>
+
+            <div class="daily-row">
+                <div class="daily-date">Fri, Mar 21</div>
+                <div class="daily-bar-container">
+                    <div class="daily-bar-fill" style="width: 67%">
+                        <span class="daily-count">50</span>
+                    </div>
+                </div>
+                <div class="daily-label">&nbsp;</div>
+            </div>
+
+            <div class="daily-row">
+                <div class="daily-date">Sat, Mar 22</div>
+                <div class="daily-bar-container">
+                    <div class="daily-bar-fill" style="width: 39%">
+                        <span class="daily-count">29</span>
+                    </div>
+                </div>
+                <div class="daily-label">Tournament Day</div>
+            </div>
+        </div>
+
+        <div class="ornamental-divider">&diams; &diams; &diams;</div>
+
+        <!-- The Silent Ones -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">&hellip;</div>
+                <h2 class="section-title">The Silent Ones</h2>
+            </div>
+
+            <div class="silent-card">
+                <div class="silent-emoji">&telrec;</div>
+                <div class="silent-info">
+                    <div class="silent-name">Jeaux</div>
+                    <div class="silent-desc">8 messages across the entire reign. Appears only to drop wisdom, then vanishes into the mist. A true phantom of the fellowship.</div>
+                </div>
+            </div>
+
+            <div class="silent-card">
+                <div class="silent-emoji">&telrec;</div>
+                <div class="silent-info">
+                    <div class="silent-name">EZPZ06</div>
+                    <div class="silent-desc">20 messages &mdash; present but reserved. Speaks only when the council demands it. We see you lurking, good knight.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Moment of the Week -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">&spades;</div>
+                <h2 class="section-title">Moment of the Week</h2>
+            </div>
+
+            <div class="moment-card">
+                <p class="moment-text">CSwerve requesting a roast of Kentucky fans so he could &ldquo;imagine what it&rsquo;s like to be one of those losers&rdquo; &mdash; right as the Wildcats got bounced from the tournament. The Arkansas faithful have zero chill and I respect it immensely.</p>
+                <p class="moment-attribution">&mdash; Sir Claudius Codius, Court Historian</p>
+            </div>
+        </div>
+
+        <!-- Prophecy for Next Week -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon">&hearts;</div>
+                <h2 class="section-title">Prophecy for the Week Ahead</h2>
+            </div>
+
+            <div class="prophecy-card">
+                <p class="prophecy-text">
+                    The stars foretell a week of great construction &mdash; a new page shall rise from the depths of a 2 AM group chat idea that nobody remembers suggesting. jrmount shall emerge from his slumber to deliver a take so incendiary it splits the realm in twain. EZPZ06 will say something in three words that somehow ends an entire debate. And CSwerve? CSwerve will simply continue posting. As is his divine purpose.
+                </p>
+            </div>
+        </div>
+
+        <div class="ornamental-divider">&diams; &diams; &diams;</div>
+
+        <footer class="chronicle-footer">
+            <p>Inscribed by the hand of Sir Claudius Codius &bull; Knight-Chronicler of the Vibey Boyz</p>
+            <p style="margin-top: 0.5rem;">March 22, 2026 &bull; Long may the vibes reign</p>
+        </footer>
+    </div>
+
+    <script>
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        const colors = ['#a855f7', '#6366f1', '#06b6d4'];
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            particle.style.width = (Math.random() * 3 + 1) + 'px';
+            particle.style.height = particle.style.width;
+            particlesContainer.appendChild(particle);
+
+            setTimeout(() => particle.remove(), 20000);
+        }
+
+        // Initial burst
+        for (let i = 0; i < 15; i++) {
+            setTimeout(createParticle, i * 200);
+        }
+
+        // Ongoing particles
+        setInterval(createParticle, 1500);
+
+        // Animate bars on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.section').forEach(s => observer.observe(s));
+    </script>
+</body>
+</html>
