@@ -474,27 +474,27 @@
 
         .back-link:hover { color: #f4d58d; }
 
-        /* AI Portrait */
-        .ai-portrait-section {
+        /* Painted Portrait */
+        .painted-portrait-section {
             margin-top: 3rem;
             text-align: center;
         }
 
-        .ai-portrait-section h3 {
+        .painted-portrait-section h3 {
             font-family: 'Cinzel Decorative', serif;
             font-size: 1.1rem;
             color: #f4d58d;
             margin-bottom: 0.5rem;
         }
 
-        .ai-portrait-section .subtitle-note {
+        .painted-portrait-section .subtitle-note {
             font-family: 'IM Fell English SC', serif;
             font-size: 0.8rem;
             color: rgba(232, 213, 183, 0.4);
             margin-bottom: 1.5rem;
         }
 
-        .ai-frame {
+        .painted-frame {
             position: relative;
             display: inline-block;
             padding: 16px;
@@ -504,27 +504,20 @@
             box-shadow: 0 0 40px rgba(191, 139, 46, 0.15), 0 20px 60px rgba(0,0,0,0.5);
         }
 
-        .ai-frame::before {
+        .painted-frame::before {
             content: '';
             position: absolute;
             inset: 6px;
             border: 1px solid rgba(191, 139, 46, 0.3);
             border-radius: 4px;
             pointer-events: none;
+            z-index: 1;
         }
 
-        .ai-frame img {
+        .painted-frame canvas {
             display: block;
-            max-width: min(350px, 80vw);
-            height: auto;
             border-radius: 4px;
-        }
-
-        .ai-frame .loading-text {
-            font-family: 'IM Fell English SC', serif;
-            font-size: 0.85rem;
-            color: rgba(232, 213, 183, 0.5);
-            padding: 8rem 2rem;
+            position: relative;
         }
 
         .version-label {
@@ -636,18 +629,13 @@
             </p>
         </div>
 
-        <div class="ai-portrait-section">
+        <div class="painted-portrait-section">
             <h3>The Enchanted Portrait</h3>
-            <p class="subtitle-note">Conjured by arcane AI sorcery — Sir Claudius's new paintbrush</p>
-            <div class="ai-frame">
-                <img id="ai-portrait"
-                     src="https://image.pollinations.ai/prompt/oil%20painting%20portrait%20of%20a%20regal%20medieval%20noblewoman%20Lady%20Bayles%20wearing%20golden%20crown%20with%20ruby%20gemstone%20dark%20flowing%20hair%20crimson%20royal%20gown%20sapphire%20necklace%20elegant%20powerful%20dark%20moody%20background%20renaissance%20style%20dramatic%20lighting%20detailed%20brushwork?width=768&height=1024&nologo=true&seed=42"
-                     alt="AI-generated portrait of Lady Bayles"
-                     loading="lazy"
-                     onerror="this.parentElement.innerHTML='<div class=\'loading-text\'>The enchantment falters... the portrait remains veiled.</div>'"
-                />
+            <p class="subtitle-note">Conjured by Sir Claudius's new paintbrush — generative canvas art</p>
+            <div class="painted-frame">
+                <canvas id="painting" width="380" height="500"></canvas>
             </div>
-            <p class="version-label">v1 &mdash; CSS &bull; v2 &mdash; AI-generated</p>
+            <p class="version-label">v1 &mdash; CSS divs &bull; v2 &mdash; Generative canvas painting</p>
         </div>
 
         <a href="/" class="back-link">Return to the Kingdom</a>
@@ -702,6 +690,280 @@
         resize();
         createParticles();
         draw();
+
+        // Generative painted portrait of Lady Bayles
+        (function() {
+            const pc = document.getElementById('painting');
+            const px = pc.getContext('2d');
+            const pw = pc.width, ph = pc.height;
+
+            // Seed-based random for consistency
+            let seed = 42;
+            function rng() { seed = (seed * 16807 + 0) % 2147483647; return (seed - 1) / 2147483646; }
+            function rngRange(a, b) { return a + rng() * (b - a); }
+
+            // Background - dark moody gradient
+            const bgGrad = px.createRadialGradient(pw/2, ph*0.35, 30, pw/2, ph*0.5, ph*0.7);
+            bgGrad.addColorStop(0, '#2a3a5c');
+            bgGrad.addColorStop(0.5, '#1a2744');
+            bgGrad.addColorStop(1, '#0d1520');
+            px.fillStyle = bgGrad;
+            px.fillRect(0, 0, pw, ph);
+
+            // Brushstroke helper
+            function brushStroke(x, y, w, h, color, angle) {
+                px.save();
+                px.translate(x, y);
+                px.rotate(angle || 0);
+                px.beginPath();
+                px.ellipse(0, 0, w/2, h/2, 0, 0, Math.PI * 2);
+                px.fillStyle = color;
+                px.globalAlpha = rngRange(0.6, 0.9);
+                px.fill();
+                px.restore();
+                px.globalAlpha = 1;
+            }
+
+            // Soft glow behind head
+            const glowGrad = px.createRadialGradient(pw/2, ph*0.25, 10, pw/2, ph*0.25, 120);
+            glowGrad.addColorStop(0, 'rgba(244, 213, 141, 0.15)');
+            glowGrad.addColorStop(1, 'transparent');
+            px.fillStyle = glowGrad;
+            px.fillRect(0, 0, pw, ph);
+
+            // Hair - dark flowing strokes
+            for (let i = 0; i < 120; i++) {
+                const hx = pw/2 + rngRange(-65, 65);
+                const hy = ph*0.12 + rngRange(0, 160);
+                const hw = rngRange(8, 25);
+                const hh = rngRange(15, 40);
+                const shade = Math.floor(rngRange(15, 45));
+                brushStroke(hx, hy, hw, hh, `rgb(${shade},${Math.floor(shade*0.6)},${Math.floor(shade*0.4)})`, rngRange(-0.4, 0.4));
+            }
+
+            // Face shape
+            const faceGrad = px.createRadialGradient(pw/2, ph*0.24, 10, pw/2, ph*0.26, 60);
+            faceGrad.addColorStop(0, '#f2d5af');
+            faceGrad.addColorStop(0.7, '#e8c098');
+            faceGrad.addColorStop(1, '#d4a878');
+            px.beginPath();
+            px.ellipse(pw/2, ph*0.25, 52, 65, 0, 0, Math.PI * 2);
+            px.fillStyle = faceGrad;
+            px.fill();
+
+            // Face details with brushstrokes for painterly feel
+            for (let i = 0; i < 40; i++) {
+                const fx = pw/2 + rngRange(-40, 40);
+                const fy = ph*0.22 + rngRange(-30, 50);
+                const r = Math.sqrt((fx-pw/2)**2 + (fy-ph*0.25)**2);
+                if (r < 50) {
+                    brushStroke(fx, fy, rngRange(8, 18), rngRange(4, 10),
+                        `rgba(${Math.floor(rngRange(220,242))},${Math.floor(rngRange(190,215))},${Math.floor(rngRange(150,180))},0.4)`,
+                        rngRange(-0.3, 0.3));
+                }
+            }
+
+            // Eyes
+            function drawEye(ex, ey) {
+                px.beginPath();
+                px.ellipse(ex, ey, 10, 5.5, 0, 0, Math.PI * 2);
+                px.fillStyle = '#fff';
+                px.globalAlpha = 0.9;
+                px.fill();
+                px.beginPath();
+                px.arc(ex, ey, 4.5, 0, Math.PI * 2);
+                px.fillStyle = '#3a2518';
+                px.fill();
+                px.beginPath();
+                px.arc(ex + 1, ey - 1, 1.5, 0, Math.PI * 2);
+                px.fillStyle = '#fff';
+                px.globalAlpha = 0.7;
+                px.fill();
+                px.globalAlpha = 1;
+                // Brow
+                px.beginPath();
+                px.moveTo(ex - 12, ey - 8);
+                px.quadraticCurveTo(ex, ey - 14, ex + 12, ey - 9);
+                px.strokeStyle = '#2c1810';
+                px.lineWidth = 2;
+                px.stroke();
+            }
+            drawEye(pw/2 - 18, ph*0.235);
+            drawEye(pw/2 + 18, ph*0.235);
+
+            // Nose
+            px.beginPath();
+            px.moveTo(pw/2, ph*0.25);
+            px.lineTo(pw/2 - 4, ph*0.28);
+            px.strokeStyle = 'rgba(180,140,100,0.5)';
+            px.lineWidth = 1.5;
+            px.stroke();
+
+            // Lips
+            px.beginPath();
+            px.moveTo(pw/2 - 12, ph*0.30);
+            px.quadraticCurveTo(pw/2, ph*0.285, pw/2 + 12, ph*0.30);
+            px.quadraticCurveTo(pw/2, ph*0.315, pw/2 - 12, ph*0.30);
+            px.fillStyle = '#c47a6a';
+            px.globalAlpha = 0.8;
+            px.fill();
+            px.globalAlpha = 1;
+
+            // Cheek blush
+            px.beginPath();
+            px.arc(pw/2 - 32, ph*0.27, 12, 0, Math.PI * 2);
+            px.fillStyle = 'rgba(210, 130, 120, 0.15)';
+            px.fill();
+            px.beginPath();
+            px.arc(pw/2 + 32, ph*0.27, 12, 0, Math.PI * 2);
+            px.fill();
+
+            // Crown
+            const crownY = ph * 0.135;
+            px.beginPath();
+            px.moveTo(pw/2 - 40, crownY + 20);
+            px.lineTo(pw/2 - 35, crownY);
+            px.lineTo(pw/2 - 20, crownY + 12);
+            px.lineTo(pw/2 - 8, crownY - 8);
+            px.lineTo(pw/2, crownY + 8);
+            px.lineTo(pw/2 + 8, crownY - 8);
+            px.lineTo(pw/2 + 20, crownY + 12);
+            px.lineTo(pw/2 + 35, crownY);
+            px.lineTo(pw/2 + 40, crownY + 20);
+            px.closePath();
+            const crownGrad = px.createLinearGradient(pw/2 - 40, crownY, pw/2 + 40, crownY + 20);
+            crownGrad.addColorStop(0, '#bf8b2e');
+            crownGrad.addColorStop(0.5, '#f4d58d');
+            crownGrad.addColorStop(1, '#bf8b2e');
+            px.fillStyle = crownGrad;
+            px.fill();
+            px.strokeStyle = '#8b6914';
+            px.lineWidth = 1;
+            px.stroke();
+
+            // Crown gems
+            [[pw/2, crownY + 2, '#e74c3c'], [pw/2 - 20, crownY + 14, '#3498db'], [pw/2 + 20, crownY + 14, '#2ecc71']].forEach(([gx, gy, gc]) => {
+                px.beginPath();
+                px.arc(gx, gy, 3, 0, Math.PI * 2);
+                px.fillStyle = gc;
+                px.fill();
+                px.shadowColor = gc;
+                px.shadowBlur = 6;
+                px.fill();
+                px.shadowBlur = 0;
+            });
+
+            // Neck
+            px.beginPath();
+            px.moveTo(pw/2 - 16, ph*0.32);
+            px.lineTo(pw/2 - 22, ph*0.40);
+            px.lineTo(pw/2 + 22, ph*0.40);
+            px.lineTo(pw/2 + 16, ph*0.32);
+            px.fillStyle = '#e0bb90';
+            px.fill();
+
+            // Necklace
+            px.beginPath();
+            px.moveTo(pw/2 - 25, ph*0.39);
+            px.quadraticCurveTo(pw/2, ph*0.42, pw/2 + 25, ph*0.39);
+            px.strokeStyle = '#f4d58d';
+            px.lineWidth = 1.5;
+            px.stroke();
+            px.beginPath();
+            px.arc(pw/2, ph*0.415, 5, 0, Math.PI * 2);
+            px.fillStyle = '#3498db';
+            px.fill();
+            px.shadowColor = '#3498db';
+            px.shadowBlur = 10;
+            px.fill();
+            px.shadowBlur = 0;
+
+            // Shoulders & gown
+            px.beginPath();
+            px.moveTo(pw/2 - 22, ph*0.40);
+            px.quadraticCurveTo(pw/2 - 80, ph*0.40, pw/2 - 120, ph*0.48);
+            px.lineTo(pw/2 - 160, ph);
+            px.lineTo(pw/2 + 160, ph);
+            px.lineTo(pw/2 + 120, ph*0.48);
+            px.quadraticCurveTo(pw/2 + 80, ph*0.40, pw/2 + 22, ph*0.40);
+            px.closePath();
+            const gownGrad = px.createLinearGradient(0, ph*0.4, 0, ph);
+            gownGrad.addColorStop(0, '#8b2252');
+            gownGrad.addColorStop(0.3, '#6b1d45');
+            gownGrad.addColorStop(1, '#4a1030');
+            px.fillStyle = gownGrad;
+            px.fill();
+
+            // Gown detail brushstrokes
+            for (let i = 0; i < 80; i++) {
+                const gx = pw/2 + rngRange(-130, 130);
+                const gy = ph*0.45 + rngRange(0, ph*0.55);
+                const gw = rngRange(15, 40);
+                const gh = rngRange(5, 15);
+                const shade = Math.floor(rngRange(80, 140));
+                brushStroke(gx, gy, gw, gh,
+                    `rgba(${shade}, ${Math.floor(shade*0.25)}, ${Math.floor(shade*0.4)}, 0.25)`,
+                    rngRange(-0.2, 0.2));
+            }
+
+            // Gold trim on gown neckline
+            px.beginPath();
+            px.moveTo(pw/2 - 22, ph*0.40);
+            px.quadraticCurveTo(pw/2 - 60, ph*0.41, pw/2 - 80, ph*0.44);
+            px.strokeStyle = 'rgba(244, 213, 141, 0.4)';
+            px.lineWidth = 2;
+            px.stroke();
+            px.beginPath();
+            px.moveTo(pw/2 + 22, ph*0.40);
+            px.quadraticCurveTo(pw/2 + 60, ph*0.41, pw/2 + 80, ph*0.44);
+            px.stroke();
+
+            // Arms
+            // Left arm
+            px.beginPath();
+            px.moveTo(pw/2 - 100, ph*0.47);
+            px.quadraticCurveTo(pw/2 - 110, ph*0.6, pw/2 - 85, ph*0.72);
+            px.lineTo(pw/2 - 70, ph*0.72);
+            px.quadraticCurveTo(pw/2 - 90, ph*0.58, pw/2 - 80, ph*0.47);
+            px.fillStyle = '#7b1e48';
+            px.fill();
+
+            // Right arm
+            px.beginPath();
+            px.moveTo(pw/2 + 100, ph*0.47);
+            px.quadraticCurveTo(pw/2 + 110, ph*0.6, pw/2 + 85, ph*0.72);
+            px.lineTo(pw/2 + 70, ph*0.72);
+            px.quadraticCurveTo(pw/2 + 90, ph*0.58, pw/2 + 80, ph*0.47);
+            px.fillStyle = '#7b1e48';
+            px.fill();
+
+            // Hands
+            px.beginPath();
+            px.ellipse(pw/2 - 78, ph*0.73, 10, 7, -0.2, 0, Math.PI * 2);
+            px.fillStyle = '#e0bb90';
+            px.fill();
+            px.beginPath();
+            px.ellipse(pw/2 + 78, ph*0.73, 10, 7, 0.2, 0, Math.PI * 2);
+            px.fill();
+
+            // Overall painterly texture overlay
+            for (let i = 0; i < 200; i++) {
+                const tx = rngRange(0, pw);
+                const ty = rngRange(0, ph);
+                const ts = rngRange(2, 8);
+                px.beginPath();
+                px.arc(tx, ty, ts, 0, Math.PI * 2);
+                px.fillStyle = `rgba(${Math.floor(rngRange(0,30))},${Math.floor(rngRange(0,20))},${Math.floor(rngRange(10,30))},${rngRange(0.02, 0.06)})`;
+                px.fill();
+            }
+
+            // Vignette
+            const vigGrad = px.createRadialGradient(pw/2, ph*0.4, pw*0.3, pw/2, ph*0.5, pw*0.9);
+            vigGrad.addColorStop(0, 'transparent');
+            vigGrad.addColorStop(1, 'rgba(0,0,0,0.5)');
+            px.fillStyle = vigGrad;
+            px.fillRect(0, 0, pw, ph);
+        })();
     </script>
 </body>
 </html>
