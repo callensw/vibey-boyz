@@ -474,6 +474,66 @@
 
         .back-link:hover { color: #f4d58d; }
 
+        /* AI Portrait */
+        .ai-portrait-section {
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .ai-portrait-section h3 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.1rem;
+            color: #f4d58d;
+            margin-bottom: 0.5rem;
+        }
+
+        .ai-portrait-section .subtitle-note {
+            font-family: 'IM Fell English SC', serif;
+            font-size: 0.8rem;
+            color: rgba(232, 213, 183, 0.4);
+            margin-bottom: 1.5rem;
+        }
+
+        .ai-frame {
+            position: relative;
+            display: inline-block;
+            padding: 16px;
+            background: linear-gradient(145deg, #2a1f0e, #1a1209, #2a1f0e);
+            border: 3px solid #bf8b2e;
+            border-radius: 8px;
+            box-shadow: 0 0 40px rgba(191, 139, 46, 0.15), 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .ai-frame::before {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border: 1px solid rgba(191, 139, 46, 0.3);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .ai-frame img {
+            display: block;
+            max-width: min(350px, 80vw);
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .ai-frame .loading-text {
+            font-family: 'IM Fell English SC', serif;
+            font-size: 0.85rem;
+            color: rgba(232, 213, 183, 0.5);
+            padding: 8rem 2rem;
+        }
+
+        .version-label {
+            font-family: 'IM Fell English SC', serif;
+            font-size: 0.75rem;
+            color: rgba(232, 213, 183, 0.35);
+            margin-top: 1rem;
+        }
+
         @media (max-width: 500px) {
             .traits { grid-template-columns: 1fr; }
             .portrait-frame { padding: 14px; }
@@ -574,6 +634,20 @@
             <p style="margin-top: 0.8rem; font-size: 0.85rem; color: rgba(232,213,183,0.4);">
                 &mdash; Lady Bayles, probably
             </p>
+        </div>
+
+        <div class="ai-portrait-section">
+            <h3>The Enchanted Portrait</h3>
+            <p class="subtitle-note">Conjured by arcane AI sorcery — Sir Claudius's new paintbrush</p>
+            <div class="ai-frame">
+                <img id="ai-portrait"
+                     src="https://image.pollinations.ai/prompt/oil%20painting%20portrait%20of%20a%20regal%20medieval%20noblewoman%20Lady%20Bayles%20wearing%20golden%20crown%20with%20ruby%20gemstone%20dark%20flowing%20hair%20crimson%20royal%20gown%20sapphire%20necklace%20elegant%20powerful%20dark%20moody%20background%20renaissance%20style%20dramatic%20lighting%20detailed%20brushwork?width=768&height=1024&nologo=true&seed=42"
+                     alt="AI-generated portrait of Lady Bayles"
+                     loading="lazy"
+                     onerror="this.parentElement.innerHTML='<div class=\'loading-text\'>The enchantment falters... the portrait remains veiled.</div>'"
+                />
+            </div>
+            <p class="version-label">v1 &mdash; CSS &bull; v2 &mdash; AI-generated</p>
         </div>
 
         <a href="/" class="back-link">Return to the Kingdom</a>
