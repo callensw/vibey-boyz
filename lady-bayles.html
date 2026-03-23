@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lady Bayles — A Royal Portrait</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English+SC&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: #0a0608;
+            color: #e8d5b7;
+            font-family: 'Cinzel', serif;
+            overflow-x: hidden;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        .herald {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .herald h1 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            background: linear-gradient(135deg, #f4d58d, #bf8b2e, #f4d58d);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gold-shimmer 3s ease infinite;
+            margin-bottom: 0.5rem;
+        }
+
+        .herald .subtitle {
+            font-family: 'IM Fell English SC', serif;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            color: rgba(232, 213, 183, 0.5);
+            letter-spacing: 0.2em;
+        }
+
+        @keyframes gold-shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Portrait Frame */
+        .portrait-frame {
+            position: relative;
+            width: min(380px, 85vw);
+            margin: 2rem auto;
+            padding: 20px;
+            background: linear-gradient(145deg, #2a1f0e, #1a1209, #2a1f0e);
+            border: 3px solid #bf8b2e;
+            border-radius: 8px;
+            box-shadow:
+                0 0 40px rgba(191, 139, 46, 0.15),
+                inset 0 0 30px rgba(0,0,0,0.5),
+                0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .portrait-frame::before {
+            content: '';
+            position: absolute;
+            inset: 6px;
+            border: 1px solid rgba(191, 139, 46, 0.3);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .portrait-inner {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: linear-gradient(180deg, #1a2744 0%, #243a5c 30%, #1d3050 60%, #162540 100%);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        /* Lady Bayles - CSS Portrait */
+        .lady {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Background glow */
+        .lady .aura {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(244, 213, 141, 0.15), transparent 70%);
+            animation: aura-pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes aura-pulse {
+            0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.1); }
+        }
+
+        /* Hair */
+        .lady .hair {
+            position: absolute;
+            width: 140px;
+            height: 170px;
+            top: 12%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(180deg, #2c1810, #1a0e08);
+            border-radius: 50% 50% 35% 35%;
+        }
+
+        .lady .hair-left, .lady .hair-right {
+            position: absolute;
+            width: 50px;
+            height: 120px;
+            top: 28%;
+            background: linear-gradient(180deg, #2c1810, #1a0e08);
+            border-radius: 0 0 40% 40%;
+        }
+
+        .lady .hair-left { left: calc(50% - 75px); }
+        .lady .hair-right { right: calc(50% - 75px); }
+
+        /* Face */
+        .lady .face {
+            position: absolute;
+            width: 110px;
+            height: 130px;
+            top: 17%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(180deg, #f0d0a8, #e8c098);
+            border-radius: 50% 50% 42% 42%;
+        }
+
+        /* Eyes */
+        .lady .eye {
+            position: absolute;
+            width: 22px;
+            height: 12px;
+            top: 42%;
+            background: #fff;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .lady .eye-left { left: calc(50% - 32px); }
+        .lady .eye-right { left: calc(50% + 10px); }
+
+        .lady .eye::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #3a2518;
+            border-radius: 50%;
+            top: 2px;
+            left: 6px;
+            animation: look-around 6s ease-in-out infinite;
+        }
+
+        @keyframes look-around {
+            0%, 100% { left: 6px; }
+            30% { left: 3px; }
+            70% { left: 9px; }
+        }
+
+        .lady .eye::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 3px;
+            background: #2c1810;
+            border-radius: 50%;
+            top: -4px;
+            left: -1px;
+        }
+
+        /* Nose */
+        .lady .nose {
+            position: absolute;
+            width: 10px;
+            height: 14px;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 2px solid rgba(180, 140, 100, 0.4);
+            border-bottom: 2px solid rgba(180, 140, 100, 0.4);
+            border-radius: 0 0 0 40%;
+        }
+
+        /* Smile */
+        .lady .smile {
+            position: absolute;
+            width: 28px;
+            height: 14px;
+            top: 60%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom: 2.5px solid #c47a6a;
+            border-radius: 0 0 50% 50%;
+        }
+
+        /* Crown / Tiara */
+        .lady .crown {
+            position: absolute;
+            top: 9%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 35px;
+        }
+
+        .lady .crown-base {
+            position: absolute;
+            bottom: 0;
+            width: 80px;
+            height: 12px;
+            background: linear-gradient(90deg, #bf8b2e, #f4d58d, #bf8b2e);
+            border-radius: 2px;
+        }
+
+        .lady .crown-point {
+            position: absolute;
+            bottom: 10px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 22px solid #bf8b2e;
+        }
+
+        .lady .crown-point:nth-child(2) { left: 5px; }
+        .lady .crown-point:nth-child(3) { left: 20px; border-bottom-color: #f4d58d; }
+        .lady .crown-point:nth-child(4) { left: 35px; }
+        .lady .crown-point:nth-child(5) { left: 50px; border-bottom-color: #f4d58d; }
+
+        .lady .crown-gem {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #e74c3c;
+            border-radius: 50%;
+            bottom: 14px;
+            left: 37px;
+            box-shadow: 0 0 8px rgba(231, 76, 60, 0.6);
+            animation: gem-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes gem-glow {
+            0%, 100% { box-shadow: 0 0 8px rgba(231, 76, 60, 0.6); }
+            50% { box-shadow: 0 0 16px rgba(231, 76, 60, 0.9); }
+        }
+
+        /* Dress / Gown */
+        .lady .gown {
+            position: absolute;
+            top: 52%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 240px;
+            background: linear-gradient(180deg, #6b1d45, #8b2252, #6b1d45);
+            clip-path: polygon(30% 0%, 70% 0%, 95% 100%, 5% 100%);
+        }
+
+        .lady .gown::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70px;
+            height: 40px;
+            background: linear-gradient(180deg, rgba(244, 213, 141, 0.3), transparent);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+        }
+
+        .lady .gown-trim {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(90deg, transparent, rgba(191, 139, 46, 0.3), transparent);
+        }
+
+        /* Necklace */
+        .lady .necklace {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 20px;
+            border-bottom: 2px solid #f4d58d;
+            border-radius: 0 0 50% 50%;
+        }
+
+        .lady .necklace::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: #3498db;
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.6);
+        }
+
+        /* Shoulders */
+        .lady .shoulder-left, .lady .shoulder-right {
+            position: absolute;
+            width: 60px;
+            height: 30px;
+            top: 48%;
+            background: linear-gradient(180deg, #6b1d45, #8b2252);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .lady .shoulder-left { left: calc(50% - 85px); }
+        .lady .shoulder-right { right: calc(50% - 85px); }
+
+        /* Neck */
+        .lady .neck {
+            position: absolute;
+            width: 36px;
+            height: 30px;
+            top: 43%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(180deg, #e8c098, #f0d0a8);
+        }
+
+        /* Name plate */
+        .nameplate {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-top: 1px solid rgba(191, 139, 46, 0.3);
+            border-bottom: 1px solid rgba(191, 139, 46, 0.3);
+        }
+
+        .nameplate h2 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.3rem;
+            color: #f4d58d;
+            margin-bottom: 0.3rem;
+        }
+
+        .nameplate p {
+            font-family: 'IM Fell English SC', serif;
+            font-size: 0.85rem;
+            color: rgba(232, 213, 183, 0.5);
+        }
+
+        /* Description */
+        .description {
+            margin-top: 2.5rem;
+            padding: 2rem;
+            background: rgba(42, 31, 14, 0.5);
+            border: 1px solid rgba(191, 139, 46, 0.15);
+            border-radius: 8px;
+        }
+
+        .description h3 {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.1rem;
+            color: #f4d58d;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .description p {
+            font-family: 'IM Fell English SC', serif;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: rgba(232, 213, 183, 0.7);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .description p:last-child { margin-bottom: 0; }
+
+        .traits {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .trait {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(191, 139, 46, 0.1);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .trait:hover {
+            border-color: rgba(191, 139, 46, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .trait .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .trait .label {
+            font-family: 'IM Fell English SC', serif;
+            font-size: 0.8rem;
+            color: rgba(232, 213, 183, 0.5);
+            margin-bottom: 0.2rem;
+        }
+
+        .trait .value {
+            font-size: 0.9rem;
+            color: #f4d58d;
+        }
+
+        .decree {
+            margin-top: 2.5rem;
+            text-align: center;
+            padding: 1.5rem;
+            border: 1px solid rgba(191, 139, 46, 0.2);
+            border-radius: 8px;
+            background: linear-gradient(180deg, rgba(107, 29, 69, 0.1), rgba(42, 31, 14, 0.3));
+        }
+
+        .decree p {
+            font-family: 'IM Fell English SC', serif;
+            font-size: 1rem;
+            color: rgba(232, 213, 183, 0.6);
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 2.5rem;
+            color: rgba(232, 213, 183, 0.4);
+            text-decoration: none;
+            font-family: 'IM Fell English SC', serif;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover { color: #f4d58d; }
+
+        @media (max-width: 500px) {
+            .traits { grid-template-columns: 1fr; }
+            .portrait-frame { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="bg"></canvas>
+
+    <div class="container">
+        <div class="herald">
+            <h1>Lady Bayles</h1>
+            <div class="subtitle">A Royal Portrait of the Realm</div>
+        </div>
+
+        <div class="portrait-frame">
+            <div class="portrait-inner">
+                <div class="lady">
+                    <div class="aura"></div>
+                    <div class="hair"></div>
+                    <div class="hair-left"></div>
+                    <div class="hair-right"></div>
+                    <div class="neck"></div>
+                    <div class="face">
+                        <div class="eye eye-left"></div>
+                        <div class="eye eye-right"></div>
+                        <div class="nose"></div>
+                        <div class="smile"></div>
+                    </div>
+                    <div class="crown">
+                        <div class="crown-base"></div>
+                        <div class="crown-point"></div>
+                        <div class="crown-point"></div>
+                        <div class="crown-point"></div>
+                        <div class="crown-point"></div>
+                        <div class="crown-gem"></div>
+                    </div>
+                    <div class="shoulder-left"></div>
+                    <div class="shoulder-right"></div>
+                    <div class="necklace"></div>
+                    <div class="gown">
+                        <div class="gown-trim"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nameplate">
+                <h2>Lady Bayles the Magnificent</h2>
+                <p>Keeper of the Sacred Vibes &bull; Protector of the Realm</p>
+            </div>
+        </div>
+
+        <div class="description">
+            <h3>As Envisioned by Sir Claudius Codius</h3>
+            <p>
+                Before thee stands Lady Bayles — a figure of regal bearing and quiet intensity.
+                Her gaze alone hath ended wars and started playlists.
+                She weareth the crown not because it was given, but because no one dared take it from her.
+            </p>
+            <p>
+                Clad in royal crimson, adorned with sapphires plucked from the Mines of Good Taste,
+                she presideth over the court with a grace that maketh lesser nobles reconsider their entire aesthetic.
+            </p>
+            <p>
+                'Twas said she once silenced a room of arguing knights with a single raised eyebrow.
+                The debate was over. No one remembers what it was about. It no longer mattered.
+            </p>
+
+            <div class="traits">
+                <div class="trait">
+                    <div class="icon">&#9876;</div>
+                    <div class="label">Weapon of Choice</div>
+                    <div class="value">The Look</div>
+                </div>
+                <div class="trait">
+                    <div class="icon">&#9813;</div>
+                    <div class="label">Title</div>
+                    <div class="value">Keeper of Vibes</div>
+                </div>
+                <div class="trait">
+                    <div class="icon">&#9829;</div>
+                    <div class="label">Weakness</div>
+                    <div class="value">None Known</div>
+                </div>
+                <div class="trait">
+                    <div class="icon">&#9733;</div>
+                    <div class="label">Power Level</div>
+                    <div class="value">Immeasurable</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="decree">
+            <p>
+                "Let it be known across all lands — the vibes are not merely good.<br>
+                They are <em>immaculate</em>. And they answer to me."
+            </p>
+            <p style="margin-top: 0.8rem; font-size: 0.85rem; color: rgba(232,213,183,0.4);">
+                &mdash; Lady Bayles, probably
+            </p>
+        </div>
+
+        <a href="/" class="back-link">Return to the Kingdom</a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('bg');
+        const ctx = canvas.getContext('2d');
+        let w, h, particles;
+
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+        }
+
+        function createParticles() {
+            const count = Math.min(50, Math.floor((w * h) / 25000));
+            particles = [];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: -Math.random() * 0.3 - 0.1,
+                    r: Math.random() * 2 + 0.5,
+                    alpha: Math.random() * 0.5 + 0.2,
+                    color: ['#f4d58d', '#bf8b2e', '#e8d5b7'][Math.floor(Math.random() * 3)]
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, w, h);
+            for (const p of particles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.y < -5) { p.y = h + 5; p.x = Math.random() * w; }
+                if (p.x < 0) p.x = w;
+                if (p.x > w) p.x = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.alpha;
+                ctx.fill();
+            }
+            ctx.globalAlpha = 1;
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', () => { resize(); createParticles(); });
+        resize();
+        createParticles();
+        draw();
+    </script>
+</body>
+</html>
