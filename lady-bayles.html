@@ -127,7 +127,7 @@
             top: 12%;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(180deg, #2c1810, #1a0e08);
+            background: linear-gradient(180deg, #d4a540, #b8892e);
             border-radius: 50% 50% 35% 35%;
         }
 
@@ -136,7 +136,7 @@
             width: 50px;
             height: 120px;
             top: 28%;
-            background: linear-gradient(180deg, #2c1810, #1a0e08);
+            background: linear-gradient(180deg, #d4a540, #b8892e);
             border-radius: 0 0 40% 40%;
         }
 
@@ -151,7 +151,7 @@
             top: 17%;
             left: 50%;
             transform: translateX(-50%);
-            background: linear-gradient(180deg, #f0d0a8, #e8c098);
+            background: linear-gradient(180deg, #fbe5d6, #f5d5c0);
             border-radius: 50% 50% 42% 42%;
         }
 
@@ -192,7 +192,7 @@
             position: absolute;
             width: 24px;
             height: 3px;
-            background: #2c1810;
+            background: #a08030;
             border-radius: 50%;
             top: -4px;
             left: -1px;
@@ -583,7 +583,7 @@
             <h3>As Envisioned by Sir Claudius Codius</h3>
             <p>
                 Before thee stands Lady Bayles — a figure of regal bearing and quiet intensity.
-                Her gaze alone hath ended wars and started playlists.
+                Fair of skin and golden of hair, her gaze alone hath ended wars and started playlists.
                 She weareth the crown not because it was given, but because no one dared take it from her.
             </p>
             <p>
@@ -737,15 +737,17 @@
                 const hy = ph*0.12 + rngRange(0, 160);
                 const hw = rngRange(8, 25);
                 const hh = rngRange(15, 40);
-                const shade = Math.floor(rngRange(15, 45));
-                brushStroke(hx, hy, hw, hh, `rgb(${shade},${Math.floor(shade*0.6)},${Math.floor(shade*0.4)})`, rngRange(-0.4, 0.4));
+                const r = Math.floor(rngRange(180, 220));
+                const g = Math.floor(rngRange(150, 180));
+                const b = Math.floor(rngRange(50, 80));
+                brushStroke(hx, hy, hw, hh, `rgb(${r},${g},${b})`, rngRange(-0.4, 0.4));
             }
 
             // Face shape
             const faceGrad = px.createRadialGradient(pw/2, ph*0.24, 10, pw/2, ph*0.26, 60);
-            faceGrad.addColorStop(0, '#f2d5af');
-            faceGrad.addColorStop(0.7, '#e8c098');
-            faceGrad.addColorStop(1, '#d4a878');
+            faceGrad.addColorStop(0, '#fce8d8');
+            faceGrad.addColorStop(0.7, '#f8dcc8');
+            faceGrad.addColorStop(1, '#f0ccb0');
             px.beginPath();
             px.ellipse(pw/2, ph*0.25, 52, 65, 0, 0, Math.PI * 2);
             px.fillStyle = faceGrad;
@@ -758,7 +760,7 @@
                 const r = Math.sqrt((fx-pw/2)**2 + (fy-ph*0.25)**2);
                 if (r < 50) {
                     brushStroke(fx, fy, rngRange(8, 18), rngRange(4, 10),
-                        `rgba(${Math.floor(rngRange(220,242))},${Math.floor(rngRange(190,215))},${Math.floor(rngRange(150,180))},0.4)`,
+                        `rgba(${Math.floor(rngRange(240,255))},${Math.floor(rngRange(220,240))},${Math.floor(rngRange(200,225))},0.4)`,
                         rngRange(-0.3, 0.3));
                 }
             }
@@ -772,7 +774,7 @@
                 px.fill();
                 px.beginPath();
                 px.arc(ex, ey, 4.5, 0, Math.PI * 2);
-                px.fillStyle = '#3a2518';
+                px.fillStyle = '#4a6080';
                 px.fill();
                 px.beginPath();
                 px.arc(ex + 1, ey - 1, 1.5, 0, Math.PI * 2);
@@ -784,7 +786,7 @@
                 px.beginPath();
                 px.moveTo(ex - 12, ey - 8);
                 px.quadraticCurveTo(ex, ey - 14, ex + 12, ey - 9);
-                px.strokeStyle = '#2c1810';
+                px.strokeStyle = '#b89040';
                 px.lineWidth = 2;
                 px.stroke();
             }
@@ -859,7 +861,7 @@
             px.lineTo(pw/2 - 22, ph*0.40);
             px.lineTo(pw/2 + 22, ph*0.40);
             px.lineTo(pw/2 + 16, ph*0.32);
-            px.fillStyle = '#e0bb90';
+            px.fillStyle = '#f5d8c4';
             px.fill();
 
             // Necklace
@@ -940,7 +942,7 @@
             // Hands
             px.beginPath();
             px.ellipse(pw/2 - 78, ph*0.73, 10, 7, -0.2, 0, Math.PI * 2);
-            px.fillStyle = '#e0bb90';
+            px.fillStyle = '#f5d8c4';
             px.fill();
             px.beginPath();
             px.ellipse(pw/2 + 78, ph*0.73, 10, 7, 0.2, 0, Math.PI * 2);
