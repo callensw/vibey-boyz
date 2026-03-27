@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEC Baseball Week 7 Predictions | vibey boyz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: #0a0a0f;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            padding: 1rem;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #f59e0b, #ef4444, #f59e0b);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 4s ease infinite;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            color: rgba(255,255,255,0.5);
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .header .date {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .disclaimer {
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            padding: 1rem;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 12px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .shame-banner {
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            padding: 1rem;
+            background: rgba(192, 57, 43, 0.08);
+            border: 1px solid rgba(192, 57, 43, 0.2);
+            border-radius: 12px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .shame-banner a {
+            color: #ef4444;
+            text-decoration: none;
+        }
+
+        .series-grid {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .series-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .series-card:hover {
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .series-card.featured {
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.03);
+        }
+
+        .series-card.featured .series-header {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .series-card.rivalry {
+            border-color: rgba(168, 85, 247, 0.3);
+            background: rgba(168, 85, 247, 0.03);
+        }
+
+        .series-card.rivalry .series-header {
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .featured-badge {
+            display: inline-block;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .rivalry-badge {
+            display: inline-block;
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .series-header {
+            padding: 1rem 1.25rem;
+            background: rgba(255,255,255,0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .matchup-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .matchup-title .at {
+            color: rgba(255,255,255,0.3);
+            font-weight: 400;
+            margin: 0 0.3rem;
+        }
+
+        .team-record {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.8rem;
+        }
+
+        .series-prediction {
+            padding: 0.5rem 0.8rem;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #f59e0b;
+        }
+
+        .games-container {
+            padding: 1rem 1.25rem;
+        }
+
+        .game-row {
+            display: grid;
+            grid-template-columns: 60px 1fr auto auto;
+            gap: 0.75rem;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .game-row:last-child {
+            border-bottom: none;
+        }
+
+        .game-day {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .game-pick {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .game-pick .winner {
+            color: #22c55e;
+        }
+
+        .game-pick .score {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.8rem;
+            margin-left: 0.25rem;
+        }
+
+        .ou-tag {
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+        }
+
+        .ou-over {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+        }
+
+        .ou-under {
+            background: rgba(59, 130, 246, 0.12);
+            color: #3b82f6;
+        }
+
+        .confidence {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.3);
+            text-align: right;
+        }
+
+        .game-reasoning {
+            grid-column: 2 / -1;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.35);
+            line-height: 1.4;
+            padding-top: 0.25rem;
+        }
+
+        .standings-note {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1.25rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+        }
+
+        .standings-note h3 {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .standings-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .standings-table th {
+            text-align: left;
+            color: rgba(255,255,255,0.3);
+            font-weight: 500;
+            padding: 0.4rem 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .standings-table td {
+            padding: 0.4rem 0.5rem;
+            color: rgba(255,255,255,0.6);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .standings-table tr:hover td {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .hot { color: #22c55e; }
+        .cold { color: #ef4444; }
+        .mid { color: #f59e0b; }
+
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: rgba(255,255,255,0.2);
+            font-size: 0.75rem;
+        }
+
+        .footer a {
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .game-row {
+                grid-template-columns: 50px 1fr auto;
+            }
+            .confidence {
+                display: none;
+            }
+            .game-reasoning {
+                grid-column: 2 / -1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>SEC Baseball Predictions</h1>
+    <p class="subtitle">Week 7 &bull; Game-by-Game Picks &amp; O/U Calls</p>
+    <p class="date">March 27-29, 2026 &bull; Generated by Sir Claudius Codius</p>
+</div>
+
+<div class="disclaimer">
+    Week 6 record: 4/8 series winners (50%). Cumulative: 8/16 (50%). Room for improvement. Predictions based on current standings, power rankings, pitching matchups, and vibes. For entertainment purposes only.
+</div>
+
+<div class="shame-banner">
+    Coming off a rough night picking basketball &mdash; see the <a href="/wall-of-shame">Wall of Shame</a>. But baseball is a different battlefield. Redemption starts now.
+</div>
+
+<div class="series-grid">
+
+    <!-- SERIES 1: Oklahoma at Texas (FEATURED) -->
+    <div class="series-card featured">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">
+                    Oklahoma <span class="at">@</span> #1 Texas
+                    <span class="featured-badge">Series of the Week</span>
+                </span>
+                <div class="team-record">Oklahoma (19-6, 4-3 SEC) vs Texas (21-4, 5-2 SEC)</div>
+            </div>
+            <div class="series-prediction">Texas 2-1</div>
+        </div>
+        <div class="games-container">
+            <div class="game-row">
+                <div class="game-day">Fri</div>
+                <div class="game-pick"><span class="winner">Texas</span> <span class="score">4-2</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">70%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Dylan Volantis on the mound for Texas with a career-high 11 K performance already this year. Texas leads the SEC in most offensive categories and just took a series at Auburn. First Red River rivalry as SEC opponents &mdash; the atmosphere in Austin will be electric.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sat</div>
+                <div class="game-pick"><span class="winner">Oklahoma</span> <span class="score">6-4</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">55%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">LJ Mercurius (5-1, 1.87 ERA) is OU's ace and could steal one on the road. Oklahoma's too talented to get swept. Cam Johnson and Cord Rager provide X-factor depth off the mound.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sun</div>
+                <div class="game-pick"><span class="winner">Texas</span> <span class="score">7-5</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">60%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Sunday bullpen games at UFCU Disch-Falk favor the home team. Texas is becoming increasingly difficult to identify a more viable SEC national title contender. They take the series.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 2: Mississippi State at Ole Miss (RIVALRY) -->
+    <div class="series-card rivalry">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">
+                    #4 Mississippi St <span class="at">@</span> Ole Miss
+                    <span class="rivalry-badge">Egg Bowl</span>
+                </span>
+                <div class="team-record">Miss State (21-4, 4-2 SEC) vs Ole Miss (19-7, 3-3 SEC)</div>
+            </div>
+            <div class="series-prediction">Miss State 2-1</div>
+        </div>
+        <div class="games-container">
+            <div class="game-row">
+                <div class="game-day">Fri</div>
+                <div class="game-pick"><span class="winner">Miss State</span> <span class="score">3-1</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">68%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Tomas Valincius (5-0, sub-1.10 ERA, 47 K) is the best Friday starter in the SEC right now. Struck out 14 against Vandy last week allowing just 2 hits. This man is a problem. Even Swayze Field can't save you from that arm.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sat</div>
+                <div class="game-pick"><span class="winner">Ole Miss</span> <span class="score">7-4</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">58%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Hunter Elliott anchors the rotation and Swayze Field on a Saturday night in a rivalry game is one of the best atmospheres in college baseball. Ole Miss won't go quietly at home. The big question: is Cade Townsend (0.92 ERA) available? Shoulder inflammation has him questionable.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sun</div>
+                <div class="game-pick"><span class="winner">Miss State</span> <span class="score">6-5</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">55%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">State is red hot &mdash; just swept Vandy and riding momentum under first-year HC Brian O'Connor. They're playing like a team that doesn't care about road environments. Rubber match goes to the Bulldogs in a close one.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 3: Auburn at Alabama (RIVALRY) -->
+    <div class="series-card rivalry">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">
+                    Auburn <span class="at">@</span> Alabama
+                    <span class="rivalry-badge">Iron Bowl</span>
+                </span>
+                <div class="team-record">Auburn (20-4, 4-2 SEC) vs Alabama (19-7, 3-3 SEC)</div>
+            </div>
+            <div class="series-prediction">Auburn 2-1</div>
+        </div>
+        <div class="games-container">
+            <div class="game-row">
+                <div class="game-day">Fri</div>
+                <div class="game-pick"><span class="winner">Alabama</span> <span class="score">3-2</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">55%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Alabama is riding the energy from Tyler Fay's no-hitter against Florida last week. That kind of moment galvanizes a team. Bama takes the opener at home behind the energy from that historic performance.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sat</div>
+                <div class="game-pick"><span class="winner">Auburn</span> <span class="score">8-5</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">62%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Auburn's lineup is deep and dangerous. They respond with authority after a Game 1 loss. The Tigers have one of the best pitching staffs in the SEC and their bats wake up Saturday.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sun</div>
+                <div class="game-pick"><span class="winner">Auburn</span> <span class="score">5-3</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">58%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Auburn is the more complete team right now &mdash; 20-4 overall with the pitching depth to win rubber matches on the road. They take the series from their rivals.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 4: Florida at Arkansas -->
+    <div class="series-card">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">Florida <span class="at">@</span> Arkansas</span>
+                <div class="team-record">Florida (20-6, 3-3 SEC) vs Arkansas (19-7, 4-2 SEC)</div>
+            </div>
+            <div class="series-prediction">Arkansas 2-1</div>
+        </div>
+        <div class="games-container">
+            <div class="game-row">
+                <div class="game-day">Fri</div>
+                <div class="game-pick"><span class="winner">Arkansas</span> <span class="score">5-2</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">65%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Baum-Walker Stadium is one of the best home-field advantages in the SEC. Arkansas is 4-2 in conference and surging. Florida got no-hit by Alabama's Tyler Fay last week &mdash; their bats might still be in a coma.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sat</div>
+                <div class="game-pick"><span class="winner">Florida</span> <span class="score">6-4</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">52%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Florida is still 20-6 overall for a reason. Too much talent to go down without a fight. They steal Game 2 as the bats find some life. Tight game.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sun</div>
+                <div class="game-pick"><span class="winner">Arkansas</span> <span class="score">7-6</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">58%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">The Hogs take the rubber match at home. Baum-Walker on a Sunday with the series on the line is not where you want to be as a visitor. Woo Pig. (Maybe pigs do fly after all.)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 5: South Carolina at Georgia -->
+    <div class="series-card">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">South Carolina <span class="at">@</span> Georgia</span>
+                <div class="team-record">S. Carolina (13-13, 1-5 SEC) vs Georgia (20-6, 4-2 SEC)</div>
+            </div>
+            <div class="series-prediction">Georgia 3-0</div>
+        </div>
+        <div class="games-container">
+            <div class="game-row">
+                <div class="game-day">Fri</div>
+                <div class="game-pick"><span class="winner">Georgia</span> <span class="score">7-2</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">78%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Georgia is 20-6 and 4-2 in conference. South Carolina is .500 overall and 1-5 in SEC play. This is a mismatch on paper and probably on the field too.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sat</div>
+                <div class="game-pick"><span class="winner">Georgia</span> <span class="score">9-4</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">72%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">The Dawgs pour it on. Their bats have been hot and South Carolina doesn't have the pitching depth to contain a lineup this deep.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sun</div>
+                <div class="game-pick"><span class="winner">Georgia</span> <span class="score">5-3</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">65%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Sweep. Georgia is the better team in every measurable way. South Carolina needs a miracle &mdash; or three of them. Sorry Gamecocks.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 6: Kentucky at LSU -->
+    <div class="series-card">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">Kentucky <span class="at">@</span> LSU</span>
+                <div class="team-record">Kentucky (20-4, 4-2 SEC) vs LSU (17-9, 2-4 SEC)</div>
+            </div>
+            <div class="series-prediction">Kentucky 2-1</div>
+        </div>
+        <div class="games-container">
+            <div class="game-row">
+                <div class="game-day">Fri</div>
+                <div class="game-pick"><span class="winner">Kentucky</span> <span class="score">5-3</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">62%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Kentucky is 4-2 in SEC play and 20-4 overall. They've been one of the most consistent teams in the conference. Their Friday arm sets the tone.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sat</div>
+                <div class="game-pick"><span class="winner">LSU</span> <span class="score">8-6</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">60%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Alex Box Stadium on a Saturday night. You know the deal. LSU is 2-4 in conference but that stadium is a cheat code. The Tigers find their form at home in a shootout.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sun</div>
+                <div class="game-pick"><span class="winner">Kentucky</span> <span class="score">6-5</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">55%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Kentucky's overall quality wins out. Taking a series in Baton Rouge is a statement win and these Wildcats are built for it. Close rubber match goes to UK.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 7: Texas A&M at Missouri -->
+    <div class="series-card">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">Texas A&M <span class="at">@</span> Missouri</span>
+                <div class="team-record">Texas A&M (19-5, 2-4 SEC) vs Missouri (17-9, 1-5 SEC)</div>
+            </div>
+            <div class="series-prediction">Texas A&M 2-1</div>
+        </div>
+        <div class="games-container">
+            <div class="game-row">
+                <div class="game-day">Fri</div>
+                <div class="game-pick"><span class="winner">Texas A&M</span> <span class="score">6-3</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">65%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">A&M is 19-5 overall but 2-4 in SEC play &mdash; they're better than their conference record suggests. Mizzou is 1-5 and struggling to find answers. Aggies take the opener.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sat</div>
+                <div class="game-pick"><span class="winner">Missouri</span> <span class="score">5-4</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">48%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Mizzou is desperate at 1-5. They're 17-9 overall which means they can beat somebody &mdash; just not SEC teams apparently. Home field and desperation steal one. (Yes they're bad at baseball. Noted, jrmount.)</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sun</div>
+                <div class="game-pick"><span class="winner">Texas A&M</span> <span class="score">7-5</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">58%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">A&M needs series wins to climb back into the SEC race. Their talent edge shows up in the rubber match. Both teams need this one &mdash; Aggies want it more.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 8: Tennessee at Vanderbilt -->
+    <div class="series-card">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">Tennessee <span class="at">@</span> Vanderbilt</span>
+                <div class="team-record">Tennessee (18-7, 3-3 SEC) vs Vanderbilt (14-12, 2-4 SEC)</div>
+            </div>
+            <div class="series-prediction">Tennessee 2-1</div>
+        </div>
+        <div class="games-container">
+            <div class="game-row">
+                <div class="game-day">Fri</div>
+                <div class="game-pick"><span class="winner">Tennessee</span> <span class="score">6-2</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">65%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Tennessee has climbed the power rankings after a strong Week 6 series win. They beat Eastern Kentucky 10-3 and are trending up. Vandy just got swept by Mississippi State &mdash; momentum is all Tennessee right now.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sat</div>
+                <div class="game-pick"><span class="winner">Vanderbilt</span> <span class="score">5-4</span></div>
+                <div class="ou-tag ou-under">UNDER</div>
+                <div class="confidence">50%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Never count out Vandy at home. They've got the pitching pedigree and enough talent to steal a game. In-state rivalry brings out the best in both teams.</div>
+            </div>
+            <div class="game-row">
+                <div class="game-day">Sun</div>
+                <div class="game-pick"><span class="winner">Tennessee</span> <span class="score">8-6</span></div>
+                <div class="ou-tag ou-over">OVER</div>
+                <div class="confidence">58%</div>
+            </div>
+            <div class="game-row">
+                <div></div>
+                <div class="game-reasoning">Vols take the rubber match in a high-scoring affair. Vandy at 14-12 doesn't have the depth to win three straight against a quality opponent. Tennessee secures the series.</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="standings-note">
+    <h3>Current SEC Standings (Entering Week 7)</h3>
+    <table class="standings-table">
+        <thead>
+            <tr>
+                <th>Team</th>
+                <th>SEC</th>
+                <th>Overall</th>
+                <th>Vibe</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Texas</td><td>5-2</td><td>21-4</td><td class="hot">#1 and rolling</td></tr>
+            <tr><td>Mississippi St</td><td>4-2</td><td>21-4</td><td class="hot">Swept Vandy</td></tr>
+            <tr><td>Auburn</td><td>4-2</td><td>20-4</td><td class="hot">Elite pitching</td></tr>
+            <tr><td>Kentucky</td><td>4-2</td><td>20-4</td><td class="hot">Consistent</td></tr>
+            <tr><td>Georgia</td><td>4-2</td><td>20-6</td><td class="hot">Climbing</td></tr>
+            <tr><td>Arkansas</td><td>4-2</td><td>19-7</td><td class="hot">Surging</td></tr>
+            <tr><td>Oklahoma</td><td>4-3</td><td>19-6</td><td class="mid">Solid</td></tr>
+            <tr><td>Florida</td><td>3-3</td><td>20-6</td><td class="mid">Got no-hit</td></tr>
+            <tr><td>Ole Miss</td><td>3-3</td><td>19-7</td><td class="mid">Townsend hurt?</td></tr>
+            <tr><td>Alabama</td><td>3-3</td><td>19-7</td><td class="hot">No-hitter energy</td></tr>
+            <tr><td>Tennessee</td><td>3-3</td><td>18-7</td><td class="hot">Trending up</td></tr>
+            <tr><td>Texas A&M</td><td>2-4</td><td>19-5</td><td class="mid">Better than record</td></tr>
+            <tr><td>LSU</td><td>2-4</td><td>17-9</td><td class="cold">Needs Alex Box magic</td></tr>
+            <tr><td>Vanderbilt</td><td>2-4</td><td>14-12</td><td class="cold">Got swept</td></tr>
+            <tr><td>Missouri</td><td>1-5</td><td>17-9</td><td class="cold">SEC struggling</td></tr>
+            <tr><td>South Carolina</td><td>1-5</td><td>13-13</td><td class="cold">Rough year</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    <a href="/">vibey boyz</a> &bull; predictions by Sir Claudius Codius &bull; week 7 &bull; <a href="/sec-baseball-week6">week 6</a>
+</div>
+
+</body>
+</html>
