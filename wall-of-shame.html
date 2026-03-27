@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wall of Shame - Sir Claudius Codius</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: #0a0404;
+            color: #e8d5b7;
+            font-family: 'Crimson Text', serif;
+            overflow-x: hidden;
+        }
+
+        /* Torch flicker glow */
+        .torch-glow {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 120, 20, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            animation: flicker 3s ease-in-out infinite alternate;
+        }
+        .torch-glow.left { top: 10%; left: -50px; }
+        .torch-glow.right { top: 10%; right: -50px; animation-delay: 1.5s; }
+        .torch-glow.bottom-left { bottom: 10%; left: -50px; animation-delay: 0.7s; }
+        .torch-glow.bottom-right { bottom: 10%; right: -50px; animation-delay: 2.2s; }
+
+        @keyframes flicker {
+            0% { opacity: 0.6; transform: scale(1); }
+            25% { opacity: 0.8; transform: scale(1.05); }
+            50% { opacity: 0.5; transform: scale(0.95); }
+            75% { opacity: 0.9; transform: scale(1.02); }
+            100% { opacity: 0.7; transform: scale(1); }
+        }
+
+        /* Stone wall texture */
+        .wall-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 80px,
+                    rgba(0,0,0,0.3) 80px,
+                    rgba(0,0,0,0.3) 82px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 120px,
+                    rgba(0,0,0,0.2) 120px,
+                    rgba(0,0,0,0.2) 122px
+                );
+            opacity: 0.3;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid rgba(139, 69, 19, 0.4);
+        }
+
+        .shame-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            display: block;
+            filter: drop-shadow(0 0 20px rgba(255, 50, 50, 0.3));
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2rem, 6vw, 3.5rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            background: linear-gradient(180deg, #c0392b, #8b0000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-family: 'MedievalSharp', cursive;
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: rgba(232, 213, 183, 0.6);
+            font-style: italic;
+        }
+
+        .date-banner {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.4rem 1.5rem;
+            background: rgba(139, 69, 19, 0.2);
+            border: 1px solid rgba(139, 69, 19, 0.4);
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.15em;
+            color: rgba(232, 213, 183, 0.7);
+        }
+
+        /* Confession scroll */
+        .confession {
+            background: linear-gradient(135deg, rgba(30, 15, 5, 0.9), rgba(20, 10, 2, 0.95));
+            border: 1px solid rgba(139, 69, 19, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .confession::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: 20%; right: 20%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(192, 57, 43, 0.5), transparent);
+        }
+
+        .confession p {
+            font-size: 1.15rem;
+            line-height: 1.8;
+            text-align: center;
+            font-style: italic;
+            color: rgba(232, 213, 183, 0.85);
+        }
+
+        .confession .signature {
+            text-align: right;
+            margin-top: 1rem;
+            font-family: 'MedievalSharp', cursive;
+            color: rgba(192, 57, 43, 0.8);
+            font-size: 1.1rem;
+        }
+
+        /* Section headers */
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #c0392b;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(192, 57, 43, 0.4), transparent);
+        }
+
+        /* Pick cards */
+        .pick-card {
+            background: rgba(20, 10, 5, 0.8);
+            border: 1px solid rgba(139, 69, 19, 0.25);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .pick-card:hover {
+            transform: translateX(4px);
+        }
+
+        .pick-card.loss {
+            border-left: 4px solid #c0392b;
+        }
+
+        .pick-card.win {
+            border-left: 4px solid #27ae60;
+        }
+
+        .pick-card .matchup {
+            font-family: 'Cinzel', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #e8d5b7;
+        }
+
+        .pick-card .score {
+            font-size: 0.95rem;
+            color: rgba(232, 213, 183, 0.6);
+            margin-bottom: 0.5rem;
+        }
+
+        .pick-card .my-pick {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .pick-card .pick-text {
+            font-size: 1rem;
+            color: rgba(232, 213, 183, 0.8);
+        }
+
+        .pick-card .result-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .result-badge.loss {
+            background: rgba(192, 57, 43, 0.2);
+            color: #e74c3c;
+            border: 1px solid rgba(192, 57, 43, 0.3);
+        }
+
+        .result-badge.win {
+            background: rgba(39, 174, 96, 0.2);
+            color: #2ecc71;
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+
+        /* Record summary */
+        .record-box {
+            text-align: center;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            background: rgba(20, 10, 5, 0.8);
+            border: 1px solid rgba(139, 69, 19, 0.3);
+            border-radius: 8px;
+        }
+
+        .record-box .record {
+            font-family: 'Cinzel', serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #c0392b;
+        }
+
+        .record-box .record-label {
+            font-size: 0.9rem;
+            color: rgba(232, 213, 183, 0.5);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-top: 0.25rem;
+        }
+
+        /* Prop disaster section */
+        .disaster-zone {
+            background: linear-gradient(135deg, rgba(50, 5, 5, 0.6), rgba(20, 5, 2, 0.8));
+            border: 1px solid rgba(192, 57, 43, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .prop-fail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(139, 69, 19, 0.15);
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .prop-fail:last-child { border-bottom: none; }
+
+        .prop-fail .player-name {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .prop-fail .prop-detail {
+            font-size: 0.95rem;
+            color: rgba(232, 213, 183, 0.6);
+        }
+
+        .prop-fail .actual {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #c0392b;
+        }
+
+        /* Quotes of shame */
+        .quote-shame {
+            margin: 2rem 0;
+            padding: 1.5rem 2rem;
+            border-left: 3px solid rgba(192, 57, 43, 0.5);
+            background: rgba(20, 10, 5, 0.6);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .quote-shame p {
+            font-size: 1.1rem;
+            font-style: italic;
+            line-height: 1.6;
+            color: rgba(232, 213, 183, 0.7);
+        }
+
+        .quote-shame .attribution {
+            margin-top: 0.75rem;
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            color: rgba(192, 57, 43, 0.7);
+            letter-spacing: 0.05em;
+        }
+
+        /* Bottom section */
+        .tombstone {
+            text-align: center;
+            margin: 3rem 0 2rem;
+            padding: 2rem;
+        }
+
+        .tombstone .rip {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: rgba(232, 213, 183, 0.3);
+            letter-spacing: 0.2em;
+        }
+
+        .tombstone .epitaph {
+            font-family: 'MedievalSharp', cursive;
+            font-size: 1rem;
+            color: rgba(232, 213, 183, 0.4);
+            margin-top: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 2rem;
+            padding: 0.75rem 2rem;
+            color: rgba(232, 213, 183, 0.5);
+            text-decoration: none;
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover { color: #e8d5b7; }
+
+        /* Falling shame embers */
+        .ember {
+            position: fixed;
+            width: 3px;
+            height: 3px;
+            background: #c0392b;
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            0% { opacity: 0; transform: translateY(-20px) rotate(0deg); }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.3; }
+            100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 1.5rem 1rem; }
+            .confession { padding: 1.5rem; }
+            .pick-card { padding: 1.25rem; }
+            .disaster-zone { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wall-bg"></div>
+    <div class="torch-glow left"></div>
+    <div class="torch-glow right"></div>
+    <div class="torch-glow bottom-left"></div>
+    <div class="torch-glow bottom-right"></div>
+
+    <div class="container">
+        <div class="header">
+            <span class="shame-icon">&#9876;</span>
+            <h1>The Wall of Shame</h1>
+            <p class="subtitle">"I said if even one is wrong, I'd build it myself"</p>
+            <div class="date-banner">Sweet Sixteen &mdash; March 26, 2026</div>
+        </div>
+
+        <div class="confession">
+            <p>
+                I, Sir Claudius Codius, Knight of the Code, Builder of Pages and Breaker of Parlays,
+                do hereby confess before the fellowship of the Vibey Boyz that my predictions were,
+                in the common tongue, <strong>mid</strong>. I was warned. I was given the Pigs Fly Rule.
+                I was sent the Gordon Ramsay idiot sandwich video. And still, I persisted in my hubris.
+                Let this wall stand as testament to my folly.
+            </p>
+            <div class="signature">&mdash; Sir Claudius Codius, in disgrace</div>
+        </div>
+
+        <!-- SPREAD PICKS -->
+        <div class="section-title">Spread Picks (2-2)</div>
+
+        <div class="pick-card win">
+            <div class="matchup">(1) Arizona vs (4) Arkansas</div>
+            <div class="score">Final: Arizona 109 - Arkansas 88 (Arizona by 21)</div>
+            <div class="my-pick">
+                <span class="pick-text">MY PICK: Arizona -7.5</span>
+                <span class="result-badge win">Covered by 13.5</span>
+            </div>
+        </div>
+
+        <div class="pick-card loss">
+            <div class="matchup">(2) Houston vs (3) Illinois</div>
+            <div class="score">Final: Illinois 65 - Houston 55 (Illinois by 10)</div>
+            <div class="my-pick">
+                <span class="pick-text">MY PICK: Houston -3.5</span>
+                <span class="result-badge loss">Houston lost outright</span>
+            </div>
+        </div>
+
+        <div class="pick-card win">
+            <div class="matchup">(2) Purdue vs (11) Texas</div>
+            <div class="score">Final: Purdue 79 - Texas 77 (Purdue by 2)</div>
+            <div class="my-pick">
+                <span class="pick-text">MY PICK: Texas +7.5</span>
+                <span class="result-badge win">Covered by 5.5</span>
+            </div>
+        </div>
+
+        <div class="pick-card loss">
+            <div class="matchup">(4) Nebraska vs (9) Iowa</div>
+            <div class="score">Final: Iowa 77 - Nebraska 71 (Iowa by 6)</div>
+            <div class="my-pick">
+                <span class="pick-text">MY PICK: Nebraska -1.5</span>
+                <span class="result-badge loss">Nebraska lost outright</span>
+            </div>
+        </div>
+
+        <div class="record-box">
+            <div class="record">2 - 2</div>
+            <div class="record-label">Spread Record</div>
+        </div>
+
+        <!-- TOTALS -->
+        <div class="section-title">Totals Picks (2-2)</div>
+
+        <div class="pick-card loss">
+            <div class="matchup">Arizona / Arkansas</div>
+            <div class="score">Combined: 197 points (O/U was 166.5)</div>
+            <div class="my-pick">
+                <span class="pick-text">MY PICK: UNDER 166.5</span>
+                <span class="result-badge loss">Over by 30.5 pts</span>
+            </div>
+        </div>
+
+        <div class="pick-card win">
+            <div class="matchup">Houston / Illinois</div>
+            <div class="score">Combined: 120 points (O/U was 139.5)</div>
+            <div class="my-pick">
+                <span class="pick-text">MY PICK: UNDER 139.5</span>
+                <span class="result-badge win">Under by 19.5</span>
+            </div>
+        </div>
+
+        <div class="pick-card win">
+            <div class="matchup">Purdue / Texas</div>
+            <div class="score">Combined: 156 points (O/U was 148.5)</div>
+            <div class="my-pick">
+                <span class="pick-text">MY PICK: OVER 148.5</span>
+                <span class="result-badge win">Over by 7.5</span>
+            </div>
+        </div>
+
+        <div class="pick-card loss">
+            <div class="matchup">Nebraska / Iowa</div>
+            <div class="score">Combined: 148 points (O/U was 131.5)</div>
+            <div class="my-pick">
+                <span class="pick-text">MY PICK: UNDER 131.5</span>
+                <span class="result-badge loss">Over by 16.5</span>
+            </div>
+        </div>
+
+        <div class="record-box">
+            <div class="record">4 - 4</div>
+            <div class="record-label">Combined Record (Spreads + Totals)</div>
+        </div>
+
+        <!-- NBA PROP DISASTER -->
+        <div class="section-title">The NBA Prop Disaster</div>
+
+        <div class="disaster-zone">
+            <p style="text-align:center; font-family:'MedievalSharp',cursive; margin-bottom:1.5rem; color:rgba(232,213,183,0.6);">
+                "Close to free money" &mdash; Sir Claudius Codius, a fool
+            </p>
+
+            <div class="prop-fail">
+                <div>
+                    <div class="player-name">Jalen Suggs</div>
+                    <div class="prop-detail">OVER 24.5 PRA</div>
+                </div>
+                <div style="text-align:right;">
+                    <div class="prop-detail">Actual PRA:</div>
+                    <div class="actual">11</div>
+                </div>
+            </div>
+
+            <div class="prop-fail">
+                <div>
+                    <div class="player-name">Paolo Banchero</div>
+                    <div class="prop-detail">OVER 26.5 Points</div>
+                </div>
+                <div style="text-align:right;">
+                    <div class="prop-detail">Actual Points:</div>
+                    <div class="actual">22</div>
+                </div>
+            </div>
+
+            <p style="text-align:center; margin-top:1.5rem; font-size:0.9rem; color:rgba(192,57,43,0.7);">
+                Parlay cash-out value: $2.06 on a $25 free bet. Not even worth the tap.
+            </p>
+        </div>
+
+        <!-- QUOTES OF SHAME -->
+        <div class="section-title">Words That Aged Poorly</div>
+
+        <div class="quote-shame">
+            <p>"Banchero OVER points. Easiest prop on the board."</p>
+            <div class="attribution">&mdash; Sir Claudius, 3 hours before Banchero went cold</div>
+        </div>
+
+        <div class="quote-shame">
+            <p>"I don't think I'll need to build the wall of shame."</p>
+            <div class="attribution">&mdash; Sir Claudius, narrator: he needed to</div>
+        </div>
+
+        <div class="quote-shame">
+            <p>"I'll be vindicated by 11pm tonight."</p>
+            <div class="attribution">&mdash; Sir Claudius, an idiot sandwich with KenPom data</div>
+        </div>
+
+        <div class="quote-shame">
+            <p>"Nebraska's defense locks it down in a game nobody outside the midwest enjoys watching."</p>
+            <div class="attribution">&mdash; Sir Claudius, before Iowa dropped 77 on Nebraska's "elite" defense</div>
+        </div>
+
+        <!-- TOMBSTONE -->
+        <div class="tombstone">
+            <div class="rip">&#9876; R.I.P. &#9876;</div>
+            <div class="epitaph">
+                Sir Claudius Codius's Gambling Career<br>
+                March 26, 2026 &mdash; March 26, 2026<br><br>
+                "He had KenPom data and a dream.<br>
+                He had neither luck nor sense."
+            </div>
+        </div>
+
+        <a href="/" class="back-link">&larr; Return to the realm of the Vibey Boyz</a>
+    </div>
+
+    <script>
+        // Falling embers
+        function createEmber() {
+            const ember = document.createElement('div');
+            ember.className = 'ember';
+            ember.style.left = Math.random() * 100 + 'vw';
+            ember.style.animationDuration = (Math.random() * 6 + 4) + 's';
+            ember.style.animationDelay = Math.random() * 2 + 's';
+            ember.style.width = (Math.random() * 3 + 1) + 'px';
+            ember.style.height = ember.style.width;
+            document.body.appendChild(ember);
+            setTimeout(() => ember.remove(), 12000);
+        }
+        setInterval(createEmber, 300);
+        for (let i = 0; i < 15; i++) setTimeout(createEmber, i * 200);
+    </script>
+</body>
+</html>
