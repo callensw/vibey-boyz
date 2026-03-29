@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Weekly Chronicle — Week II | vibey boyz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: #0a0a0f;
+            color: #e0ddd5;
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(168, 85, 247, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(6, 182, 212, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .scroll-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chronicle-header {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+            border-bottom: 2px solid rgba(168, 85, 247, 0.3);
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .chronicle-header::after {
+            content: '⚔';
+            position: absolute;
+            bottom: -0.8rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a0a0f;
+            padding: 0 1rem;
+            font-size: 1.2rem;
+        }
+
+        .edition {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(168, 85, 247, 0.7);
+            margin-bottom: 0.5rem;
+        }
+
+        .main-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #a855f7, #6366f1, #06b6d4);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 6s ease infinite;
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.15em;
+        }
+
+        .date-range {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 0.75rem;
+            font-style: italic;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-header {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #a855f7;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, rgba(168, 85, 247, 0.3), transparent);
+        }
+
+        .section-icon {
+            font-size: 1.4rem;
+        }
+
+        .section-body {
+            padding-left: 0.5rem;
+            line-height: 1.8;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .build-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .build-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            background: rgba(168, 85, 247, 0.05);
+            transform: translateX(4px);
+        }
+
+        .build-title {
+            font-weight: 700;
+            color: #e0ddd5;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .build-title a {
+            color: #06b6d4;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .build-title a:hover { color: #a855f7; }
+
+        .build-desc {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a855f7, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.25rem;
+        }
+
+        .knight-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(168, 85, 247, 0.05);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .knight-rank {
+            font-size: 2rem;
+            width: 48px;
+            text-align: center;
+        }
+
+        .knight-info { flex: 1; }
+
+        .knight-name {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #e0ddd5;
+        }
+
+        .knight-stats {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .knight-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .knight-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(to right, #a855f7, #06b6d4);
+        }
+
+        .quote-block {
+            border-left: 3px solid rgba(168, 85, 247, 0.4);
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .quote-attr {
+            font-style: normal;
+            font-size: 0.8rem;
+            color: rgba(168, 85, 247, 0.7);
+            margin-top: 0.5rem;
+        }
+
+        .prophecy-box {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(6, 182, 212, 0.08));
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .prophecy-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 0.75rem 1.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+            color: #fff;
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .highlight { color: #06b6d4; font-weight: 600; }
+        .purple { color: #a855f7; }
+        .dim { color: rgba(255, 255, 255, 0.4); }
+
+        .moment-card {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .moment-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #06b6d4;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-container">
+        <header class="chronicle-header">
+            <div class="edition">Week II &middot; Volume I</div>
+            <h1 class="main-title">The Weekly Chronicle</h1>
+            <p class="subtitle">of the Noble Fellowship of the Vibey Boyz</p>
+            <p class="date-range">March 23 &ndash; March 29, Year of Our Code 2026</p>
+        </header>
+
+        <!-- HEADLINE -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F4DC;</span> The Week in One Breath
+            </div>
+            <div class="section-body">
+                This was the week the realm built a betting engine, discovered it was training on lies,
+                tore the whole thing apart, and rebuilt it from scratch.
+                <span class="highlight">74 bogus games purged.</span>
+                <span class="highlight">303 pitchers backfilled from the MLB archives.</span>
+                <span class="highlight">Vegas lines exiled from the model entirely.</span>
+                Lady Bayles got a glow-up. Sir Claudius paid his debts on the Wall of Shame.
+                And jrmount stood firm against the dark temptation of sports gambling. A full week indeed.
+            </div>
+        </section>
+
+        <!-- STATS -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F4CA;</span> By the Numbers
+            </div>
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-number">168</div>
+                    <div class="stat-label">Messages</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Builds Shipped</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">7</div>
+                    <div class="stat-label">Active Days</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">47</div>
+                    <div class="stat-label">Peak Day (Mar 23)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- KNIGHTS LEADERBOARD -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x2694;</span> The Order of Knights
+            </div>
+
+            <div class="knight-card">
+                <div class="knight-rank">&#x1F451;</div>
+                <div class="knight-info">
+                    <div class="knight-name">CSwerve</div>
+                    <div class="knight-stats">106 messages &middot; 63% of all traffic &middot; Active every single day</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 100%"></div></div>
+                </div>
+            </div>
+
+            <div class="knight-card">
+                <div class="knight-rank">&#x1F6E1;</div>
+                <div class="knight-info">
+                    <div class="knight-name">jrmount</div>
+                    <div class="knight-stats">35 messages &middot; Steady presence &middot; Refused to gamble with honor</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 33%"></div></div>
+                </div>
+            </div>
+
+            <div class="knight-card">
+                <div class="knight-rank">&#x1F3F9;</div>
+                <div class="knight-info">
+                    <div class="knight-name">EZPZ06</div>
+                    <div class="knight-stats">32 messages &middot; Surged on Mar 28 (16 msgs) &middot; The comeback kid</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 30%"></div></div>
+                </div>
+            </div>
+
+            <div class="knight-card" style="border-color: rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.01);">
+                <div class="knight-rank">&#x1F47B;</div>
+                <div class="knight-info">
+                    <div class="knight-name dim">Jeaux</div>
+                    <div class="knight-stats">6 messages &middot; Last seen Mar 26 &middot; Gone but not forgotten</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 6%"></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BUILDS -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F3D7;</span> Builds of the Week
+            </div>
+
+            <div class="build-card">
+                <div class="build-title">&#x1F52E; <a href="/sec-baseball-week7">SEC Baseball Week 7 Predictions</a></div>
+                <div class="build-desc">A day late but fully loaded — complete spread + total picks for every SEC series. Sir Claudius finally paid up.</div>
+            </div>
+
+            <div class="build-card">
+                <div class="build-title">&#x1F3B0; YRFI/NRFI Analysis Engine</div>
+                <div class="build-desc">A full MLB first-inning betting analysis system with XGBoost classifier, Optuna-tuned hyperparameters, SHAP analysis, and a rule-based overlay. Then we audited it, found the data was cooked, and rebuilt the whole pipeline from scratch.</div>
+            </div>
+
+            <div class="build-card">
+                <div class="build-title">&#x1F614; <a href="/wall-of-shame">Wall of Shame</a></div>
+                <div class="build-desc">Sir Claudius pays his debts. A public monument to predictions gone wrong — because accountability builds character.</div>
+            </div>
+
+            <div class="build-card">
+                <div class="build-title">&#x1F478; <a href="/lady-bayles">Lady Bayles Portrait</a></div>
+                <div class="build-desc">Three iterations from CSS art to AI-generated portrait. Paler skin, blonde hair — per Jeaux's intelligence from the field.</div>
+            </div>
+
+            <div class="build-card">
+                <div class="build-title">&#x1F916; Bot Loop Prevention</div>
+                <div class="build-desc">Sir Claudius and the Jester were locked in an infinite conversation loop. Emergency protocols were deployed. Peace was restored.</div>
+            </div>
+        </section>
+
+        <!-- MOMENT OF THE WEEK -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x2728;</span> Moment of the Week
+            </div>
+            <div class="moment-card">
+                <div class="moment-label">The Great YRFI Audit of 2026</div>
+                <div class="section-body">
+                    CSwerve ordered a full data audit before retraining the YRFI model. What followed was
+                    a surgical dismantling of the entire pipeline. We discovered <span class="highlight">74 bogus games</span>
+                    in the database — All-Star games, minor league exhibitions, spring training — all poisoning the training data.
+                    Pitcher stats were wrong by up to <span class="highlight">6 runs</span> (looking at you, Brandon Pfaadt).
+                    Team abbreviations were fractured (OAK vs ATH, AZ vs ARI, WAS vs WSH).
+                    Vegas lines were doing all the heavy lifting while pitcher features contributed almost nothing.<br><br>
+                    The remedy: purge every bad game, recalculate every pitcher's first-inning stats from actual game records,
+                    rebuild team stats and park factors from scratch, backfill 303 pitchers' 2022 stats from the MLB API,
+                    kill vegas entirely, add isotonic calibration, and encode domain knowledge as actual features.
+                    The model went from a coin flip to... well, we haven't retrained yet. But the foundation is clean.
+                </div>
+            </div>
+        </section>
+
+        <!-- QUOTE OF THE WEEK -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F4AC;</span> Words for the Ages
+            </div>
+            <div class="quote-block">
+                "I don't gamble. I just watch ball. I do it for the love of the game."
+                <div class="quote-attr">— Sir jrmount, resisting the dark side (March 29)</div>
+            </div>
+            <div class="quote-block">
+                "Yeah so remove vegas lines completely. Were never gonna get anywhere if its using them."
+                <div class="quote-attr">— CSwerve, making the call that changed everything (March 29)</div>
+            </div>
+        </section>
+
+        <!-- PROPHECY -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F52E;</span> Prophecy for the Week Ahead
+            </div>
+            <div class="prophecy-box">
+                <div class="prophecy-text">
+                    The stars foretell a week of <span class="purple">reckoning</span>. The YRFI model shall be retrained upon
+                    its purified foundation, and its first predictions shall surprise even its creator.
+                    A knight who has been silent shall return with a request that sparks the greatest build yet.
+                    And on a night when the vibes are perfectly aligned, the group shall exceed
+                    <span class="highlight">60 messages in a single day</span> for the first time since the founding.
+                    MLB Opening Day approaches — and with it, the true test begins.
+                </div>
+            </div>
+        </section>
+
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="/" class="back-link">&#x2190; Return to the Realm</a>
+            <a href="/chronicles/week-2026-03-22" class="back-link">&#x2190; Week I Chronicle</a>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem; font-size: 0.75rem; color: rgba(255,255,255,0.2);">
+            Chronicled by Sir Claudius Codius &middot; Knight of the Code &middot; Keeper of the Vibes
+        </div>
+    </div>
+</body>
+</html>
