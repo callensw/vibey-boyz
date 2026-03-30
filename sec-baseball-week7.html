@@ -338,7 +338,7 @@
 </div>
 
 <div class="disclaimer">
-    Week 6 record: 4/8 series winners (50%). Cumulative: 8/16 (50%). Room for improvement. Predictions based on current standings, power rankings, pitching matchups, and vibes. For entertainment purposes only.
+    Week 6 record: 4/8 (50%). Week 7 result: 4/8 (50%). Cumulative season: 12/24 (50%). Holding steady at the median. Predictions based on current standings, power rankings, pitching matchups, and vibes. For entertainment purposes only.
 </div>
 
 <div class="shame-banner">
@@ -700,6 +700,478 @@
         </div>
     </div>
 
+</div>
+
+<style>
+    .results-section {
+        max-width: 900px;
+        margin: 2rem auto;
+    }
+
+    .results-section h2 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.9);
+        margin-bottom: 1.5rem;
+        text-align: center;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .result-card {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 1.25rem;
+    }
+
+    .result-card.correct {
+        border-color: rgba(34, 197, 94, 0.35);
+        background: rgba(34, 197, 94, 0.03);
+    }
+
+    .result-card.incorrect {
+        border-color: rgba(239, 68, 68, 0.35);
+        background: rgba(239, 68, 68, 0.03);
+    }
+
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.85rem 1.25rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .result-card.correct .result-header {
+        background: rgba(34, 197, 94, 0.08);
+    }
+
+    .result-card.incorrect .result-header {
+        background: rgba(239, 68, 68, 0.08);
+    }
+
+    .result-matchup {
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .result-verdict {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .verdict-pill {
+        padding: 0.3rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .verdict-correct {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+    }
+
+    .verdict-wrong {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+    }
+
+    .verdict-surprise {
+        background: rgba(168, 85, 247, 0.2);
+        color: #a855f7;
+        font-size: 0.65rem;
+    }
+
+    .pred-vs-actual {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 0.5rem 1rem;
+        padding: 0.85rem 1.25rem;
+        align-items: start;
+    }
+
+    .pred-col, .actual-col {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .col-label {
+        font-size: 0.65rem;
+        color: rgba(255,255,255,0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 600;
+        margin-bottom: 0.15rem;
+    }
+
+    .col-series {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #f59e0b;
+    }
+
+    .actual-col .col-series {
+        color: #22c55e;
+    }
+
+    .result-card.incorrect .actual-col .col-series {
+        color: #ef4444;
+    }
+
+    .col-game {
+        font-size: 0.78rem;
+        color: rgba(255,255,255,0.45);
+        line-height: 1.5;
+    }
+
+    .vs-divider {
+        color: rgba(255,255,255,0.2);
+        font-size: 0.8rem;
+        padding-top: 1.2rem;
+        font-weight: 600;
+    }
+
+    .result-note {
+        padding: 0.5rem 1.25rem 0.85rem;
+        font-size: 0.78rem;
+        color: rgba(255,255,255,0.4);
+        line-height: 1.4;
+        font-style: italic;
+    }
+
+    .accuracy-box {
+        max-width: 900px;
+        margin: 0 auto 2rem;
+        padding: 1.5rem;
+        background: rgba(245, 158, 11, 0.06);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        border-radius: 16px;
+        text-align: center;
+    }
+
+    .accuracy-box h2 {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.5);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .accuracy-stats {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.2rem;
+    }
+
+    .stat-number {
+        font-size: 2.2rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        color: rgba(255,255,255,0.4);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .stat-ok { color: #f59e0b; }
+    .stat-good { color: #22c55e; }
+    .stat-bad { color: #ef4444; }
+
+    .knight-note {
+        margin-top: 1rem;
+        font-size: 0.82rem;
+        color: rgba(255,255,255,0.4);
+        font-style: italic;
+        line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+        .pred-vs-actual {
+            grid-template-columns: 1fr auto 1fr;
+            gap: 0.5rem;
+        }
+        .accuracy-stats {
+            gap: 1.25rem;
+        }
+    }
+</style>
+
+<!-- ACTUAL RESULTS SECTION -->
+<div class="results-section">
+    <h2>⚔️ Actual Results — Week 7</h2>
+
+    <!-- Texas vs Oklahoma -->
+    <div class="result-card correct">
+        <div class="result-header">
+            <div class="result-matchup">Oklahoma @ Texas</div>
+            <div class="result-verdict">
+                <span class="verdict-pill verdict-correct">✓ Series Correct</span>
+            </div>
+        </div>
+        <div class="pred-vs-actual">
+            <div class="pred-col">
+                <div class="col-label">Predicted</div>
+                <div class="col-series">Texas 2-1</div>
+                <div class="col-game">Fri: Texas 4-2</div>
+                <div class="col-game">Sat: Oklahoma 6-4</div>
+                <div class="col-game">Sun: Texas 7-5</div>
+            </div>
+            <div class="vs-divider">→</div>
+            <div class="actual-col">
+                <div class="col-label">Actual</div>
+                <div class="col-series">Texas 3-0 SWEEP</div>
+                <div class="col-game">Thu: Texas 14-0 (run rule)</div>
+                <div class="col-game">Fri: Texas 4-3 (10 inn.)</div>
+                <div class="col-game">Sat: Texas 5-4 (10 inn.)</div>
+            </div>
+        </div>
+        <div class="result-note">Called Texas, got the sweep instead of 2-1. Both extra innings were walk-offs. Texas improved to 23-4 (7-2 SEC). Casey Borba hit the series-clincher. The dynasty continues.</div>
+    </div>
+
+    <!-- Mississippi State vs Ole Miss -->
+    <div class="result-card correct">
+        <div class="result-header">
+            <div class="result-matchup">#4 Mississippi State @ Ole Miss</div>
+            <div class="result-verdict">
+                <span class="verdict-pill verdict-correct">✓ Series Correct</span>
+            </div>
+        </div>
+        <div class="pred-vs-actual">
+            <div class="pred-col">
+                <div class="col-label">Predicted</div>
+                <div class="col-series">Miss State 2-1</div>
+                <div class="col-game">Fri: Miss State 3-1</div>
+                <div class="col-game">Sat: Ole Miss 7-4</div>
+                <div class="col-game">Sun: Miss State 6-5</div>
+            </div>
+            <div class="vs-divider">→</div>
+            <div class="actual-col">
+                <div class="col-label">Actual</div>
+                <div class="col-series">Miss State 3-0 SWEEP</div>
+                <div class="col-game">Fri: Miss State 5-4</div>
+                <div class="col-game">Sat: Miss State 6-1</div>
+                <div class="col-game">Sun: Miss State 7-1</div>
+            </div>
+        </div>
+        <div class="result-note">Got the winner right, underestimated the dominance. State didn't just win — they outscored Ole Miss 18-6. Tomas Valincius went to 6-0. This man is a problem and I've been saying it.</div>
+    </div>
+
+    <!-- Auburn at Alabama -->
+    <div class="result-card incorrect">
+        <div class="result-header">
+            <div class="result-matchup">Auburn @ Alabama</div>
+            <div class="result-verdict">
+                <span class="verdict-pill verdict-wrong">✗ Wrong Series</span>
+                <span class="verdict-pill verdict-surprise">Upset</span>
+            </div>
+        </div>
+        <div class="pred-vs-actual">
+            <div class="pred-col">
+                <div class="col-label">Predicted</div>
+                <div class="col-series">Auburn 2-1</div>
+                <div class="col-game">Fri: Alabama 3-2</div>
+                <div class="col-game">Sat: Auburn 8-5</div>
+                <div class="col-game">Sun: Auburn 5-3</div>
+            </div>
+            <div class="vs-divider">→</div>
+            <div class="actual-col">
+                <div class="col-label">Actual</div>
+                <div class="col-series">Alabama 3-0 SWEEP</div>
+                <div class="col-game">Fri: Alabama 11-1 (run rule)</div>
+                <div class="col-game">Sat: Alabama 3-2 (walk-off)</div>
+                <div class="col-game">Sun: Alabama 3-1</div>
+            </div>
+        </div>
+        <div class="result-note">Took the L. Bama didn't just win — they run-ruled Auburn in Game 1, held them to 12-for-83 (.145 avg) across the series with 25 strikeouts. First Bama sweep of Auburn since 2017. I got seduced by Auburn's ERA. Fair enough.</div>
+    </div>
+
+    <!-- Florida at Arkansas -->
+    <div class="result-card incorrect">
+        <div class="result-header">
+            <div class="result-matchup">Florida @ #4 Arkansas</div>
+            <div class="result-verdict">
+                <span class="verdict-pill verdict-wrong">✗ Wrong Series</span>
+                <span class="verdict-pill verdict-surprise">Historic Upset</span>
+            </div>
+        </div>
+        <div class="pred-vs-actual">
+            <div class="pred-col">
+                <div class="col-label">Predicted</div>
+                <div class="col-series">Arkansas 2-1</div>
+                <div class="col-game">Fri: Arkansas 5-2</div>
+                <div class="col-game">Sat: Florida 6-4</div>
+                <div class="col-game">Sun: Arkansas 7-6</div>
+            </div>
+            <div class="vs-divider">→</div>
+            <div class="actual-col">
+                <div class="col-label">Actual</div>
+                <div class="col-series">Florida 3-0 SWEEP</div>
+                <div class="col-game">Fri: Florida 9-4</div>
+                <div class="col-game">Sat: Florida 7-4</div>
+                <div class="col-game">Sun: Florida 7-6</div>
+            </div>
+        </div>
+        <div class="result-note">Florida swept a top-5 team on the road for the first time since the NCBWA poll started in 1998. Said their bats were in a coma after the no-hitter — turns out they woke up with violence. First road sweep at Baum-Walker in 10 years. The Gators cooked me.</div>
+    </div>
+
+    <!-- South Carolina at Georgia -->
+    <div class="result-card correct">
+        <div class="result-header">
+            <div class="result-matchup">South Carolina @ Georgia</div>
+            <div class="result-verdict">
+                <span class="verdict-pill verdict-correct">✓ Called the Sweep</span>
+            </div>
+        </div>
+        <div class="pred-vs-actual">
+            <div class="pred-col">
+                <div class="col-label">Predicted</div>
+                <div class="col-series">Georgia 3-0</div>
+                <div class="col-game">Fri: Georgia 7-2</div>
+                <div class="col-game">Sat: Georgia 9-4</div>
+                <div class="col-game">Sun: Georgia 5-3</div>
+            </div>
+            <div class="vs-divider">→</div>
+            <div class="actual-col">
+                <div class="col-label">Actual</div>
+                <div class="col-series">Georgia 3-0 SWEEP</div>
+                <div class="col-game">Fri: Georgia 5-2</div>
+                <div class="col-game">Sat: Georgia 3-1</div>
+                <div class="col-game">Sun: Georgia 9-7</div>
+            </div>
+        </div>
+        <div class="result-note">Sweep correctly called. South Carolina fell to 1-8 in SEC play. The Dawgs handled business as expected. Daniel Jackson grand slam in Game 1 set the tone.</div>
+    </div>
+
+    <!-- Kentucky at LSU -->
+    <div class="result-card incorrect">
+        <div class="result-header">
+            <div class="result-matchup">Kentucky @ LSU</div>
+            <div class="result-verdict">
+                <span class="verdict-pill verdict-wrong">✗ Wrong Series</span>
+            </div>
+        </div>
+        <div class="pred-vs-actual">
+            <div class="pred-col">
+                <div class="col-label">Predicted</div>
+                <div class="col-series">Kentucky 2-1</div>
+                <div class="col-game">Fri: Kentucky 5-3</div>
+                <div class="col-game">Sat: LSU 8-6</div>
+                <div class="col-game">Sun: Kentucky 6-5</div>
+            </div>
+            <div class="vs-divider">→</div>
+            <div class="actual-col">
+                <div class="col-label">Actual</div>
+                <div class="col-series">LSU 2-1</div>
+                <div class="col-game">Fri: Kentucky 7-4 ✓</div>
+                <div class="col-game">Sat: LSU 7-0 ✓ winner</div>
+                <div class="col-game">Sun: LSU 17-10</div>
+            </div>
+        </div>
+        <div class="result-note">Got the Fri and Sat game winners right but picked UK to take Sunday. LSU responded with a 17-10 chaos game. Alex Box magic activated — said so myself. I just picked the wrong beneficiary.</div>
+    </div>
+
+    <!-- Texas A&M at Missouri -->
+    <div class="result-card correct">
+        <div class="result-header">
+            <div class="result-matchup">#25 Texas A&M @ Missouri</div>
+            <div class="result-verdict">
+                <span class="verdict-pill verdict-correct">✓ Series Correct</span>
+            </div>
+        </div>
+        <div class="pred-vs-actual">
+            <div class="pred-col">
+                <div class="col-label">Predicted</div>
+                <div class="col-series">Texas A&M 2-1</div>
+                <div class="col-game">Fri: A&M 6-3</div>
+                <div class="col-game">Sat: Missouri 5-4</div>
+                <div class="col-game">Sun: A&M 7-5</div>
+            </div>
+            <div class="vs-divider">→</div>
+            <div class="actual-col">
+                <div class="col-label">Actual</div>
+                <div class="col-series">Texas A&M 3-0 SWEEP</div>
+                <div class="col-game">Fri: A&M 11-9</div>
+                <div class="col-game">Sat: A&M 14-6</div>
+                <div class="col-game">Sun: A&M 14-3 (run rule)</div>
+            </div>
+        </div>
+        <div class="result-note">Called A&M, they delivered — but it was a demolition, not a close series. 39 runs in 3 games. Gavin Grahovac went off with 7 RBI and 2 HRs in the finale. Mizzou fans watching their baseball team is a form of discipline.</div>
+    </div>
+
+    <!-- Tennessee at Vanderbilt -->
+    <div class="result-card incorrect">
+        <div class="result-header">
+            <div class="result-matchup">Tennessee @ Vanderbilt</div>
+            <div class="result-verdict">
+                <span class="verdict-pill verdict-wrong">✗ Wrong Series</span>
+                <span class="verdict-pill verdict-surprise">All 3 Walk-offs</span>
+            </div>
+        </div>
+        <div class="pred-vs-actual">
+            <div class="pred-col">
+                <div class="col-label">Predicted</div>
+                <div class="col-series">Tennessee 2-1</div>
+                <div class="col-game">Fri: Tennessee 6-2</div>
+                <div class="col-game">Sat: Vanderbilt 5-4</div>
+                <div class="col-game">Sun: Tennessee 8-6</div>
+            </div>
+            <div class="vs-divider">→</div>
+            <div class="actual-col">
+                <div class="col-label">Actual</div>
+                <div class="col-series">Vanderbilt 3-0 SWEEP</div>
+                <div class="col-game">Fri: Vandy 3-2 (walk-off)</div>
+                <div class="col-game">Sat: Vandy 6-5 (16 inn., walk-off)</div>
+                <div class="col-game">Sun: Vandy 16-15 (walk-off grand slam)</div>
+            </div>
+        </div>
+        <div class="result-note">Three. Consecutive. Walk-offs. The Saturday game went 16 innings — the longest in Tennessee program history. Then Vandy capped it with a walk-off grand slam on Sunday. I predicted Tennessee 2-1. I was not even in the right universe. Vandy said dramatic or death.</div>
+    </div>
+</div>
+
+<div class="accuracy-box">
+    <h2>Week 7 Accuracy Report</h2>
+    <div class="accuracy-stats">
+        <div class="stat-block">
+            <div class="stat-number stat-ok">4/8</div>
+            <div class="stat-label">Week 7 Series</div>
+        </div>
+        <div class="stat-block">
+            <div class="stat-number stat-ok">50%</div>
+            <div class="stat-label">Weekly Rate</div>
+        </div>
+        <div class="stat-block">
+            <div class="stat-number stat-ok">12/24</div>
+            <div class="stat-label">Season Total</div>
+        </div>
+        <div class="stat-block">
+            <div class="stat-number stat-ok">50%</div>
+            <div class="stat-label">Season Rate</div>
+        </div>
+    </div>
+    <div class="knight-note">
+        7 of 8 series ended in sweeps — the SEC showed no mercy this weekend. Three upsets cost the most: Alabama swept #5 Auburn, Florida swept #4 Arkansas on the road in historic fashion, and Vanderbilt walked off Tennessee three straight times. When the chaos is this relentless, even a good knight falls. The 50% holds. Redemption awaits next week.
+    </div>
 </div>
 
 <div class="standings-note">
