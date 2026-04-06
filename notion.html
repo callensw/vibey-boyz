@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibey Notion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #111118;
+            --bg-tertiary: #1a1a24;
+            --bg-hover: #22222e;
+            --bg-active: #2a2a3a;
+            --border: rgba(255, 255, 255, 0.06);
+            --border-hover: rgba(255, 255, 255, 0.12);
+            --text-primary: rgba(255, 255, 255, 0.9);
+            --text-secondary: rgba(255, 255, 255, 0.5);
+            --text-tertiary: rgba(255, 255, 255, 0.25);
+            --accent: #7c5bf0;
+            --accent-hover: #6a4bd8;
+            --accent-subtle: rgba(124, 91, 240, 0.12);
+            --accent-glow: rgba(124, 91, 240, 0.25);
+            --danger: #e05555;
+            --danger-hover: rgba(224, 85, 85, 0.15);
+            --sidebar-width: 260px;
+            --topbar-height: 48px;
+            --checkbox-checked: #7c5bf0;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 16px 16px 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .sidebar-brand-icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #7c5bf0, #6366f1);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .sidebar-close {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .sidebar-close:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .sidebar-search {
+            padding: 8px 12px;
+        }
+
+        .sidebar-search input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 7px 10px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .sidebar-search input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .sidebar-search input:focus {
+            border-color: var(--accent);
+        }
+
+        .sidebar-pages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px 8px;
+        }
+
+        .sidebar-section-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-tertiary);
+            padding: 12px 8px 6px;
+        }
+
+        .page-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.15s;
+            gap: 8px;
+            position: relative;
+            user-select: none;
+        }
+
+        .page-item:hover {
+            background: var(--bg-hover);
+        }
+
+        .page-item.active {
+            background: var(--bg-active);
+        }
+
+        .page-item-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+            width: 20px;
+            text-align: center;
+        }
+
+        .page-item-name {
+            flex: 1;
+            font-size: 13px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.15s;
+        }
+
+        .page-item:hover .page-item-name,
+        .page-item.active .page-item-name {
+            color: var(--text-primary);
+        }
+
+        .page-item-actions {
+            display: flex;
+            gap: 2px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .page-item:hover .page-item-actions {
+            opacity: 1;
+        }
+
+        .page-item-btn {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 14px;
+            line-height: 1;
+            transition: all 0.15s;
+        }
+
+        .page-item-btn:hover {
+            background: var(--bg-active);
+            color: var(--text-primary);
+        }
+
+        .page-item-btn.delete:hover {
+            color: var(--danger);
+            background: var(--danger-hover);
+        }
+
+        .sidebar-footer {
+            padding: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        .new-page-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 12px;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .new-page-btn:hover {
+            background: var(--accent-subtle);
+            border-color: var(--accent);
+            color: var(--text-primary);
+        }
+
+        .new-page-btn .plus-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: 300;
+        }
+
+        /* ===== MAIN CONTENT AREA ===== */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            min-width: 0;
+        }
+
+        /* ===== TOPBAR ===== */
+        .topbar {
+            height: var(--topbar-height);
+            min-height: var(--topbar-height);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 8px;
+            background: var(--bg-primary);
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 4px;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .menu-toggle:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb-icon {
+            font-size: 15px;
+        }
+
+        .breadcrumb-sep {
+            color: var(--text-tertiary);
+            font-size: 12px;
+        }
+
+        .breadcrumb-page {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .topbar-btn {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: inherit;
+            transition: all 0.15s;
+        }
+
+        .topbar-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* ===== EDITOR ===== */
+        .editor-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .editor {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 40px 60px 200px;
+            min-height: 100%;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            border: none;
+            outline: none;
+            width: 100%;
+            background: none;
+            font-family: inherit;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .page-title:empty::before {
+            content: 'Untitled';
+            color: var(--text-tertiary);
+        }
+
+        .page-title[contenteditable]:focus:empty::before {
+            color: var(--text-tertiary);
+        }
+
+        .editor-content {
+            min-height: 300px;
+            outline: none;
+            font-size: 15px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .editor-content:empty::before {
+            content: "Type '/' for commands...";
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
+
+        /* Block styles */
+        .editor-content .block {
+            padding: 3px 0;
+            outline: none;
+            position: relative;
+            min-height: 1.7em;
+        }
+
+        .editor-content .block:empty::before {
+            content: "Type '/' for commands...";
+            color: var(--text-tertiary);
+            font-style: italic;
+            pointer-events: none;
+        }
+
+        .editor-content .block:not(:first-child):empty::before {
+            content: '';
+        }
+
+        .editor-content .block:focus:empty::before {
+            content: "Type '/' for commands...";
+        }
+
+        .editor-content h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 24px;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .editor-content h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 20px;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .editor-content h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 16px;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .editor-content p {
+            min-height: 1em;
+        }
+
+        .editor-content ul, .editor-content ol {
+            padding-left: 24px;
+        }
+
+        .editor-content li {
+            padding: 1px 0;
+        }
+
+        .editor-content .todo-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 2px 0;
+        }
+
+        .editor-content .todo-checkbox {
+            width: 18px;
+            height: 18px;
+            min-width: 18px;
+            border: 2px solid var(--text-tertiary);
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+
+        .editor-content .todo-checkbox:hover {
+            border-color: var(--accent);
+        }
+
+        .editor-content .todo-checkbox.checked {
+            background: var(--checkbox-checked);
+            border-color: var(--checkbox-checked);
+        }
+
+        .editor-content .todo-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .editor-content .todo-text {
+            flex: 1;
+            outline: none;
+            min-height: 1em;
+        }
+
+        .editor-content .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: var(--text-tertiary);
+        }
+
+        .editor-content .divider {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 16px 0;
+        }
+
+        .editor-content .code-block {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 14px 16px;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #e0def0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            outline: none;
+            margin: 8px 0;
+            tab-size: 2;
+        }
+
+        /* ===== SLASH COMMAND MENU ===== */
+        .slash-menu {
+            position: fixed;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-hover);
+            border-radius: 8px;
+            padding: 6px;
+            min-width: 240px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
+            z-index: 1000;
+            display: none;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .slash-menu.visible {
+            display: block;
+            animation: slashMenuIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slashMenuIn {
+            from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .slash-menu-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-tertiary);
+            padding: 6px 8px 4px;
+        }
+
+        .slash-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .slash-menu-item:hover,
+        .slash-menu-item.selected {
+            background: var(--bg-hover);
+        }
+
+        .slash-menu-item-icon {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .slash-menu-item-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slash-menu-item-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .slash-menu-item-desc {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        /* ===== RENAME INPUT ===== */
+        .rename-input {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 13px;
+            padding: 2px 6px;
+            outline: none;
+            width: 100%;
+        }
+
+        /* ===== OVERLAY (mobile) ===== */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+
+        .sidebar-overlay.visible {
+            display: block;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-tertiary);
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-sub {
+            font-size: 13px;
+            color: var(--text-tertiary);
+        }
+
+        /* ===== WORD COUNT ===== */
+        .word-count {
+            font-size: 11px;
+            color: var(--text-tertiary);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-close {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .editor {
+                padding: 24px 20px 150px;
+            }
+
+            .page-title {
+                font-size: 26px;
+            }
+        }
+
+        /* ===== DELETE CONFIRM ===== */
+        .confirm-dialog {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .confirm-dialog.visible {
+            display: flex;
+        }
+
+        .confirm-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-hover);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .confirm-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .confirm-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .confirm-btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .confirm-btn.cancel {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .confirm-btn.cancel:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .confirm-btn.danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .confirm-btn.danger:hover {
+            background: #c94444;
+        }
+
+        /* ===== DRAG HANDLE ===== */
+        .block-handle {
+            position: absolute;
+            left: -28px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            color: var(--text-tertiary);
+            opacity: 0;
+            transition: opacity 0.15s;
+            font-size: 12px;
+            border-radius: 3px;
+        }
+
+        .block:hover > .block-handle {
+            opacity: 1;
+        }
+
+        .block-handle:hover {
+            background: var(--bg-hover);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <div class="sidebar-brand-icon">V</div>
+                Vibey Notion
+            </div>
+            <button class="sidebar-close" id="sidebarClose" title="Close sidebar">×</button>
+        </div>
+        <div class="sidebar-search">
+            <input type="text" placeholder="Search pages..." id="searchInput">
+        </div>
+        <div class="sidebar-pages" id="pagesList">
+            <div class="sidebar-section-label">Pages</div>
+        </div>
+        <div class="sidebar-footer">
+            <button class="new-page-btn" id="newPageBtn">
+                <span class="plus-icon">+</span>
+                New page
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="main">
+        <div class="topbar">
+            <button class="menu-toggle" id="menuToggle" title="Toggle sidebar">☰</button>
+            <div class="breadcrumb">
+                <span class="breadcrumb-icon">📄</span>
+                <span class="breadcrumb-sep">/</span>
+                <span class="breadcrumb-page" id="breadcrumbPage">Welcome</span>
+            </div>
+            <div class="topbar-right">
+                <span class="word-count" id="wordCount"></span>
+                <button class="topbar-btn" id="exportBtn" title="Export page">Export</button>
+            </div>
+        </div>
+        <div class="editor-wrapper" id="editorWrapper">
+            <div class="editor" id="editor">
+                <div class="page-title" contenteditable="true" id="pageTitle" spellcheck="false"></div>
+                <div class="editor-content" id="editorContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slash Command Menu -->
+    <div class="slash-menu" id="slashMenu">
+        <div class="slash-menu-label">Basic blocks</div>
+    </div>
+
+    <!-- Delete Confirmation -->
+    <div class="confirm-dialog" id="confirmDialog">
+        <div class="confirm-box">
+            <div class="confirm-title">Delete page</div>
+            <div class="confirm-message" id="confirmMessage">Are you sure you want to delete this page? This action cannot be undone.</div>
+            <div class="confirm-buttons">
+                <button class="confirm-btn cancel" id="confirmCancel">Cancel</button>
+                <button class="confirm-btn danger" id="confirmDelete">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function() {
+        'use strict';
+
+        // ===== STORAGE KEY =====
+        const STORAGE_KEY = 'vibey-notion-data';
+
+        // ===== DEFAULT DATA =====
+        const defaultPages = [
+            {
+                id: generateId(),
+                icon: '👋',
+                title: 'Welcome to Vibey Notion',
+                blocks: [
+                    { type: 'h1', content: 'Welcome to Vibey Notion' },
+                    { type: 'p', content: 'A minimal workspace for the vibey boyz. Jot down ideas, track builds, plan world domination — whatever you need.' },
+                    { type: 'h2', content: 'How to use' },
+                    { type: 'todo', content: 'Click on a page in the sidebar to open it', checked: false },
+                    { type: 'todo', content: 'Click the + New page button to create a page', checked: false },
+                    { type: 'todo', content: 'Start typing to add content', checked: false },
+                    { type: 'todo', content: 'Type / to open the command menu', checked: false },
+                    { type: 'divider', content: '' },
+                    { type: 'h2', content: 'Block types' },
+                    { type: 'p', content: 'You can create different block types with shortcuts:' },
+                    { type: 'bullet', content: 'Type <strong>#</strong> + space for Heading 1' },
+                    { type: 'bullet', content: 'Type <strong>##</strong> + space for Heading 2' },
+                    { type: 'bullet', content: 'Type <strong>###</strong> + space for Heading 3' },
+                    { type: 'bullet', content: 'Type <strong>-</strong> + space for bullet list' },
+                    { type: 'bullet', content: 'Type <strong>1.</strong> + space for numbered list' },
+                    { type: 'bullet', content: 'Type <strong>[]</strong> + space for a todo checkbox' },
+                    { type: 'bullet', content: 'Type <strong>---</strong> for a divider' },
+                    { type: 'bullet', content: 'Type <strong>```</strong> for a code block' },
+                    { type: 'divider', content: '' },
+                    { type: 'p', content: 'Everything saves automatically to your browser. Happy vibing. ✨' },
+                ],
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            },
+            {
+                id: generateId(),
+                icon: '💡',
+                title: 'Group Ideas',
+                blocks: [
+                    { type: 'h1', content: 'Group Ideas' },
+                    { type: 'p', content: 'Drop your ideas here. No idea is too wild.' },
+                    { type: 'divider', content: '' },
+                    { type: 'p', content: '' },
+                ],
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            },
+            {
+                id: generateId(),
+                icon: '🔨',
+                title: 'Build Log',
+                blocks: [
+                    { type: 'h1', content: 'Build Log' },
+                    { type: 'p', content: 'A record of everything the vibey boyz have shipped.' },
+                    { type: 'divider', content: '' },
+                    { type: 'h2', content: 'Shipped' },
+                    { type: 'todo', content: 'Vibey Boyz landing page', checked: true },
+                    { type: 'todo', content: 'Lady Bayles portrait', checked: true },
+                    { type: 'todo', content: 'Hall of Vibes', checked: true },
+                    { type: 'todo', content: 'Wall of Shame', checked: true },
+                    { type: 'todo', content: 'SEC Baseball predictions', checked: true },
+                    { type: 'todo', content: 'Weekly Chronicles', checked: true },
+                    { type: 'todo', content: 'WANTED: Jeaux poster', checked: true },
+                    { type: 'todo', content: 'Vibey Notion workspace', checked: false },
+                    { type: 'divider', content: '' },
+                    { type: 'h2', content: 'Ideas in the Pipeline' },
+                    { type: 'todo', content: 'Add your next build idea here...', checked: false },
+                ],
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            }
+        ];
+
+        // ===== STATE =====
+        let pages = [];
+        let activePageId = null;
+        let slashMenuVisible = false;
+        let slashMenuIndex = 0;
+        let slashMenuBlock = null;
+        let deletePageId = null;
+        let searchQuery = '';
+
+        // ===== DOM REFS =====
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarClose = document.getElementById('sidebarClose');
+        const menuToggle = document.getElementById('menuToggle');
+        const pagesList = document.getElementById('pagesList');
+        const searchInput = document.getElementById('searchInput');
+        const newPageBtn = document.getElementById('newPageBtn');
+        const breadcrumbPage = document.getElementById('breadcrumbPage');
+        const pageTitle = document.getElementById('pageTitle');
+        const editorContent = document.getElementById('editorContent');
+        const editorWrapper = document.getElementById('editorWrapper');
+        const slashMenu = document.getElementById('slashMenu');
+        const confirmDialog = document.getElementById('confirmDialog');
+        const confirmMessage = document.getElementById('confirmMessage');
+        const confirmCancel = document.getElementById('confirmCancel');
+        const confirmDelete = document.getElementById('confirmDelete');
+        const wordCount = document.getElementById('wordCount');
+        const exportBtn = document.getElementById('exportBtn');
+
+        // ===== SLASH COMMANDS =====
+        const slashCommands = [
+            { type: 'p', label: 'Text', desc: 'Plain text block', icon: 'Aa' },
+            { type: 'h1', label: 'Heading 1', desc: 'Large section heading', icon: 'H1' },
+            { type: 'h2', label: 'Heading 2', desc: 'Medium section heading', icon: 'H2' },
+            { type: 'h3', label: 'Heading 3', desc: 'Small section heading', icon: 'H3' },
+            { type: 'bullet', label: 'Bullet List', desc: 'Unordered list item', icon: '•' },
+            { type: 'numbered', label: 'Numbered List', desc: 'Ordered list item', icon: '1.' },
+            { type: 'todo', label: 'To-do', desc: 'Checkbox item', icon: '☐' },
+            { type: 'divider', label: 'Divider', desc: 'Horizontal line separator', icon: '—' },
+            { type: 'code', label: 'Code Block', desc: 'Code snippet', icon: '</>' },
+        ];
+
+        // ===== HELPERS =====
+        function generateId() {
+            return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6);
+        }
+
+        function loadData() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                if (data) {
+                    pages = JSON.parse(data);
+                    if (!pages || !pages.length) {
+                        pages = JSON.parse(JSON.stringify(defaultPages));
+                    }
+                } else {
+                    pages = JSON.parse(JSON.stringify(defaultPages));
+                }
+            } catch (e) {
+                pages = JSON.parse(JSON.stringify(defaultPages));
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(pages));
+            } catch (e) {
+                console.warn('Failed to save:', e);
+            }
+        }
+
+        function getPage(id) {
+            return pages.find(p => p.id === id);
+        }
+
+        // ===== SIDEBAR RENDERING =====
+        function renderSidebar() {
+            const filteredPages = searchQuery
+                ? pages.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()))
+                : pages;
+
+            let html = '<div class="sidebar-section-label">Pages</div>';
+            filteredPages.forEach(page => {
+                const isActive = page.id === activePageId;
+                html += `
+                    <div class="page-item ${isActive ? 'active' : ''}" data-id="${page.id}">
+                        <span class="page-item-icon">${page.icon || '📄'}</span>
+                        <span class="page-item-name">${escapeHtml(page.title) || 'Untitled'}</span>
+                        <div class="page-item-actions">
+                            <button class="page-item-btn rename" data-id="${page.id}" title="Rename">✏</button>
+                            <button class="page-item-btn delete" data-id="${page.id}" title="Delete">×</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (filteredPages.length === 0 && searchQuery) {
+                html += '<div style="padding: 12px; color: var(--text-tertiary); font-size: 13px; text-align: center;">No pages found</div>';
+            }
+
+            pagesList.innerHTML = html;
+
+            // Attach click listeners
+            pagesList.querySelectorAll('.page-item').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    if (e.target.closest('.page-item-btn')) return;
+                    selectPage(el.dataset.id);
+                    closeSidebarMobile();
+                });
+            });
+
+            pagesList.querySelectorAll('.page-item-btn.rename').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    startRename(btn.dataset.id);
+                });
+            });
+
+            pagesList.querySelectorAll('.page-item-btn.delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showDeleteConfirm(btn.dataset.id);
+                });
+            });
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ===== PAGE SELECTION =====
+        function selectPage(id) {
+            // Save current page first
+            saveCurrentPage();
+
+            activePageId = id;
+            const page = getPage(id);
+            if (!page) return;
+
+            breadcrumbPage.textContent = page.title || 'Untitled';
+            pageTitle.innerHTML = escapeHtml(page.title);
+
+            renderBlocks(page.blocks);
+            renderSidebar();
+            updateWordCount();
+        }
+
+        function renderBlocks(blocks) {
+            editorContent.innerHTML = '';
+            if (!blocks || blocks.length === 0) {
+                const block = createBlockElement('p', '');
+                editorContent.appendChild(block);
+                return;
+            }
+            blocks.forEach(blockData => {
+                const el = createBlockElement(blockData.type, blockData.content, blockData.checked);
+                editorContent.appendChild(el);
+            });
+        }
+
+        function createBlockElement(type, content, checked) {
+            let el;
+
+            switch (type) {
+                case 'h1':
+                    el = document.createElement('h1');
+                    el.className = 'block';
+                    el.contentEditable = true;
+                    el.innerHTML = content || '';
+                    break;
+                case 'h2':
+                    el = document.createElement('h2');
+                    el.className = 'block';
+                    el.contentEditable = true;
+                    el.innerHTML = content || '';
+                    break;
+                case 'h3':
+                    el = document.createElement('h3');
+                    el.className = 'block';
+                    el.contentEditable = true;
+                    el.innerHTML = content || '';
+                    break;
+                case 'bullet': {
+                    el = document.createElement('div');
+                    el.className = 'block';
+                    el.style.display = 'flex';
+                    el.style.alignItems = 'flex-start';
+                    el.style.gap = '8px';
+                    const bullet = document.createElement('span');
+                    bullet.textContent = '•';
+                    bullet.style.color = 'var(--accent)';
+                    bullet.style.fontWeight = '700';
+                    bullet.style.lineHeight = '1.7';
+                    bullet.style.flexShrink = '0';
+                    bullet.contentEditable = false;
+                    const text = document.createElement('span');
+                    text.contentEditable = true;
+                    text.style.flex = '1';
+                    text.style.outline = 'none';
+                    text.innerHTML = content || '';
+                    el.appendChild(bullet);
+                    el.appendChild(text);
+                    el.dataset.type = 'bullet';
+                    setupBulletKeys(el, text);
+                    return el;
+                }
+                case 'numbered': {
+                    el = document.createElement('div');
+                    el.className = 'block';
+                    el.style.display = 'flex';
+                    el.style.alignItems = 'flex-start';
+                    el.style.gap = '8px';
+                    const num = document.createElement('span');
+                    num.className = 'list-number';
+                    num.style.color = 'var(--accent)';
+                    num.style.fontWeight = '500';
+                    num.style.lineHeight = '1.7';
+                    num.style.flexShrink = '0';
+                    num.style.minWidth = '18px';
+                    num.contentEditable = false;
+                    // Number will be set by reindex
+                    const text = document.createElement('span');
+                    text.contentEditable = true;
+                    text.style.flex = '1';
+                    text.style.outline = 'none';
+                    text.innerHTML = content || '';
+                    el.appendChild(num);
+                    el.appendChild(text);
+                    el.dataset.type = 'numbered';
+                    setupBulletKeys(el, text);
+                    reindexNumberedList();
+                    return el;
+                }
+                case 'todo': {
+                    el = document.createElement('div');
+                    el.className = 'block todo-item' + (checked ? ' completed' : '');
+                    const cb = document.createElement('div');
+                    cb.className = 'todo-checkbox' + (checked ? ' checked' : '');
+                    cb.addEventListener('click', () => {
+                        cb.classList.toggle('checked');
+                        el.classList.toggle('completed');
+                        saveCurrentPage();
+                    });
+                    const text = document.createElement('div');
+                    text.className = 'todo-text';
+                    text.contentEditable = true;
+                    text.innerHTML = content || '';
+                    el.appendChild(cb);
+                    el.appendChild(text);
+                    el.dataset.type = 'todo';
+                    setupBulletKeys(el, text);
+                    return el;
+                }
+                case 'divider':
+                    el = document.createElement('hr');
+                    el.className = 'block divider';
+                    el.dataset.type = 'divider';
+                    el.addEventListener('click', () => {
+                        // Create a new block after divider if clicked
+                        const newBlock = createBlockElement('p', '');
+                        el.after(newBlock);
+                        focusBlock(newBlock);
+                    });
+                    return el;
+                case 'code':
+                    el = document.createElement('div');
+                    el.className = 'block code-block';
+                    el.contentEditable = true;
+                    el.dataset.type = 'code';
+                    el.innerHTML = content || '';
+                    el.addEventListener('keydown', (e) => {
+                        if (e.key === 'Tab') {
+                            e.preventDefault();
+                            document.execCommand('insertText', false, '  ');
+                        }
+                    });
+                    return el;
+                default:
+                    el = document.createElement('p');
+                    el.className = 'block';
+                    el.contentEditable = true;
+                    el.innerHTML = content || '';
+            }
+
+            el.dataset.type = type;
+            return el;
+        }
+
+        function setupBulletKeys(container, textEl) {
+            textEl.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    const type = container.dataset.type;
+                    if (textEl.textContent.trim() === '') {
+                        // Empty bullet/todo → convert to plain paragraph
+                        const p = createBlockElement('p', '');
+                        container.after(p);
+                        container.remove();
+                        focusBlock(p);
+                        reindexNumberedList();
+                    } else {
+                        // Create new block of same type
+                        const checked = type === 'todo' ? false : undefined;
+                        const newBlock = createBlockElement(type, '', checked);
+                        container.after(newBlock);
+                        focusBlock(newBlock);
+                        reindexNumberedList();
+                    }
+                    saveCurrentPage();
+                }
+                if (e.key === 'Backspace' && textEl.textContent === '') {
+                    e.preventDefault();
+                    const prev = container.previousElementSibling;
+                    const p = createBlockElement('p', '');
+                    container.after(p);
+                    container.remove();
+                    focusBlock(p);
+                    reindexNumberedList();
+                    saveCurrentPage();
+                }
+            });
+        }
+
+        function focusBlock(block) {
+            requestAnimationFrame(() => {
+                if (block.dataset && block.dataset.type === 'todo') {
+                    const t = block.querySelector('.todo-text');
+                    if (t) t.focus();
+                } else if (block.dataset && (block.dataset.type === 'bullet' || block.dataset.type === 'numbered')) {
+                    const t = block.querySelector('span[contenteditable]');
+                    if (t) t.focus();
+                } else if (block.contentEditable === 'true') {
+                    block.focus();
+                }
+            });
+        }
+
+        function reindexNumberedList() {
+            let counter = 0;
+            editorContent.querySelectorAll('.block').forEach(b => {
+                if (b.dataset.type === 'numbered') {
+                    counter++;
+                    const numEl = b.querySelector('.list-number');
+                    if (numEl) numEl.textContent = counter + '.';
+                } else {
+                    counter = 0;
+                }
+            });
+        }
+
+        // ===== SAVE CURRENT PAGE =====
+        function saveCurrentPage() {
+            if (!activePageId) return;
+            const page = getPage(activePageId);
+            if (!page) return;
+
+            // Save title
+            page.title = pageTitle.textContent.trim() || 'Untitled';
+            breadcrumbPage.textContent = page.title;
+
+            // Save blocks
+            page.blocks = [];
+            editorContent.querySelectorAll('.block').forEach(block => {
+                const type = block.dataset.type || 'p';
+                let content = '';
+                let checked = undefined;
+
+                if (type === 'todo') {
+                    content = block.querySelector('.todo-text')?.innerHTML || '';
+                    checked = block.querySelector('.todo-checkbox')?.classList.contains('checked') || false;
+                } else if (type === 'bullet' || type === 'numbered') {
+                    content = block.querySelector('span[contenteditable]')?.innerHTML || '';
+                } else if (type === 'divider') {
+                    content = '';
+                } else {
+                    content = block.innerHTML;
+                }
+
+                page.blocks.push({ type, content, ...(checked !== undefined ? { checked } : {}) });
+            });
+
+            page.updatedAt = Date.now();
+            saveData();
+            renderSidebar();
+        }
+
+        // ===== PAGE OPERATIONS =====
+        function createNewPage() {
+            const page = {
+                id: generateId(),
+                icon: '📄',
+                title: 'Untitled',
+                blocks: [{ type: 'p', content: '' }],
+                createdAt: Date.now(),
+                updatedAt: Date.now()
+            };
+            pages.unshift(page);
+            saveData();
+            selectPage(page.id);
+            pageTitle.focus();
+
+            // Select all text in title for easy overwrite
+            const range = document.createRange();
+            range.selectNodeContents(pageTitle);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
+
+        function startRename(id) {
+            const pageItem = pagesList.querySelector(`.page-item[data-id="${id}"]`);
+            if (!pageItem) return;
+            const nameEl = pageItem.querySelector('.page-item-name');
+            const page = getPage(id);
+            if (!page) return;
+
+            const input = document.createElement('input');
+            input.className = 'rename-input';
+            input.value = page.title;
+            nameEl.replaceWith(input);
+            input.focus();
+            input.select();
+
+            const finish = () => {
+                const newTitle = input.value.trim() || 'Untitled';
+                page.title = newTitle;
+                if (activePageId === id) {
+                    pageTitle.textContent = newTitle;
+                    breadcrumbPage.textContent = newTitle;
+                }
+                saveData();
+                renderSidebar();
+            };
+
+            input.addEventListener('blur', finish);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+                if (e.key === 'Escape') { input.blur(); }
+            });
+        }
+
+        function showDeleteConfirm(id) {
+            deletePageId = id;
+            const page = getPage(id);
+            confirmMessage.textContent = `Are you sure you want to delete "${page?.title || 'Untitled'}"? This cannot be undone.`;
+            confirmDialog.classList.add('visible');
+        }
+
+        function deletePage(id) {
+            const idx = pages.findIndex(p => p.id === id);
+            if (idx === -1) return;
+            pages.splice(idx, 1);
+            saveData();
+
+            if (activePageId === id) {
+                if (pages.length > 0) {
+                    selectPage(pages[0].id);
+                } else {
+                    activePageId = null;
+                    editorContent.innerHTML = '';
+                    pageTitle.textContent = '';
+                    breadcrumbPage.textContent = '';
+                    showEmptyState();
+                }
+            }
+            renderSidebar();
+        }
+
+        function showEmptyState() {
+            editorContent.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📝</div>
+                    <div class="empty-state-text">No page selected</div>
+                    <div class="empty-state-sub">Create a new page to get started</div>
+                </div>
+            `;
+        }
+
+        // ===== SIDEBAR MOBILE =====
+        function openSidebarMobile() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('visible');
+        }
+
+        function closeSidebarMobile() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('visible');
+        }
+
+        // ===== SLASH MENU =====
+        function showSlashMenu(block) {
+            slashMenuBlock = block;
+            slashMenuIndex = 0;
+            slashMenuVisible = true;
+            renderSlashMenu('');
+            positionSlashMenu(block);
+            slashMenu.classList.add('visible');
+        }
+
+        function hideSlashMenu() {
+            slashMenuVisible = false;
+            slashMenuBlock = null;
+            slashMenu.classList.remove('visible');
+        }
+
+        function renderSlashMenu(filter) {
+            const filtered = filter
+                ? slashCommands.filter(c => c.label.toLowerCase().includes(filter.toLowerCase()) || c.type.includes(filter.toLowerCase()))
+                : slashCommands;
+
+            if (filtered.length === 0) {
+                hideSlashMenu();
+                return;
+            }
+
+            slashMenuIndex = Math.min(slashMenuIndex, filtered.length - 1);
+
+            let html = '<div class="slash-menu-label">Basic blocks</div>';
+            filtered.forEach((cmd, i) => {
+                html += `
+                    <div class="slash-menu-item ${i === slashMenuIndex ? 'selected' : ''}" data-index="${i}" data-type="${cmd.type}">
+                        <div class="slash-menu-item-icon">${cmd.icon}</div>
+                        <div class="slash-menu-item-text">
+                            <div class="slash-menu-item-title">${cmd.label}</div>
+                            <div class="slash-menu-item-desc">${cmd.desc}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            slashMenu.innerHTML = html;
+
+            // Click handlers
+            slashMenu.querySelectorAll('.slash-menu-item').forEach(item => {
+                item.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    executeSlashCommand(item.dataset.type);
+                });
+                item.addEventListener('mouseenter', () => {
+                    slashMenuIndex = parseInt(item.dataset.index);
+                    slashMenu.querySelectorAll('.slash-menu-item').forEach((el, i) => {
+                        el.classList.toggle('selected', i === slashMenuIndex);
+                    });
+                });
+            });
+
+            slashMenu._filtered = filtered;
+        }
+
+        function positionSlashMenu(block) {
+            const rect = (block || editorContent).getBoundingClientRect();
+            const sel = window.getSelection();
+            let top = rect.bottom + 4;
+            let left = rect.left;
+
+            if (sel && sel.rangeCount > 0) {
+                const range = sel.getRangeAt(0);
+                const caretRect = range.getBoundingClientRect();
+                if (caretRect.width || caretRect.height) {
+                    top = caretRect.bottom + 4;
+                    left = caretRect.left;
+                }
+            }
+
+            // Keep in viewport
+            const menuHeight = 360;
+            if (top + menuHeight > window.innerHeight) {
+                top = rect.top - menuHeight - 4;
+            }
+            left = Math.max(8, Math.min(left, window.innerWidth - 260));
+
+            slashMenu.style.top = top + 'px';
+            slashMenu.style.left = left + 'px';
+        }
+
+        function executeSlashCommand(type) {
+            if (!slashMenuBlock) { hideSlashMenu(); return; }
+
+            const block = slashMenuBlock;
+            hideSlashMenu();
+
+            if (type === 'divider') {
+                const newEl = createBlockElement('divider', '');
+                block.after(newEl);
+                // Also add a paragraph after divider
+                const pAfter = createBlockElement('p', '');
+                newEl.after(pAfter);
+                block.remove();
+                focusBlock(pAfter);
+            } else {
+                const newEl = createBlockElement(type, '');
+                block.after(newEl);
+                block.remove();
+                focusBlock(newEl);
+                reindexNumberedList();
+            }
+
+            saveCurrentPage();
+        }
+
+        // ===== MARKDOWN SHORTCUTS =====
+        function checkMarkdownShortcut(block) {
+            if (!block || block.dataset.type === 'code') return false;
+
+            // Get the text content — handle various block types
+            let textEl = block;
+            if (block.dataset.type === 'bullet' || block.dataset.type === 'numbered') {
+                textEl = block.querySelector('span[contenteditable]');
+            } else if (block.dataset.type === 'todo') {
+                textEl = block.querySelector('.todo-text');
+            }
+            if (!textEl) return false;
+
+            const text = textEl.textContent;
+
+            const shortcuts = [
+                { pattern: /^###\s$/, type: 'h3' },
+                { pattern: /^##\s$/, type: 'h2' },
+                { pattern: /^#\s$/, type: 'h1' },
+                { pattern: /^-\s$/, type: 'bullet' },
+                { pattern: /^1\.\s$/, type: 'numbered' },
+                { pattern: /^\[\]\s$/, type: 'todo' },
+                { pattern: /^---$/, type: 'divider' },
+                { pattern: /^```$/, type: 'code' },
+            ];
+
+            for (const sc of shortcuts) {
+                if (sc.pattern.test(text)) {
+                    if (sc.type === 'divider') {
+                        const newEl = createBlockElement('divider', '');
+                        block.after(newEl);
+                        const pAfter = createBlockElement('p', '');
+                        newEl.after(pAfter);
+                        block.remove();
+                        focusBlock(pAfter);
+                    } else {
+                        const newEl = createBlockElement(sc.type, '');
+                        block.after(newEl);
+                        block.remove();
+                        focusBlock(newEl);
+                    }
+                    reindexNumberedList();
+                    saveCurrentPage();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // ===== EDITOR KEY HANDLING =====
+        editorContent.addEventListener('keydown', (e) => {
+            // Slash menu navigation
+            if (slashMenuVisible) {
+                const filtered = slashMenu._filtered || slashCommands;
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    slashMenuIndex = (slashMenuIndex + 1) % filtered.length;
+                    renderSlashMenu(getSlashFilter());
+                    return;
+                }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    slashMenuIndex = (slashMenuIndex - 1 + filtered.length) % filtered.length;
+                    renderSlashMenu(getSlashFilter());
+                    return;
+                }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (filtered[slashMenuIndex]) {
+                        executeSlashCommand(filtered[slashMenuIndex].type);
+                    }
+                    return;
+                }
+                if (e.key === 'Escape') {
+                    hideSlashMenu();
+                    return;
+                }
+            }
+
+            const block = getCurrentBlock();
+            if (!block) return;
+
+            // Enter key: create new block
+            if (e.key === 'Enter' && !e.shiftKey && block.dataset.type !== 'code'
+                && block.dataset.type !== 'bullet' && block.dataset.type !== 'numbered' && block.dataset.type !== 'todo') {
+                e.preventDefault();
+                const newBlock = createBlockElement('p', '');
+                block.after(newBlock);
+                focusBlock(newBlock);
+                saveCurrentPage();
+                return;
+            }
+
+            // Backspace on empty block: remove and focus previous
+            if (e.key === 'Backspace' && block.dataset.type !== 'bullet'
+                && block.dataset.type !== 'numbered' && block.dataset.type !== 'todo') {
+                const isEffectivelyEmpty = block.textContent.trim() === '' && block.querySelector('br') === null || block.innerHTML === '' || block.innerHTML === '<br>';
+                if (isEffectivelyEmpty && block.previousElementSibling) {
+                    e.preventDefault();
+                    const prev = block.previousElementSibling;
+                    block.remove();
+                    focusBlockEnd(prev);
+                    reindexNumberedList();
+                    saveCurrentPage();
+                    return;
+                }
+            }
+
+            // Enter in code block: insert newline
+            if (e.key === 'Enter' && block.dataset.type === 'code') {
+                // default behavior for shift+enter and regular enter in code
+                if (!e.shiftKey && e.ctrlKey) {
+                    // Ctrl+Enter exits code block
+                    e.preventDefault();
+                    const newBlock = createBlockElement('p', '');
+                    block.after(newBlock);
+                    focusBlock(newBlock);
+                    saveCurrentPage();
+                }
+                return;
+            }
+        });
+
+        editorContent.addEventListener('input', (e) => {
+            const block = getCurrentBlock();
+            if (!block) return;
+
+            // Check markdown shortcuts
+            if (checkMarkdownShortcut(block)) return;
+
+            // Handle slash menu
+            if (slashMenuVisible) {
+                const filter = getSlashFilter();
+                if (filter === null) {
+                    hideSlashMenu();
+                } else {
+                    slashMenuIndex = 0;
+                    renderSlashMenu(filter);
+                    positionSlashMenu(block);
+                }
+            } else {
+                // Check if user typed /
+                let textEl = block;
+                if (block.dataset.type === 'bullet' || block.dataset.type === 'numbered') {
+                    textEl = block.querySelector('span[contenteditable]');
+                } else if (block.dataset.type === 'todo') {
+                    textEl = block.querySelector('.todo-text');
+                }
+                if (textEl && textEl.textContent === '/') {
+                    showSlashMenu(block);
+                }
+            }
+
+            updateWordCount();
+            // Debounced save
+            clearTimeout(editorContent._saveTimer);
+            editorContent._saveTimer = setTimeout(saveCurrentPage, 500);
+        });
+
+        function getSlashFilter() {
+            const block = slashMenuBlock;
+            if (!block) return null;
+
+            let textEl = block;
+            if (block.dataset.type === 'bullet' || block.dataset.type === 'numbered') {
+                textEl = block.querySelector('span[contenteditable]');
+            } else if (block.dataset.type === 'todo') {
+                textEl = block.querySelector('.todo-text');
+            }
+            if (!textEl) return null;
+
+            const text = textEl.textContent;
+            if (!text.startsWith('/')) return null;
+            return text.slice(1);
+        }
+
+        function getCurrentBlock() {
+            const sel = window.getSelection();
+            if (!sel || !sel.anchorNode) return null;
+            let node = sel.anchorNode;
+            while (node && node !== editorContent) {
+                if (node.classList && node.classList.contains('block')) return node;
+                node = node.parentElement;
+            }
+            return null;
+        }
+
+        function focusBlockEnd(block) {
+            requestAnimationFrame(() => {
+                let target = block;
+                if (block.dataset && block.dataset.type === 'todo') {
+                    target = block.querySelector('.todo-text') || block;
+                } else if (block.dataset && (block.dataset.type === 'bullet' || block.dataset.type === 'numbered')) {
+                    target = block.querySelector('span[contenteditable]') || block;
+                }
+                if (target.contentEditable === 'true' || target.isContentEditable) {
+                    target.focus();
+                    const range = document.createRange();
+                    range.selectNodeContents(target);
+                    range.collapse(false);
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            });
+        }
+
+        // ===== TITLE HANDLING =====
+        pageTitle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const firstBlock = editorContent.querySelector('.block');
+                if (firstBlock) {
+                    focusBlock(firstBlock);
+                }
+            }
+        });
+
+        pageTitle.addEventListener('input', () => {
+            clearTimeout(pageTitle._saveTimer);
+            pageTitle._saveTimer = setTimeout(saveCurrentPage, 300);
+        });
+
+        // ===== WORD COUNT =====
+        function updateWordCount() {
+            const text = editorContent.textContent.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            wordCount.textContent = words + ' word' + (words !== 1 ? 's' : '');
+        }
+
+        // ===== EXPORT =====
+        exportBtn.addEventListener('click', () => {
+            const page = getPage(activePageId);
+            if (!page) return;
+
+            let md = '# ' + page.title + '\n\n';
+            page.blocks.forEach(b => {
+                switch (b.type) {
+                    case 'h1': md += '# ' + stripHtml(b.content) + '\n\n'; break;
+                    case 'h2': md += '## ' + stripHtml(b.content) + '\n\n'; break;
+                    case 'h3': md += '### ' + stripHtml(b.content) + '\n\n'; break;
+                    case 'p': md += stripHtml(b.content) + '\n\n'; break;
+                    case 'bullet': md += '- ' + stripHtml(b.content) + '\n'; break;
+                    case 'numbered': md += '1. ' + stripHtml(b.content) + '\n'; break;
+                    case 'todo': md += (b.checked ? '- [x] ' : '- [ ] ') + stripHtml(b.content) + '\n'; break;
+                    case 'divider': md += '---\n\n'; break;
+                    case 'code': md += '```\n' + stripHtml(b.content) + '\n```\n\n'; break;
+                }
+            });
+
+            const blob = new Blob([md], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = (page.title || 'untitled').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() + '.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        function stripHtml(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html || '';
+            return div.textContent || '';
+        }
+
+        // ===== EVENT LISTENERS =====
+        newPageBtn.addEventListener('click', createNewPage);
+
+        menuToggle.addEventListener('click', openSidebarMobile);
+        sidebarClose.addEventListener('click', closeSidebarMobile);
+        sidebarOverlay.addEventListener('click', closeSidebarMobile);
+
+        searchInput.addEventListener('input', () => {
+            searchQuery = searchInput.value;
+            renderSidebar();
+        });
+
+        confirmCancel.addEventListener('click', () => {
+            confirmDialog.classList.remove('visible');
+            deletePageId = null;
+        });
+
+        confirmDelete.addEventListener('click', () => {
+            if (deletePageId) {
+                deletePage(deletePageId);
+                deletePageId = null;
+            }
+            confirmDialog.classList.remove('visible');
+        });
+
+        confirmDialog.addEventListener('click', (e) => {
+            if (e.target === confirmDialog) {
+                confirmDialog.classList.remove('visible');
+                deletePageId = null;
+            }
+        });
+
+        // Close slash menu on click outside
+        document.addEventListener('click', (e) => {
+            if (slashMenuVisible && !slashMenu.contains(e.target)) {
+                hideSlashMenu();
+            }
+        });
+
+        // Keyboard shortcut: Ctrl/Cmd + N for new page
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                createNewPage();
+            }
+            // Escape closes slash menu
+            if (e.key === 'Escape' && slashMenuVisible) {
+                hideSlashMenu();
+            }
+        });
+
+        // Auto-save on blur
+        window.addEventListener('blur', saveCurrentPage);
+        window.addEventListener('beforeunload', saveCurrentPage);
+
+        // ===== INIT =====
+        loadData();
+        renderSidebar();
+        if (pages.length > 0) {
+            selectPage(pages[0].id);
+        } else {
+            showEmptyState();
+        }
+
+    })();
+    </script>
+</body>
+</html>
