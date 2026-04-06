@@ -1,0 +1,18 @@
+{
+  "name": "Vibey Notes",
+  "short_name": "Notes",
+  "description": "A mobile-first notes app that doesn't suck",
+  "start_url": "/notion-mobile",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#7c5bf0",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='96' fill='%237c5bf0'/><path d='M160 128h48v256h-48zm0 0l144 256h48L208 128z' fill='white'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
