@@ -342,6 +342,39 @@
             gap: 6px;
         }
 
+        .sync-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: var(--text-tertiary);
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .sync-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4ade80;
+            transition: background 0.3s;
+        }
+
+        .sync-dot.saving {
+            background: #facc15;
+            animation: pulse-dot 1s ease-in-out infinite;
+        }
+
+        .sync-dot.offline {
+            background: #ef4444;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
         .topbar-btn {
             background: none;
             border: none;
@@ -503,7 +536,7 @@
         }
 
         .editor-content .todo-checkbox.checked::after {
-            content: '✓';
+            content: '\2713';
             color: white;
             font-size: 12px;
             font-weight: 700;
@@ -813,6 +846,30 @@
             background: var(--bg-hover);
             color: var(--text-secondary);
         }
+
+        /* ===== LOADING STATE ===== */
+        .loading-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-tertiary);
+            gap: 12px;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -826,7 +883,7 @@
                 <div class="sidebar-brand-icon">V</div>
                 Vibey Notion
             </div>
-            <button class="sidebar-close" id="sidebarClose" title="Close sidebar">×</button>
+            <button class="sidebar-close" id="sidebarClose" title="Close sidebar">&times;</button>
         </div>
         <div class="sidebar-search">
             <input type="text" placeholder="Search pages..." id="searchInput">
@@ -845,13 +902,17 @@
     <!-- Main content -->
     <div class="main">
         <div class="topbar">
-            <button class="menu-toggle" id="menuToggle" title="Toggle sidebar">☰</button>
+            <button class="menu-toggle" id="menuToggle" title="Toggle sidebar">&#9776;</button>
             <div class="breadcrumb">
-                <span class="breadcrumb-icon">📄</span>
+                <span class="breadcrumb-icon">&#128196;</span>
                 <span class="breadcrumb-sep">/</span>
-                <span class="breadcrumb-page" id="breadcrumbPage">Welcome</span>
+                <span class="breadcrumb-page" id="breadcrumbPage">Loading...</span>
             </div>
             <div class="topbar-right">
+                <div class="sync-indicator">
+                    <div class="sync-dot" id="syncDot"></div>
+                    <span id="syncLabel">Synced</span>
+                </div>
                 <span class="word-count" id="wordCount"></span>
                 <button class="topbar-btn" id="exportBtn" title="Export page">Export</button>
             </div>
@@ -881,93 +942,46 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script>
     (function() {
         'use strict';
 
-        // ===== STORAGE KEY =====
-        const STORAGE_KEY = 'vibey-notion-data';
+        // =========================================================================
+        // 1. SUPABASE CLIENT INIT
+        // =========================================================================
+        const SUPABASE_URL = 'https://kakjbyoxqjvwnsdbqcnb.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtha2pieW94cWp2d25zZGJxY25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0NzQxMjgsImV4cCI6MjA4NTA1MDEyOH0.6kkaabg_8D2qKcIsuEUVuZWja3LIdx8-a2wwoTmu30k';
 
-        // ===== DEFAULT DATA =====
-        const defaultPages = [
-            {
-                id: generateId(),
-                icon: '👋',
-                title: 'Welcome to Vibey Notion',
-                blocks: [
-                    { type: 'h1', content: 'Welcome to Vibey Notion' },
-                    { type: 'p', content: 'A minimal workspace for the vibey boyz. Jot down ideas, track builds, plan world domination — whatever you need.' },
-                    { type: 'h2', content: 'How to use' },
-                    { type: 'todo', content: 'Click on a page in the sidebar to open it', checked: false },
-                    { type: 'todo', content: 'Click the + New page button to create a page', checked: false },
-                    { type: 'todo', content: 'Start typing to add content', checked: false },
-                    { type: 'todo', content: 'Type / to open the command menu', checked: false },
-                    { type: 'divider', content: '' },
-                    { type: 'h2', content: 'Block types' },
-                    { type: 'p', content: 'You can create different block types with shortcuts:' },
-                    { type: 'bullet', content: 'Type <strong>#</strong> + space for Heading 1' },
-                    { type: 'bullet', content: 'Type <strong>##</strong> + space for Heading 2' },
-                    { type: 'bullet', content: 'Type <strong>###</strong> + space for Heading 3' },
-                    { type: 'bullet', content: 'Type <strong>-</strong> + space for bullet list' },
-                    { type: 'bullet', content: 'Type <strong>1.</strong> + space for numbered list' },
-                    { type: 'bullet', content: 'Type <strong>[]</strong> + space for a todo checkbox' },
-                    { type: 'bullet', content: 'Type <strong>---</strong> for a divider' },
-                    { type: 'bullet', content: 'Type <strong>```</strong> for a code block' },
-                    { type: 'divider', content: '' },
-                    { type: 'p', content: 'Everything saves automatically to your browser. Happy vibing. ✨' },
-                ],
-                createdAt: Date.now(),
-                updatedAt: Date.now()
-            },
-            {
-                id: generateId(),
-                icon: '💡',
-                title: 'Group Ideas',
-                blocks: [
-                    { type: 'h1', content: 'Group Ideas' },
-                    { type: 'p', content: 'Drop your ideas here. No idea is too wild.' },
-                    { type: 'divider', content: '' },
-                    { type: 'p', content: '' },
-                ],
-                createdAt: Date.now(),
-                updatedAt: Date.now()
-            },
-            {
-                id: generateId(),
-                icon: '🔨',
-                title: 'Build Log',
-                blocks: [
-                    { type: 'h1', content: 'Build Log' },
-                    { type: 'p', content: 'A record of everything the vibey boyz have shipped.' },
-                    { type: 'divider', content: '' },
-                    { type: 'h2', content: 'Shipped' },
-                    { type: 'todo', content: 'Vibey Boyz landing page', checked: true },
-                    { type: 'todo', content: 'Lady Bayles portrait', checked: true },
-                    { type: 'todo', content: 'Hall of Vibes', checked: true },
-                    { type: 'todo', content: 'Wall of Shame', checked: true },
-                    { type: 'todo', content: 'SEC Baseball predictions', checked: true },
-                    { type: 'todo', content: 'Weekly Chronicles', checked: true },
-                    { type: 'todo', content: 'WANTED: Jeaux poster', checked: true },
-                    { type: 'todo', content: 'Vibey Notion workspace', checked: false },
-                    { type: 'divider', content: '' },
-                    { type: 'h2', content: 'Ideas in the Pipeline' },
-                    { type: 'todo', content: 'Add your next build idea here...', checked: false },
-                ],
-                createdAt: Date.now(),
-                updatedAt: Date.now()
-            }
-        ];
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+            realtime: { params: { eventsPerSecond: 10 } }
+        });
 
-        // ===== STATE =====
-        let pages = [];
+        // =========================================================================
+        // 2. STATE MANAGEMENT
+        // =========================================================================
+        let pages = [];                 // Array of page objects from DB
+        let blocks = [];                // Blocks for the currently active page
         let activePageId = null;
+        let deletePageId = null;
+        let searchQuery = '';
+        let pendingSaves = 0;           // Track number of in-flight saves
+        let isOnline = true;
+        let focusedBlockId = null;      // Block ID currently focused by user
+        let queuedUpdates = new Map();  // blockId -> payload for updates that arrived while focused
+
+        // Slash menu state
         let slashMenuVisible = false;
         let slashMenuIndex = 0;
         let slashMenuBlock = null;
-        let deletePageId = null;
-        let searchQuery = '';
 
-        // ===== DOM REFS =====
+        // Debounce timers per block
+        const blockSaveTimers = new Map();
+        let titleSaveTimer = null;
+
+        // =========================================================================
+        // DOM REFS
+        // =========================================================================
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
         const sidebarClose = document.getElementById('sidebarClose');
@@ -986,142 +1000,594 @@
         const confirmDelete = document.getElementById('confirmDelete');
         const wordCount = document.getElementById('wordCount');
         const exportBtn = document.getElementById('exportBtn');
+        const syncDot = document.getElementById('syncDot');
+        const syncLabel = document.getElementById('syncLabel');
 
-        // ===== SLASH COMMANDS =====
+        // Slash commands definition
         const slashCommands = [
             { type: 'p', label: 'Text', desc: 'Plain text block', icon: 'Aa' },
             { type: 'h1', label: 'Heading 1', desc: 'Large section heading', icon: 'H1' },
             { type: 'h2', label: 'Heading 2', desc: 'Medium section heading', icon: 'H2' },
             { type: 'h3', label: 'Heading 3', desc: 'Small section heading', icon: 'H3' },
-            { type: 'bullet', label: 'Bullet List', desc: 'Unordered list item', icon: '•' },
+            { type: 'bullet', label: 'Bullet List', desc: 'Unordered list item', icon: '\u2022' },
             { type: 'numbered', label: 'Numbered List', desc: 'Ordered list item', icon: '1.' },
-            { type: 'todo', label: 'To-do', desc: 'Checkbox item', icon: '☐' },
-            { type: 'divider', label: 'Divider', desc: 'Horizontal line separator', icon: '—' },
+            { type: 'todo', label: 'To-do', desc: 'Checkbox item', icon: '\u2610' },
+            { type: 'divider', label: 'Divider', desc: 'Horizontal line separator', icon: '\u2014' },
             { type: 'code', label: 'Code Block', desc: 'Code snippet', icon: '</>' },
         ];
 
-        // ===== HELPERS =====
-        function generateId() {
-            return 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6);
-        }
-
-        function loadData() {
-            try {
-                const data = localStorage.getItem(STORAGE_KEY);
-                if (data) {
-                    pages = JSON.parse(data);
-                    if (!pages || !pages.length) {
-                        pages = JSON.parse(JSON.stringify(defaultPages));
-                    }
-                } else {
-                    pages = JSON.parse(JSON.stringify(defaultPages));
-                }
-            } catch (e) {
-                pages = JSON.parse(JSON.stringify(defaultPages));
-            }
-        }
-
-        function saveData() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(pages));
-            } catch (e) {
-                console.warn('Failed to save:', e);
-            }
-        }
-
-        function getPage(id) {
-            return pages.find(p => p.id === id);
-        }
-
-        // ===== SIDEBAR RENDERING =====
-        function renderSidebar() {
-            const filteredPages = searchQuery
-                ? pages.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()))
-                : pages;
-
-            let html = '<div class="sidebar-section-label">Pages</div>';
-            filteredPages.forEach(page => {
-                const isActive = page.id === activePageId;
-                html += `
-                    <div class="page-item ${isActive ? 'active' : ''}" data-id="${page.id}">
-                        <span class="page-item-icon">${page.icon || '📄'}</span>
-                        <span class="page-item-name">${escapeHtml(page.title) || 'Untitled'}</span>
-                        <div class="page-item-actions">
-                            <button class="page-item-btn rename" data-id="${page.id}" title="Rename">✏</button>
-                            <button class="page-item-btn delete" data-id="${page.id}" title="Delete">×</button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            if (filteredPages.length === 0 && searchQuery) {
-                html += '<div style="padding: 12px; color: var(--text-tertiary); font-size: 13px; text-align: center;">No pages found</div>';
-            }
-
-            pagesList.innerHTML = html;
-
-            // Attach click listeners
-            pagesList.querySelectorAll('.page-item').forEach(el => {
-                el.addEventListener('click', (e) => {
-                    if (e.target.closest('.page-item-btn')) return;
-                    selectPage(el.dataset.id);
-                    closeSidebarMobile();
-                });
-            });
-
-            pagesList.querySelectorAll('.page-item-btn.rename').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    startRename(btn.dataset.id);
-                });
-            });
-
-            pagesList.querySelectorAll('.page-item-btn.delete').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    showDeleteConfirm(btn.dataset.id);
-                });
-            });
-        }
-
+        // =========================================================================
+        // HELPERS
+        // =========================================================================
         function escapeHtml(str) {
             const div = document.createElement('div');
-            div.textContent = str;
+            div.textContent = str || '';
             return div.innerHTML;
         }
 
-        // ===== PAGE SELECTION =====
-        function selectPage(id) {
-            // Save current page first
-            saveCurrentPage();
-
-            activePageId = id;
-            const page = getPage(id);
-            if (!page) return;
-
-            breadcrumbPage.textContent = page.title || 'Untitled';
-            pageTitle.innerHTML = escapeHtml(page.title);
-
-            renderBlocks(page.blocks);
-            renderSidebar();
-            updateWordCount();
+        function stripHtml(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html || '';
+            return div.textContent || '';
         }
 
-        function renderBlocks(blocks) {
-            editorContent.innerHTML = '';
-            if (!blocks || blocks.length === 0) {
-                const block = createBlockElement('p', '');
-                editorContent.appendChild(block);
-                return;
+        function generateUUID() {
+            return crypto.randomUUID ? crypto.randomUUID() :
+                'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+                    const r = Math.random() * 16 | 0;
+                    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                });
+        }
+
+        // =========================================================================
+        // SYNC STATUS INDICATOR
+        // =========================================================================
+        function setSyncStatus(status) {
+            syncDot.className = 'sync-dot';
+            if (status === 'saving') {
+                syncDot.classList.add('saving');
+                syncLabel.textContent = 'Saving...';
+            } else if (status === 'offline') {
+                syncDot.classList.add('offline');
+                syncLabel.textContent = 'Offline';
+            } else {
+                syncLabel.textContent = 'Synced';
             }
-            blocks.forEach(blockData => {
-                const el = createBlockElement(blockData.type, blockData.content, blockData.checked);
-                editorContent.appendChild(el);
+        }
+
+        function trackSave(promise) {
+            pendingSaves++;
+            setSyncStatus('saving');
+            return promise.then(res => {
+                pendingSaves--;
+                if (pendingSaves <= 0) { pendingSaves = 0; setSyncStatus(isOnline ? 'synced' : 'offline'); }
+                return res;
+            }).catch(err => {
+                pendingSaves--;
+                if (pendingSaves <= 0) { pendingSaves = 0; setSyncStatus('offline'); }
+                console.error('Supabase error:', err);
+                return null;
             });
         }
 
-        function createBlockElement(type, content, checked) {
+        // =========================================================================
+        // 3. REALTIME SUBSCRIPTIONS
+        // =========================================================================
+        function setupRealtimeSubscriptions() {
+            // Pages channel
+            sb.channel('notion-pages')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'notion_pages' }, payload => {
+                    handlePageRealtimeEvent(payload);
+                })
+                .subscribe((status) => {
+                    if (status === 'SUBSCRIBED') {
+                        isOnline = true;
+                        if (pendingSaves === 0) setSyncStatus('synced');
+                    } else if (status === 'CLOSED' || status === 'CHANNEL_ERROR') {
+                        isOnline = false;
+                        setSyncStatus('offline');
+                    }
+                });
+
+            // Blocks channel
+            sb.channel('notion-blocks')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'notion_blocks' }, payload => {
+                    handleBlockRealtimeEvent(payload);
+                })
+                .subscribe();
+        }
+
+        function handlePageRealtimeEvent(payload) {
+            const { eventType, new: newRow, old: oldRow } = payload;
+
+            if (eventType === 'INSERT') {
+                // Only add if we don't already have it (optimistic insert)
+                if (!pages.find(p => p.id === newRow.id)) {
+                    pages.push(newRow);
+                    pages.sort((a, b) => a.sort_order - b.sort_order);
+                    renderSidebar();
+                }
+            } else if (eventType === 'UPDATE') {
+                const idx = pages.findIndex(p => p.id === newRow.id);
+                if (idx !== -1) {
+                    pages[idx] = newRow;
+                    pages.sort((a, b) => a.sort_order - b.sort_order);
+                    renderSidebar();
+                    // Update title display if it's the active page
+                    if (activePageId === newRow.id) {
+                        breadcrumbPage.textContent = newRow.title || 'Untitled';
+                        // Only update title contenteditable if user is not editing it
+                        if (document.activeElement !== pageTitle) {
+                            pageTitle.textContent = newRow.title || '';
+                        }
+                    }
+                }
+            } else if (eventType === 'DELETE') {
+                const id = oldRow.id;
+                pages = pages.filter(p => p.id !== id);
+                renderSidebar();
+                if (activePageId === id) {
+                    if (pages.length > 0) {
+                        selectPage(pages[0].id);
+                    } else {
+                        activePageId = null;
+                        showEmptyState();
+                    }
+                }
+            }
+        }
+
+        function handleBlockRealtimeEvent(payload) {
+            const { eventType, new: newRow, old: oldRow } = payload;
+
+            // Only process blocks for the currently active page
+            if (eventType === 'INSERT' || eventType === 'UPDATE') {
+                if (newRow.page_id !== activePageId) return;
+            }
+            if (eventType === 'DELETE') {
+                if (!blocks.find(b => b.id === (oldRow && oldRow.id))) return;
+            }
+
+            if (eventType === 'INSERT') {
+                if (!blocks.find(b => b.id === newRow.id)) {
+                    blocks.push(newRow);
+                    blocks.sort((a, b) => a.sort_order - b.sort_order);
+                    renderBlockFromData(newRow);
+                    reorderDOMBlocks();
+                    reindexNumberedList();
+                }
+            } else if (eventType === 'UPDATE') {
+                const idx = blocks.findIndex(b => b.id === newRow.id);
+                if (idx !== -1) {
+                    blocks[idx] = newRow;
+                    // If this block is currently focused, queue the update
+                    if (focusedBlockId === newRow.id) {
+                        queuedUpdates.set(newRow.id, newRow);
+                    } else {
+                        updateBlockDOM(newRow);
+                    }
+                }
+            } else if (eventType === 'DELETE') {
+                const id = oldRow.id;
+                blocks = blocks.filter(b => b.id !== id);
+                const el = editorContent.querySelector(`[data-block-id="${id}"]`);
+                if (el) el.remove();
+                reindexNumberedList();
+            }
+        }
+
+        function reorderDOMBlocks() {
+            const sorted = [...blocks].sort((a, b) => a.sort_order - b.sort_order);
+            sorted.forEach(b => {
+                const el = editorContent.querySelector(`[data-block-id="${b.id}"]`);
+                if (el) editorContent.appendChild(el);
+            });
+        }
+
+        function updateBlockDOM(blockData) {
+            const el = editorContent.querySelector(`[data-block-id="${blockData.id}"]`);
+            if (!el) return;
+
+            const type = blockData.type;
+            const currentType = el.dataset.type;
+
+            // If type changed, re-render the whole block
+            if (currentType !== type) {
+                const newEl = createBlockElement(type, blockData.content, blockData.checked, blockData.id);
+                el.replaceWith(newEl);
+                reindexNumberedList();
+                return;
+            }
+
+            // Same type — just update content
+            if (type === 'todo') {
+                const textEl = el.querySelector('.todo-text');
+                if (textEl) textEl.innerHTML = blockData.content || '';
+                const cb = el.querySelector('.todo-checkbox');
+                if (cb) {
+                    cb.classList.toggle('checked', !!blockData.checked);
+                    el.classList.toggle('completed', !!blockData.checked);
+                }
+            } else if (type === 'bullet' || type === 'numbered') {
+                const textEl = el.querySelector('span[contenteditable]');
+                if (textEl) textEl.innerHTML = blockData.content || '';
+            } else if (type === 'divider') {
+                // Nothing to update
+            } else {
+                el.innerHTML = blockData.content || '';
+            }
+            reindexNumberedList();
+        }
+
+        // =========================================================================
+        // 4. PAGE CRUD
+        // =========================================================================
+        async function loadPages() {
+            const { data, error } = await sb
+                .from('notion_pages')
+                .select('*')
+                .order('sort_order', { ascending: true });
+
+            if (error) {
+                console.error('Failed to load pages:', error);
+                setSyncStatus('offline');
+                return;
+            }
+
+            pages = data || [];
+
+            // If no pages exist, seed the defaults
+            if (pages.length === 0) {
+                await seedDefaultPages();
+            }
+
+            renderSidebar();
+
+            if (pages.length > 0) {
+                selectPage(pages[0].id);
+            } else {
+                showEmptyState();
+            }
+        }
+
+        async function seedDefaultPages() {
+            const defaultPages = [
+                { title: 'Welcome to Vibey Notion', icon: '\uD83D\uDC4B', sort_order: 0 },
+                { title: 'Group Ideas', icon: '\uD83D\uDCA1', sort_order: 1 },
+                { title: 'Build Log', icon: '\uD83D\uDD28', sort_order: 2 }
+            ];
+
+            const { data: insertedPages, error } = await sb
+                .from('notion_pages')
+                .insert(defaultPages)
+                .select();
+
+            if (error || !insertedPages) {
+                console.error('Failed to seed pages:', error);
+                return;
+            }
+
+            pages = insertedPages;
+
+            // Seed blocks for the Welcome page
+            const welcomeId = insertedPages[0].id;
+            const welcomeBlocks = [
+                { page_id: welcomeId, type: 'h1', content: 'Welcome to Vibey Notion', sort_order: 0 },
+                { page_id: welcomeId, type: 'p', content: 'A minimal workspace for the vibey boyz. Jot down ideas, track builds, plan world domination \u2014 whatever you need.', sort_order: 1 },
+                { page_id: welcomeId, type: 'h2', content: 'How to use', sort_order: 2 },
+                { page_id: welcomeId, type: 'todo', content: 'Click on a page in the sidebar to open it', checked: false, sort_order: 3 },
+                { page_id: welcomeId, type: 'todo', content: 'Click the + New page button to create a page', checked: false, sort_order: 4 },
+                { page_id: welcomeId, type: 'todo', content: 'Start typing to add content', checked: false, sort_order: 5 },
+                { page_id: welcomeId, type: 'todo', content: 'Type / to open the command menu', checked: false, sort_order: 6 },
+                { page_id: welcomeId, type: 'divider', content: '', sort_order: 7 },
+                { page_id: welcomeId, type: 'h2', content: 'Block types', sort_order: 8 },
+                { page_id: welcomeId, type: 'p', content: 'You can create different block types with shortcuts:', sort_order: 9 },
+                { page_id: welcomeId, type: 'bullet', content: 'Type <strong>#</strong> + space for Heading 1', sort_order: 10 },
+                { page_id: welcomeId, type: 'bullet', content: 'Type <strong>##</strong> + space for Heading 2', sort_order: 11 },
+                { page_id: welcomeId, type: 'bullet', content: 'Type <strong>###</strong> + space for Heading 3', sort_order: 12 },
+                { page_id: welcomeId, type: 'bullet', content: 'Type <strong>-</strong> + space for bullet list', sort_order: 13 },
+                { page_id: welcomeId, type: 'bullet', content: 'Type <strong>1.</strong> + space for numbered list', sort_order: 14 },
+                { page_id: welcomeId, type: 'bullet', content: 'Type <strong>[]</strong> + space for a todo checkbox', sort_order: 15 },
+                { page_id: welcomeId, type: 'bullet', content: 'Type <strong>---</strong> for a divider', sort_order: 16 },
+                { page_id: welcomeId, type: 'bullet', content: 'Type <strong>```</strong> for a code block', sort_order: 17 },
+                { page_id: welcomeId, type: 'divider', content: '', sort_order: 18 },
+                { page_id: welcomeId, type: 'p', content: 'Everything syncs in real-time across all devices. Happy vibing. \u2728', sort_order: 19 },
+            ];
+
+            await sb.from('notion_blocks').insert(welcomeBlocks);
+
+            // Seed blocks for Group Ideas
+            const ideasId = insertedPages[1].id;
+            const ideasBlocks = [
+                { page_id: ideasId, type: 'h1', content: 'Group Ideas', sort_order: 0 },
+                { page_id: ideasId, type: 'p', content: 'Drop your ideas here. No idea is too wild.', sort_order: 1 },
+                { page_id: ideasId, type: 'divider', content: '', sort_order: 2 },
+                { page_id: ideasId, type: 'p', content: '', sort_order: 3 },
+            ];
+            await sb.from('notion_blocks').insert(ideasBlocks);
+
+            // Seed blocks for Build Log
+            const buildId = insertedPages[2].id;
+            const buildBlocks = [
+                { page_id: buildId, type: 'h1', content: 'Build Log', sort_order: 0 },
+                { page_id: buildId, type: 'p', content: 'A record of everything the vibey boyz have shipped.', sort_order: 1 },
+                { page_id: buildId, type: 'divider', content: '', sort_order: 2 },
+                { page_id: buildId, type: 'h2', content: 'Shipped', sort_order: 3 },
+                { page_id: buildId, type: 'todo', content: 'Vibey Boyz landing page', checked: true, sort_order: 4 },
+                { page_id: buildId, type: 'todo', content: 'Lady Bayles portrait', checked: true, sort_order: 5 },
+                { page_id: buildId, type: 'todo', content: 'Hall of Vibes', checked: true, sort_order: 6 },
+                { page_id: buildId, type: 'todo', content: 'Wall of Shame', checked: true, sort_order: 7 },
+                { page_id: buildId, type: 'todo', content: 'SEC Baseball predictions', checked: true, sort_order: 8 },
+                { page_id: buildId, type: 'todo', content: 'Weekly Chronicles', checked: true, sort_order: 9 },
+                { page_id: buildId, type: 'todo', content: 'WANTED: Jeaux poster', checked: true, sort_order: 10 },
+                { page_id: buildId, type: 'todo', content: 'Vibey Notion workspace', checked: true, sort_order: 11 },
+                { page_id: buildId, type: 'divider', content: '', sort_order: 12 },
+                { page_id: buildId, type: 'h2', content: 'Ideas in the Pipeline', sort_order: 13 },
+                { page_id: buildId, type: 'todo', content: 'Add your next build idea here...', checked: false, sort_order: 14 },
+            ];
+            await sb.from('notion_blocks').insert(buildBlocks);
+        }
+
+        async function createNewPage() {
+            const maxOrder = pages.reduce((max, p) => Math.max(max, p.sort_order || 0), -1);
+            const newPage = {
+                id: generateUUID(),
+                title: 'Untitled',
+                icon: '\uD83D\uDCC4',
+                sort_order: maxOrder + 1
+            };
+
+            // Optimistic: add to local state and render
+            pages.push(newPage);
+            renderSidebar();
+            selectPage(newPage.id);
+
+            // Focus the title for easy rename
+            pageTitle.focus();
+            const range = document.createRange();
+            range.selectNodeContents(pageTitle);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            // Persist to Supabase
+            trackSave(
+                sb.from('notion_pages').insert({
+                    id: newPage.id,
+                    title: newPage.title,
+                    icon: newPage.icon,
+                    sort_order: newPage.sort_order
+                }).then()
+            );
+        }
+
+        async function renamePage(id, newTitle) {
+            const page = pages.find(p => p.id === id);
+            if (!page) return;
+            page.title = newTitle;
+            if (activePageId === id) {
+                breadcrumbPage.textContent = newTitle;
+            }
+            renderSidebar();
+            trackSave(
+                sb.from('notion_pages').update({ title: newTitle, updated_at: new Date().toISOString() }).eq('id', id).then()
+            );
+        }
+
+        async function deletePageConfirmed(id) {
+            // Optimistic: remove from local state
+            pages = pages.filter(p => p.id !== id);
+            renderSidebar();
+
+            if (activePageId === id) {
+                if (pages.length > 0) {
+                    selectPage(pages[0].id);
+                } else {
+                    activePageId = null;
+                    blocks = [];
+                    showEmptyState();
+                }
+            }
+
+            // Persist (cascade will delete blocks)
+            trackSave(sb.from('notion_pages').delete().eq('id', id).then());
+        }
+
+        // =========================================================================
+        // 5. BLOCK CRUD
+        // =========================================================================
+        async function loadBlocksForPage(pageId) {
+            const { data, error } = await sb
+                .from('notion_blocks')
+                .select('*')
+                .eq('page_id', pageId)
+                .order('sort_order', { ascending: true });
+
+            if (error) {
+                console.error('Failed to load blocks:', error);
+                return [];
+            }
+
+            return data || [];
+        }
+
+        function saveBlockDebounced(blockId) {
+            if (blockSaveTimers.has(blockId)) {
+                clearTimeout(blockSaveTimers.get(blockId));
+            }
+            blockSaveTimers.set(blockId, setTimeout(() => {
+                blockSaveTimers.delete(blockId);
+                persistBlock(blockId);
+            }, 500));
+        }
+
+        function persistBlock(blockId) {
+            const blockData = blocks.find(b => b.id === blockId);
+            if (!blockData) return;
+
+            // Read content from DOM
+            const el = editorContent.querySelector(`[data-block-id="${blockId}"]`);
+            if (!el) return;
+
+            const type = el.dataset.type || 'p';
+            let content = '';
+            let checked = null;
+
+            if (type === 'todo') {
+                content = el.querySelector('.todo-text')?.innerHTML || '';
+                checked = el.querySelector('.todo-checkbox')?.classList.contains('checked') || false;
+            } else if (type === 'bullet' || type === 'numbered') {
+                content = el.querySelector('span[contenteditable]')?.innerHTML || '';
+            } else if (type === 'divider') {
+                content = '';
+            } else {
+                content = el.innerHTML;
+            }
+
+            // Update local state
+            blockData.content = content;
+            blockData.type = type;
+            if (checked !== null) blockData.checked = checked;
+
+            // Persist to Supabase
+            const updatePayload = {
+                content,
+                type,
+                updated_at: new Date().toISOString()
+            };
+            if (checked !== null) updatePayload.checked = checked;
+
+            trackSave(sb.from('notion_blocks').update(updatePayload).eq('id', blockId).then());
+        }
+
+        async function insertBlock(type, content, afterBlockId, checked) {
+            const id = generateUUID();
+
+            // Determine sort_order
+            let sortOrder = 0;
+            if (afterBlockId) {
+                const afterBlock = blocks.find(b => b.id === afterBlockId);
+                const afterIdx = blocks.indexOf(afterBlock);
+                if (afterIdx !== -1) {
+                    // Shift all blocks after this one
+                    const nextBlocks = blocks.filter(b => b.sort_order > afterBlock.sort_order);
+                    nextBlocks.forEach(b => b.sort_order += 1);
+                    sortOrder = afterBlock.sort_order + 1;
+
+                    // Batch update sort orders in Supabase for shifted blocks
+                    if (nextBlocks.length > 0) {
+                        // Fire-and-forget sort order updates
+                        nextBlocks.forEach(b => {
+                            sb.from('notion_blocks').update({ sort_order: b.sort_order }).eq('id', b.id).then();
+                        });
+                    }
+                }
+            } else {
+                sortOrder = blocks.length > 0 ? Math.max(...blocks.map(b => b.sort_order)) + 1 : 0;
+            }
+
+            const newBlock = {
+                id,
+                page_id: activePageId,
+                type,
+                content: content || '',
+                checked: checked || false,
+                sort_order: sortOrder
+            };
+
+            // Optimistic: add to state and DOM
+            blocks.push(newBlock);
+            blocks.sort((a, b) => a.sort_order - b.sort_order);
+            const el = createBlockElement(type, content, checked, id);
+
+            if (afterBlockId) {
+                const afterEl = editorContent.querySelector(`[data-block-id="${afterBlockId}"]`);
+                if (afterEl) {
+                    afterEl.after(el);
+                } else {
+                    editorContent.appendChild(el);
+                }
+            } else {
+                editorContent.appendChild(el);
+            }
+
+            // Persist
+            trackSave(sb.from('notion_blocks').insert({
+                id: newBlock.id,
+                page_id: newBlock.page_id,
+                type: newBlock.type,
+                content: newBlock.content,
+                checked: newBlock.checked,
+                sort_order: newBlock.sort_order
+            }).then());
+
+            return el;
+        }
+
+        async function deleteBlock(blockId) {
+            blocks = blocks.filter(b => b.id !== blockId);
+            const el = editorContent.querySelector(`[data-block-id="${blockId}"]`);
+            if (el) el.remove();
+
+            trackSave(sb.from('notion_blocks').delete().eq('id', blockId).then());
+        }
+
+        async function updateBlockType(blockId, newType) {
+            const blockData = blocks.find(b => b.id === blockId);
+            if (!blockData) return;
+            blockData.type = newType;
+            blockData.content = '';
+
+            trackSave(
+                sb.from('notion_blocks').update({
+                    type: newType,
+                    content: '',
+                    updated_at: new Date().toISOString()
+                }).eq('id', blockId).then()
+            );
+        }
+
+        async function updateBlockChecked(blockId, checked) {
+            const blockData = blocks.find(b => b.id === blockId);
+            if (!blockData) return;
+            blockData.checked = checked;
+
+            trackSave(
+                sb.from('notion_blocks').update({
+                    checked,
+                    updated_at: new Date().toISOString()
+                }).eq('id', blockId).then()
+            );
+        }
+
+        // =========================================================================
+        // 6. EDITOR / DOM RENDERING
+        // =========================================================================
+        function renderAllBlocks() {
+            editorContent.innerHTML = '';
+            if (!blocks || blocks.length === 0) {
+                // Create a default empty block
+                insertBlock('p', '', null);
+                return;
+            }
+            blocks.sort((a, b) => a.sort_order - b.sort_order);
+            blocks.forEach(blockData => {
+                const el = createBlockElement(blockData.type, blockData.content, blockData.checked, blockData.id);
+                editorContent.appendChild(el);
+            });
+            reindexNumberedList();
+        }
+
+        function renderBlockFromData(blockData) {
+            // Only add if not already in DOM
+            if (editorContent.querySelector(`[data-block-id="${blockData.id}"]`)) return;
+            const el = createBlockElement(blockData.type, blockData.content, blockData.checked, blockData.id);
+            editorContent.appendChild(el);
+        }
+
+        function createBlockElement(type, content, checked, blockId) {
             let el;
+            const id = blockId || generateUUID();
 
             switch (type) {
                 case 'h1':
@@ -1149,7 +1615,7 @@
                     el.style.alignItems = 'flex-start';
                     el.style.gap = '8px';
                     const bullet = document.createElement('span');
-                    bullet.textContent = '•';
+                    bullet.textContent = '\u2022';
                     bullet.style.color = 'var(--accent)';
                     bullet.style.fontWeight = '700';
                     bullet.style.lineHeight = '1.7';
@@ -1163,7 +1629,9 @@
                     el.appendChild(bullet);
                     el.appendChild(text);
                     el.dataset.type = 'bullet';
-                    setupBulletKeys(el, text);
+                    el.dataset.blockId = id;
+                    setupCompoundBlockKeys(el, text, id);
+                    setupBlockFocusTracking(text, id);
                     return el;
                 }
                 case 'numbered': {
@@ -1180,7 +1648,6 @@
                     num.style.flexShrink = '0';
                     num.style.minWidth = '18px';
                     num.contentEditable = false;
-                    // Number will be set by reindex
                     const text = document.createElement('span');
                     text.contentEditable = true;
                     text.style.flex = '1';
@@ -1189,8 +1656,9 @@
                     el.appendChild(num);
                     el.appendChild(text);
                     el.dataset.type = 'numbered';
-                    setupBulletKeys(el, text);
-                    reindexNumberedList();
+                    el.dataset.blockId = id;
+                    setupCompoundBlockKeys(el, text, id);
+                    setupBlockFocusTracking(text, id);
                     return el;
                 }
                 case 'todo': {
@@ -1201,7 +1669,8 @@
                     cb.addEventListener('click', () => {
                         cb.classList.toggle('checked');
                         el.classList.toggle('completed');
-                        saveCurrentPage();
+                        const isChecked = cb.classList.contains('checked');
+                        updateBlockChecked(id, isChecked);
                     });
                     const text = document.createElement('div');
                     text.className = 'todo-text';
@@ -1210,18 +1679,20 @@
                     el.appendChild(cb);
                     el.appendChild(text);
                     el.dataset.type = 'todo';
-                    setupBulletKeys(el, text);
+                    el.dataset.blockId = id;
+                    setupCompoundBlockKeys(el, text, id);
+                    setupBlockFocusTracking(text, id);
                     return el;
                 }
                 case 'divider':
                     el = document.createElement('hr');
                     el.className = 'block divider';
                     el.dataset.type = 'divider';
+                    el.dataset.blockId = id;
                     el.addEventListener('click', () => {
-                        // Create a new block after divider if clicked
-                        const newBlock = createBlockElement('p', '');
-                        el.after(newBlock);
-                        focusBlock(newBlock);
+                        insertBlock('p', '', id).then(newEl => {
+                            if (newEl) focusBlock(newEl);
+                        });
                     });
                     return el;
                 case 'code':
@@ -1236,6 +1707,8 @@
                             document.execCommand('insertText', false, '  ');
                         }
                     });
+                    el.dataset.blockId = id;
+                    setupBlockFocusTracking(el, id);
                     return el;
                 default:
                     el = document.createElement('p');
@@ -1245,42 +1718,83 @@
             }
 
             el.dataset.type = type;
+            el.dataset.blockId = id;
+            setupBlockFocusTracking(el, id);
             return el;
         }
 
-        function setupBulletKeys(container, textEl) {
+        function setupBlockFocusTracking(editableEl, blockId) {
+            editableEl.addEventListener('focus', () => {
+                focusedBlockId = blockId;
+            });
+            editableEl.addEventListener('blur', () => {
+                if (focusedBlockId === blockId) {
+                    focusedBlockId = null;
+                    // Apply any queued remote updates
+                    if (queuedUpdates.has(blockId)) {
+                        const queuedData = queuedUpdates.get(blockId);
+                        queuedUpdates.delete(blockId);
+                        updateBlockDOM(queuedData);
+                    }
+                }
+            });
+        }
+
+        function setupCompoundBlockKeys(container, textEl, blockId) {
             textEl.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     const type = container.dataset.type;
                     if (textEl.textContent.trim() === '') {
-                        // Empty bullet/todo → convert to plain paragraph
-                        const p = createBlockElement('p', '');
-                        container.after(p);
-                        container.remove();
-                        focusBlock(p);
-                        reindexNumberedList();
+                        // Empty item -> convert to plain paragraph
+                        replaceBlockWithType(blockId, 'p', '');
                     } else {
+                        // Save current block content first
+                        saveBlockDebounced(blockId);
                         // Create new block of same type
-                        const checked = type === 'todo' ? false : undefined;
-                        const newBlock = createBlockElement(type, '', checked);
-                        container.after(newBlock);
-                        focusBlock(newBlock);
-                        reindexNumberedList();
+                        const newChecked = type === 'todo' ? false : undefined;
+                        insertBlock(type, '', blockId, newChecked).then(newEl => {
+                            if (newEl) {
+                                focusBlock(newEl);
+                                reindexNumberedList();
+                            }
+                        });
                     }
-                    saveCurrentPage();
                 }
                 if (e.key === 'Backspace' && textEl.textContent === '') {
                     e.preventDefault();
                     const prev = container.previousElementSibling;
-                    const p = createBlockElement('p', '');
-                    container.after(p);
-                    container.remove();
-                    focusBlock(p);
+                    deleteBlock(blockId);
+                    if (prev) {
+                        focusBlockEnd(prev);
+                    }
                     reindexNumberedList();
-                    saveCurrentPage();
                 }
             });
+        }
+
+        async function replaceBlockWithType(blockId, newType, content) {
+            const blockData = blocks.find(b => b.id === blockId);
+            if (!blockData) return;
+
+            blockData.type = newType;
+            blockData.content = content || '';
+
+            const oldEl = editorContent.querySelector(`[data-block-id="${blockId}"]`);
+            if (!oldEl) return;
+
+            const newEl = createBlockElement(newType, content, false, blockId);
+            oldEl.replaceWith(newEl);
+            focusBlock(newEl);
+            reindexNumberedList();
+
+            trackSave(
+                sb.from('notion_blocks').update({
+                    type: newType,
+                    content: content || '',
+                    updated_at: new Date().toISOString()
+                }).eq('id', blockId).then()
+            );
         }
 
         function focusBlock(block) {
@@ -1293,6 +1807,26 @@
                     if (t) t.focus();
                 } else if (block.contentEditable === 'true') {
                     block.focus();
+                }
+            });
+        }
+
+        function focusBlockEnd(block) {
+            requestAnimationFrame(() => {
+                let target = block;
+                if (block.dataset && block.dataset.type === 'todo') {
+                    target = block.querySelector('.todo-text') || block;
+                } else if (block.dataset && (block.dataset.type === 'bullet' || block.dataset.type === 'numbered')) {
+                    target = block.querySelector('span[contenteditable]') || block;
+                }
+                if (target.contentEditable === 'true' || target.isContentEditable) {
+                    target.focus();
+                    const range = document.createRange();
+                    range.selectNodeContents(target);
+                    range.collapse(false);
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
                 }
             });
         }
@@ -1310,146 +1844,24 @@
             });
         }
 
-        // ===== SAVE CURRENT PAGE =====
-        function saveCurrentPage() {
-            if (!activePageId) return;
-            const page = getPage(activePageId);
-            if (!page) return;
-
-            // Save title
-            page.title = pageTitle.textContent.trim() || 'Untitled';
-            breadcrumbPage.textContent = page.title;
-
-            // Save blocks
-            page.blocks = [];
-            editorContent.querySelectorAll('.block').forEach(block => {
-                const type = block.dataset.type || 'p';
-                let content = '';
-                let checked = undefined;
-
-                if (type === 'todo') {
-                    content = block.querySelector('.todo-text')?.innerHTML || '';
-                    checked = block.querySelector('.todo-checkbox')?.classList.contains('checked') || false;
-                } else if (type === 'bullet' || type === 'numbered') {
-                    content = block.querySelector('span[contenteditable]')?.innerHTML || '';
-                } else if (type === 'divider') {
-                    content = '';
-                } else {
-                    content = block.innerHTML;
-                }
-
-                page.blocks.push({ type, content, ...(checked !== undefined ? { checked } : {}) });
-            });
-
-            page.updatedAt = Date.now();
-            saveData();
-            renderSidebar();
-        }
-
-        // ===== PAGE OPERATIONS =====
-        function createNewPage() {
-            const page = {
-                id: generateId(),
-                icon: '📄',
-                title: 'Untitled',
-                blocks: [{ type: 'p', content: '' }],
-                createdAt: Date.now(),
-                updatedAt: Date.now()
-            };
-            pages.unshift(page);
-            saveData();
-            selectPage(page.id);
-            pageTitle.focus();
-
-            // Select all text in title for easy overwrite
-            const range = document.createRange();
-            range.selectNodeContents(pageTitle);
+        function getCurrentBlock() {
             const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-        }
-
-        function startRename(id) {
-            const pageItem = pagesList.querySelector(`.page-item[data-id="${id}"]`);
-            if (!pageItem) return;
-            const nameEl = pageItem.querySelector('.page-item-name');
-            const page = getPage(id);
-            if (!page) return;
-
-            const input = document.createElement('input');
-            input.className = 'rename-input';
-            input.value = page.title;
-            nameEl.replaceWith(input);
-            input.focus();
-            input.select();
-
-            const finish = () => {
-                const newTitle = input.value.trim() || 'Untitled';
-                page.title = newTitle;
-                if (activePageId === id) {
-                    pageTitle.textContent = newTitle;
-                    breadcrumbPage.textContent = newTitle;
-                }
-                saveData();
-                renderSidebar();
-            };
-
-            input.addEventListener('blur', finish);
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
-                if (e.key === 'Escape') { input.blur(); }
-            });
-        }
-
-        function showDeleteConfirm(id) {
-            deletePageId = id;
-            const page = getPage(id);
-            confirmMessage.textContent = `Are you sure you want to delete "${page?.title || 'Untitled'}"? This cannot be undone.`;
-            confirmDialog.classList.add('visible');
-        }
-
-        function deletePage(id) {
-            const idx = pages.findIndex(p => p.id === id);
-            if (idx === -1) return;
-            pages.splice(idx, 1);
-            saveData();
-
-            if (activePageId === id) {
-                if (pages.length > 0) {
-                    selectPage(pages[0].id);
-                } else {
-                    activePageId = null;
-                    editorContent.innerHTML = '';
-                    pageTitle.textContent = '';
-                    breadcrumbPage.textContent = '';
-                    showEmptyState();
-                }
+            if (!sel || !sel.anchorNode) return null;
+            let node = sel.anchorNode;
+            while (node && node !== editorContent) {
+                if (node.classList && node.classList.contains('block')) return node;
+                node = node.parentElement;
             }
-            renderSidebar();
+            return null;
         }
 
-        function showEmptyState() {
-            editorContent.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">📝</div>
-                    <div class="empty-state-text">No page selected</div>
-                    <div class="empty-state-sub">Create a new page to get started</div>
-                </div>
-            `;
+        function getBlockId(blockEl) {
+            return blockEl ? blockEl.dataset.blockId : null;
         }
 
-        // ===== SIDEBAR MOBILE =====
-        function openSidebarMobile() {
-            sidebar.classList.add('open');
-            sidebarOverlay.classList.add('visible');
-        }
-
-        function closeSidebarMobile() {
-            sidebar.classList.remove('open');
-            sidebarOverlay.classList.remove('visible');
-        }
-
-        // ===== SLASH MENU =====
+        // =========================================================================
+        // 7. SLASH COMMANDS
+        // =========================================================================
         function showSlashMenu(block) {
             slashMenuBlock = block;
             slashMenuIndex = 0;
@@ -1492,7 +1904,6 @@
 
             slashMenu.innerHTML = html;
 
-            // Click handlers
             slashMenu.querySelectorAll('.slash-menu-item').forEach(item => {
                 item.addEventListener('mousedown', (e) => {
                     e.preventDefault();
@@ -1524,7 +1935,6 @@
                 }
             }
 
-            // Keep in viewport
             const menuHeight = 360;
             if (top + menuHeight > window.innerHeight) {
                 top = rect.top - menuHeight - 4;
@@ -1539,32 +1949,47 @@
             if (!slashMenuBlock) { hideSlashMenu(); return; }
 
             const block = slashMenuBlock;
+            const blockId = getBlockId(block);
             hideSlashMenu();
 
             if (type === 'divider') {
-                const newEl = createBlockElement('divider', '');
-                block.after(newEl);
-                // Also add a paragraph after divider
-                const pAfter = createBlockElement('p', '');
-                newEl.after(pAfter);
-                block.remove();
-                focusBlock(pAfter);
+                // Replace current block with divider and add a paragraph after
+                replaceBlockWithType(blockId, 'divider', '').then(() => {
+                    insertBlock('p', '', blockId).then(newEl => {
+                        if (newEl) focusBlock(newEl);
+                    });
+                });
             } else {
-                const newEl = createBlockElement(type, '');
-                block.after(newEl);
-                block.remove();
-                focusBlock(newEl);
-                reindexNumberedList();
+                replaceBlockWithType(blockId, type, '');
             }
-
-            saveCurrentPage();
         }
 
-        // ===== MARKDOWN SHORTCUTS =====
+        function getSlashFilter() {
+            const block = slashMenuBlock;
+            if (!block) return null;
+
+            let textEl = block;
+            if (block.dataset.type === 'bullet' || block.dataset.type === 'numbered') {
+                textEl = block.querySelector('span[contenteditable]');
+            } else if (block.dataset.type === 'todo') {
+                textEl = block.querySelector('.todo-text');
+            }
+            if (!textEl) return null;
+
+            const text = textEl.textContent;
+            if (!text.startsWith('/')) return null;
+            return text.slice(1);
+        }
+
+        // =========================================================================
+        // 8. MARKDOWN SHORTCUTS
+        // =========================================================================
         function checkMarkdownShortcut(block) {
             if (!block || block.dataset.type === 'code') return false;
 
-            // Get the text content — handle various block types
+            const blockId = getBlockId(block);
+            if (!blockId) return false;
+
             let textEl = block;
             if (block.dataset.type === 'bullet' || block.dataset.type === 'numbered') {
                 textEl = block.querySelector('span[contenteditable]');
@@ -1589,27 +2014,199 @@
             for (const sc of shortcuts) {
                 if (sc.pattern.test(text)) {
                     if (sc.type === 'divider') {
-                        const newEl = createBlockElement('divider', '');
-                        block.after(newEl);
-                        const pAfter = createBlockElement('p', '');
-                        newEl.after(pAfter);
-                        block.remove();
-                        focusBlock(pAfter);
+                        replaceBlockWithType(blockId, 'divider', '').then(() => {
+                            insertBlock('p', '', blockId).then(newEl => {
+                                if (newEl) focusBlock(newEl);
+                            });
+                        });
                     } else {
-                        const newEl = createBlockElement(sc.type, '');
-                        block.after(newEl);
-                        block.remove();
-                        focusBlock(newEl);
+                        replaceBlockWithType(blockId, sc.type, '');
                     }
-                    reindexNumberedList();
-                    saveCurrentPage();
                     return true;
                 }
             }
             return false;
         }
 
-        // ===== EDITOR KEY HANDLING =====
+        // =========================================================================
+        // 9. UI CHROME (sidebar, topbar, dialogs, mobile)
+        // =========================================================================
+
+        // --- Sidebar rendering ---
+        function renderSidebar() {
+            const filteredPages = searchQuery
+                ? pages.filter(p => (p.title || '').toLowerCase().includes(searchQuery.toLowerCase()))
+                : pages;
+
+            let html = '<div class="sidebar-section-label">Pages</div>';
+            filteredPages.forEach(page => {
+                const isActive = page.id === activePageId;
+                html += `
+                    <div class="page-item ${isActive ? 'active' : ''}" data-id="${page.id}">
+                        <span class="page-item-icon">${page.icon || '\uD83D\uDCC4'}</span>
+                        <span class="page-item-name">${escapeHtml(page.title) || 'Untitled'}</span>
+                        <div class="page-item-actions">
+                            <button class="page-item-btn rename" data-id="${page.id}" title="Rename">\u270F</button>
+                            <button class="page-item-btn delete" data-id="${page.id}" title="Delete">\u00D7</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (filteredPages.length === 0 && searchQuery) {
+                html += '<div style="padding: 12px; color: var(--text-tertiary); font-size: 13px; text-align: center;">No pages found</div>';
+            }
+
+            pagesList.innerHTML = html;
+
+            // Attach click listeners
+            pagesList.querySelectorAll('.page-item').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    if (e.target.closest('.page-item-btn')) return;
+                    selectPage(el.dataset.id);
+                    closeSidebarMobile();
+                });
+            });
+
+            pagesList.querySelectorAll('.page-item-btn.rename').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    startRename(btn.dataset.id);
+                });
+            });
+
+            pagesList.querySelectorAll('.page-item-btn.delete').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showDeleteConfirm(btn.dataset.id);
+                });
+            });
+        }
+
+        // --- Page selection ---
+        async function selectPage(id) {
+            // Flush any pending saves for current page
+            blockSaveTimers.forEach((timer, blockId) => {
+                clearTimeout(timer);
+                persistBlock(blockId);
+            });
+            blockSaveTimers.clear();
+
+            activePageId = id;
+            const page = pages.find(p => p.id === id);
+            if (!page) return;
+
+            breadcrumbPage.textContent = page.title || 'Untitled';
+            pageTitle.textContent = page.title || '';
+
+            // Show loading state
+            editorContent.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><span style="font-size:13px;">Loading blocks...</span></div>';
+
+            // Load blocks from Supabase
+            blocks = await loadBlocksForPage(id);
+            renderAllBlocks();
+            renderSidebar();
+            updateWordCount();
+        }
+
+        // --- Rename ---
+        function startRename(id) {
+            const pageItem = pagesList.querySelector(`.page-item[data-id="${id}"]`);
+            if (!pageItem) return;
+            const nameEl = pageItem.querySelector('.page-item-name');
+            const page = pages.find(p => p.id === id);
+            if (!page) return;
+
+            const input = document.createElement('input');
+            input.className = 'rename-input';
+            input.value = page.title || '';
+            nameEl.replaceWith(input);
+            input.focus();
+            input.select();
+
+            const finish = () => {
+                const newTitle = input.value.trim() || 'Untitled';
+                renamePage(id, newTitle);
+            };
+
+            input.addEventListener('blur', finish);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+                if (e.key === 'Escape') { input.blur(); }
+            });
+        }
+
+        // --- Delete confirm ---
+        function showDeleteConfirm(id) {
+            deletePageId = id;
+            const page = pages.find(p => p.id === id);
+            confirmMessage.textContent = `Are you sure you want to delete "${page?.title || 'Untitled'}"? This cannot be undone.`;
+            confirmDialog.classList.add('visible');
+        }
+
+        // --- Empty state ---
+        function showEmptyState() {
+            pageTitle.textContent = '';
+            breadcrumbPage.textContent = '';
+            editorContent.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">\uD83D\uDCDD</div>
+                    <div class="empty-state-text">No page selected</div>
+                    <div class="empty-state-sub">Create a new page to get started</div>
+                </div>
+            `;
+        }
+
+        // --- Mobile sidebar ---
+        function openSidebarMobile() {
+            sidebar.classList.add('open');
+            sidebarOverlay.classList.add('visible');
+        }
+
+        function closeSidebarMobile() {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('visible');
+        }
+
+        // --- Word count ---
+        function updateWordCount() {
+            const text = editorContent.textContent.trim();
+            const words = text ? text.split(/\s+/).length : 0;
+            wordCount.textContent = words + ' word' + (words !== 1 ? 's' : '');
+        }
+
+        // --- Export ---
+        function exportPage() {
+            const page = pages.find(p => p.id === activePageId);
+            if (!page) return;
+
+            let md = '# ' + (page.title || 'Untitled') + '\n\n';
+            blocks.forEach(b => {
+                switch (b.type) {
+                    case 'h1': md += '# ' + stripHtml(b.content) + '\n\n'; break;
+                    case 'h2': md += '## ' + stripHtml(b.content) + '\n\n'; break;
+                    case 'h3': md += '### ' + stripHtml(b.content) + '\n\n'; break;
+                    case 'p': md += stripHtml(b.content) + '\n\n'; break;
+                    case 'bullet': md += '- ' + stripHtml(b.content) + '\n'; break;
+                    case 'numbered': md += '1. ' + stripHtml(b.content) + '\n'; break;
+                    case 'todo': md += (b.checked ? '- [x] ' : '- [ ] ') + stripHtml(b.content) + '\n'; break;
+                    case 'divider': md += '---\n\n'; break;
+                    case 'code': md += '```\n' + stripHtml(b.content) + '\n```\n\n'; break;
+                }
+            });
+
+            const blob = new Blob([md], { type: 'text/markdown' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = (page.title || 'untitled').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() + '.md';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // =========================================================================
+        // EDITOR KEY HANDLING
+        // =========================================================================
         editorContent.addEventListener('keydown', (e) => {
             // Slash menu navigation
             if (slashMenuVisible) {
@@ -1641,15 +2238,17 @@
 
             const block = getCurrentBlock();
             if (!block) return;
+            const blockId = getBlockId(block);
 
-            // Enter key: create new block
+            // Enter key: create new block (for simple block types)
             if (e.key === 'Enter' && !e.shiftKey && block.dataset.type !== 'code'
                 && block.dataset.type !== 'bullet' && block.dataset.type !== 'numbered' && block.dataset.type !== 'todo') {
                 e.preventDefault();
-                const newBlock = createBlockElement('p', '');
-                block.after(newBlock);
-                focusBlock(newBlock);
-                saveCurrentPage();
+                // Persist current block content first
+                if (blockId) saveBlockDebounced(blockId);
+                insertBlock('p', '', blockId).then(newEl => {
+                    if (newEl) focusBlock(newEl);
+                });
                 return;
             }
 
@@ -1660,24 +2259,21 @@
                 if (isEffectivelyEmpty && block.previousElementSibling) {
                     e.preventDefault();
                     const prev = block.previousElementSibling;
-                    block.remove();
+                    if (blockId) deleteBlock(blockId);
                     focusBlockEnd(prev);
                     reindexNumberedList();
-                    saveCurrentPage();
                     return;
                 }
             }
 
-            // Enter in code block: insert newline
+            // Ctrl+Enter in code block exits to new paragraph
             if (e.key === 'Enter' && block.dataset.type === 'code') {
-                // default behavior for shift+enter and regular enter in code
                 if (!e.shiftKey && e.ctrlKey) {
-                    // Ctrl+Enter exits code block
                     e.preventDefault();
-                    const newBlock = createBlockElement('p', '');
-                    block.after(newBlock);
-                    focusBlock(newBlock);
-                    saveCurrentPage();
+                    if (blockId) saveBlockDebounced(blockId);
+                    insertBlock('p', '', blockId).then(newEl => {
+                        if (newEl) focusBlock(newEl);
+                    });
                 }
                 return;
             }
@@ -1686,6 +2282,7 @@
         editorContent.addEventListener('input', (e) => {
             const block = getCurrentBlock();
             if (!block) return;
+            const blockId = getBlockId(block);
 
             // Check markdown shortcuts
             if (checkMarkdownShortcut(block)) return;
@@ -1714,60 +2311,16 @@
             }
 
             updateWordCount();
-            // Debounced save
-            clearTimeout(editorContent._saveTimer);
-            editorContent._saveTimer = setTimeout(saveCurrentPage, 500);
+
+            // Debounced save per block
+            if (blockId) {
+                saveBlockDebounced(blockId);
+            }
         });
 
-        function getSlashFilter() {
-            const block = slashMenuBlock;
-            if (!block) return null;
-
-            let textEl = block;
-            if (block.dataset.type === 'bullet' || block.dataset.type === 'numbered') {
-                textEl = block.querySelector('span[contenteditable]');
-            } else if (block.dataset.type === 'todo') {
-                textEl = block.querySelector('.todo-text');
-            }
-            if (!textEl) return null;
-
-            const text = textEl.textContent;
-            if (!text.startsWith('/')) return null;
-            return text.slice(1);
-        }
-
-        function getCurrentBlock() {
-            const sel = window.getSelection();
-            if (!sel || !sel.anchorNode) return null;
-            let node = sel.anchorNode;
-            while (node && node !== editorContent) {
-                if (node.classList && node.classList.contains('block')) return node;
-                node = node.parentElement;
-            }
-            return null;
-        }
-
-        function focusBlockEnd(block) {
-            requestAnimationFrame(() => {
-                let target = block;
-                if (block.dataset && block.dataset.type === 'todo') {
-                    target = block.querySelector('.todo-text') || block;
-                } else if (block.dataset && (block.dataset.type === 'bullet' || block.dataset.type === 'numbered')) {
-                    target = block.querySelector('span[contenteditable]') || block;
-                }
-                if (target.contentEditable === 'true' || target.isContentEditable) {
-                    target.focus();
-                    const range = document.createRange();
-                    range.selectNodeContents(target);
-                    range.collapse(false);
-                    const sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                }
-            });
-        }
-
-        // ===== TITLE HANDLING =====
+        // =========================================================================
+        // TITLE HANDLING
+        // =========================================================================
         pageTitle.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -1779,53 +2332,18 @@
         });
 
         pageTitle.addEventListener('input', () => {
-            clearTimeout(pageTitle._saveTimer);
-            pageTitle._saveTimer = setTimeout(saveCurrentPage, 300);
-        });
-
-        // ===== WORD COUNT =====
-        function updateWordCount() {
-            const text = editorContent.textContent.trim();
-            const words = text ? text.split(/\s+/).length : 0;
-            wordCount.textContent = words + ' word' + (words !== 1 ? 's' : '');
-        }
-
-        // ===== EXPORT =====
-        exportBtn.addEventListener('click', () => {
-            const page = getPage(activePageId);
-            if (!page) return;
-
-            let md = '# ' + page.title + '\n\n';
-            page.blocks.forEach(b => {
-                switch (b.type) {
-                    case 'h1': md += '# ' + stripHtml(b.content) + '\n\n'; break;
-                    case 'h2': md += '## ' + stripHtml(b.content) + '\n\n'; break;
-                    case 'h3': md += '### ' + stripHtml(b.content) + '\n\n'; break;
-                    case 'p': md += stripHtml(b.content) + '\n\n'; break;
-                    case 'bullet': md += '- ' + stripHtml(b.content) + '\n'; break;
-                    case 'numbered': md += '1. ' + stripHtml(b.content) + '\n'; break;
-                    case 'todo': md += (b.checked ? '- [x] ' : '- [ ] ') + stripHtml(b.content) + '\n'; break;
-                    case 'divider': md += '---\n\n'; break;
-                    case 'code': md += '```\n' + stripHtml(b.content) + '\n```\n\n'; break;
+            if (titleSaveTimer) clearTimeout(titleSaveTimer);
+            titleSaveTimer = setTimeout(() => {
+                const newTitle = pageTitle.textContent.trim() || 'Untitled';
+                if (activePageId) {
+                    renamePage(activePageId, newTitle);
                 }
-            });
-
-            const blob = new Blob([md], { type: 'text/markdown' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = (page.title || 'untitled').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() + '.md';
-            a.click();
-            URL.revokeObjectURL(url);
+            }, 500);
         });
 
-        function stripHtml(html) {
-            const div = document.createElement('div');
-            div.innerHTML = html || '';
-            return div.textContent || '';
-        }
-
-        // ===== EVENT LISTENERS =====
+        // =========================================================================
+        // EVENT LISTENERS
+        // =========================================================================
         newPageBtn.addEventListener('click', createNewPage);
 
         menuToggle.addEventListener('click', openSidebarMobile);
@@ -1844,7 +2362,7 @@
 
         confirmDelete.addEventListener('click', () => {
             if (deletePageId) {
-                deletePage(deletePageId);
+                deletePageConfirmed(deletePageId);
                 deletePageId = null;
             }
             confirmDialog.classList.remove('visible');
@@ -1856,6 +2374,8 @@
                 deletePageId = null;
             }
         });
+
+        exportBtn.addEventListener('click', exportPage);
 
         // Close slash menu on click outside
         document.addEventListener('click', (e) => {
@@ -1870,24 +2390,28 @@
                 e.preventDefault();
                 createNewPage();
             }
-            // Escape closes slash menu
             if (e.key === 'Escape' && slashMenuVisible) {
                 hideSlashMenu();
             }
         });
 
-        // Auto-save on blur
-        window.addEventListener('blur', saveCurrentPage);
-        window.addEventListener('beforeunload', saveCurrentPage);
+        // Flush pending saves on unload
+        window.addEventListener('beforeunload', () => {
+            blockSaveTimers.forEach((timer, blockId) => {
+                clearTimeout(timer);
+                persistBlock(blockId);
+            });
+        });
 
-        // ===== INIT =====
-        loadData();
-        renderSidebar();
-        if (pages.length > 0) {
-            selectPage(pages[0].id);
-        } else {
-            showEmptyState();
-        }
+        // =========================================================================
+        // 10. INIT / BOOTSTRAP
+        // =========================================================================
+        (async function init() {
+            setSyncStatus('saving'); // Show "connecting" state initially
+            setupRealtimeSubscriptions();
+            await loadPages();
+            setSyncStatus('synced');
+        })();
 
     })();
     </script>
