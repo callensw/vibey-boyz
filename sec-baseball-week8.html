@@ -291,6 +291,100 @@
             text-decoration: none;
         }
 
+        /* ─── Actual Results Styles ─── */
+        .results-scorecard {
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .scorecard-header {
+            padding: 1rem 1.25rem;
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .scorecard-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .week-record {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #f59e0b;
+        }
+
+        .scorecard-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            align-items: center;
+            padding: 0.65rem 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            gap: 0.75rem;
+            font-size: 0.82rem;
+        }
+
+        .scorecard-row:last-child { border-bottom: none; }
+
+        .scorecard-matchup { color: rgba(255,255,255,0.7); font-weight: 500; }
+        .scorecard-predicted { color: rgba(255,255,255,0.35); font-size: 0.78rem; }
+        .scorecard-actual { font-weight: 600; }
+        .scorecard-actual.correct { color: #22c55e; }
+        .scorecard-actual.wrong { color: #ef4444; }
+
+        .result-pill {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .result-pill.hit { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .result-pill.miss { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .result-pill.miss-upset { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+
+        .actual-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        .actual-tag.hit-tag { background: rgba(34,197,94,0.12); color: #22c55e; }
+        .actual-tag.miss-tag { background: rgba(239,68,68,0.12); color: #ef4444; }
+
+        .upset-note {
+            max-width: 900px;
+            margin: -0.5rem auto 2rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(239,68,68,0.06);
+            border: 1px solid rgba(239,68,68,0.15);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 600px) {
+            .scorecard-row { grid-template-columns: 1fr 1fr; }
+            .scorecard-predicted { display: none; }
+        }
+
         @media (max-width: 600px) {
             .series-header {
                 flex-direction: column;
@@ -315,7 +409,66 @@
 </div>
 
 <div class="season-record">
-    <strong>Season record: 12/24 (50%)</strong> through Week 7. Holding steady at the Mendoza line. The knight rides on.
+    <strong>Season record through Week 7: 12/24 (50%)</strong> &mdash; Holding steady at the Mendoza line. &nbsp;|&nbsp; <strong>Week 8: 5/8 (62.5%)</strong> &mdash; Updated below. &nbsp;|&nbsp; <strong>Cumulative: 17/32 (53.1%)</strong>
+</div>
+
+<!-- ═══ WEEK 8 ACTUAL RESULTS SCORECARD ═══ -->
+<div class="results-scorecard">
+    <div class="scorecard-header">
+        <span class="scorecard-title">⚔ Week 8 Actual Results</span>
+        <span class="week-record">5/8 Correct &mdash; 62.5%</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Georgia @ Miss State</span>
+        <span class="scorecard-predicted">Predicted: Miss State 2-1</span>
+        <span class="scorecard-actual wrong">Georgia 3-0 SWEEP</span>
+        <span class="result-pill miss-upset">Miss — Upset</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Alabama @ Oklahoma</span>
+        <span class="scorecard-predicted">Predicted: Alabama 2-1</span>
+        <span class="scorecard-actual correct">Alabama 2-1 ✓</span>
+        <span class="result-pill hit">Hit</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Arkansas @ Auburn</span>
+        <span class="scorecard-predicted">Predicted: Auburn 2-1</span>
+        <span class="scorecard-actual correct">Auburn 2-1 ✓</span>
+        <span class="result-pill hit">Hit</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Ole Miss @ Florida</span>
+        <span class="scorecard-predicted">Predicted: Florida 2-1</span>
+        <span class="scorecard-actual wrong">Ole Miss 2-1 (9th inn rally)</span>
+        <span class="result-pill miss">Miss</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Texas @ South Carolina</span>
+        <span class="scorecard-predicted">Predicted: Texas 3-0</span>
+        <span class="scorecard-actual correct">Texas 2-1 ✓ (SC stole G1 9-1)</span>
+        <span class="result-pill hit">Hit</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Vanderbilt @ Texas A&amp;M</span>
+        <span class="scorecard-predicted">Predicted: A&amp;M 2-1</span>
+        <span class="scorecard-actual correct">Texas A&amp;M 2-1 ✓</span>
+        <span class="result-pill hit">Hit</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Missouri @ Kentucky</span>
+        <span class="scorecard-predicted">Predicted: Kentucky 3-0</span>
+        <span class="scorecard-actual wrong">Missouri 2-1 (road upset)</span>
+        <span class="result-pill miss-upset">Miss — Upset</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">LSU @ Tennessee</span>
+        <span class="scorecard-predicted">Predicted: LSU 2-1</span>
+        <span class="scorecard-actual correct">LSU 2-1 ✓ (Arrambide 4 HRs!)</span>
+        <span class="result-pill hit">Hit</span>
+    </div>
+</div>
+<div class="upset-note">
+    <strong>Storylines of the Week:</strong> Georgia swept 18-0-at-home Miss State for the first time since 2004 — the knight bows before thee, Dawgs. Missouri went to Lexington and stole a road series at a ranked Kentucky squad. South Carolina shocked No. 2 Texas 9-1 in the opener before the Horns rallied. And LSU's Cade Arrambide hit <strong>four home runs in a single game</strong> (16-6 G3). Madness in Baton Rouge.
 </div>
 
 <div class="series-grid">
@@ -330,7 +483,10 @@
                 </span>
                 <div class="team-record">Georgia (8-2, 25-6, RPI 27) vs Miss State (7-3, 25-5, RPI 6)</div>
             </div>
-            <div class="series-prediction">Miss State 2-1</div>
+            <div>
+                <div class="series-prediction">Miss State 2-1</div>
+                <span class="actual-tag miss-tag">✗ Actual: Georgia 3-0 SWEEP</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -351,7 +507,10 @@
                 <span class="matchup-title">Alabama <span class="at">@</span> Oklahoma</span>
                 <div class="team-record">Alabama (7-4, 24-8, RPI 3) vs Oklahoma (5-6, 21-9, RPI 20)</div>
             </div>
-            <div class="series-prediction">Alabama 2-1</div>
+            <div>
+                <div class="series-prediction">Alabama 2-1</div>
+                <span class="actual-tag hit-tag">✓ Actual: Alabama 2-1</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -372,7 +531,10 @@
                 <span class="matchup-title">Arkansas <span class="at">@</span> Auburn</span>
                 <div class="team-record">Arkansas (4-6, 19-12, RPI 70) vs Auburn (5-5, 21-8, RPI 4)</div>
             </div>
-            <div class="series-prediction">Auburn 2-1</div>
+            <div>
+                <div class="series-prediction">Auburn 2-1</div>
+                <span class="actual-tag hit-tag">✓ Actual: Auburn 2-1</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -393,7 +555,10 @@
                 <span class="matchup-title">Ole Miss <span class="at">@</span> Florida</span>
                 <div class="team-record">Ole Miss (4-6, 21-10, RPI 11) vs Florida (6-4, 23-8, RPI 7)</div>
             </div>
-            <div class="series-prediction">Florida 2-1</div>
+            <div>
+                <div class="series-prediction">Florida 2-1</div>
+                <span class="actual-tag miss-tag">✗ Actual: Ole Miss 2-1 (9th inn)</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -414,7 +579,10 @@
                 <span class="matchup-title">Texas <span class="at">@</span> South Carolina</span>
                 <div class="team-record">Texas (7-3, 24-5, RPI 2) vs S. Carolina (2-8, 15-16, RPI 91)</div>
             </div>
-            <div class="series-prediction">Texas 3-0</div>
+            <div>
+                <div class="series-prediction">Texas 3-0</div>
+                <span class="actual-tag hit-tag">✓ Actual: Texas 2-1 (SC stole G1)</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -435,7 +603,10 @@
                 <span class="matchup-title">Vanderbilt <span class="at">@</span> Texas A&amp;M</span>
                 <div class="team-record">Vanderbilt (6-4, 19-12, RPI 97) vs Texas A&amp;M (5-5, 23-6, RPI 19)</div>
             </div>
-            <div class="series-prediction">Texas A&amp;M 2-1</div>
+            <div>
+                <div class="series-prediction">Texas A&amp;M 2-1</div>
+                <span class="actual-tag hit-tag">✓ Actual: A&amp;M 2-1 (DH sweep Sat)</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -456,7 +627,10 @@
                 <span class="matchup-title">Missouri <span class="at">@</span> Kentucky</span>
                 <div class="team-record">Missouri (1-8, 17-13, RPI 139) vs Kentucky (5-4, 22-6, RPI 12)</div>
             </div>
-            <div class="series-prediction">Kentucky 3-0</div>
+            <div>
+                <div class="series-prediction">Kentucky 3-0</div>
+                <span class="actual-tag miss-tag">✗ Actual: Missouri 2-1 (road upset!)</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -477,7 +651,10 @@
                 <span class="matchup-title">LSU <span class="at">@</span> Tennessee</span>
                 <div class="team-record">LSU (4-5, 20-10, RPI 82) vs Tennessee (3-6, 19-10, RPI 43)</div>
             </div>
-            <div class="series-prediction">LSU 2-1</div>
+            <div>
+                <div class="series-prediction">LSU 2-1</div>
+                <span class="actual-tag hit-tag">✓ Actual: LSU 2-1 (Arrambide 4 HRs!)</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
