@@ -819,6 +819,94 @@
             background: #c94444;
         }
 
+        .confirm-btn.accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .confirm-btn.accent:hover {
+            background: var(--accent-hover);
+        }
+
+        /* ===== LOCK DIALOG ===== */
+        .lock-dialog {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .lock-dialog.visible {
+            display: flex;
+        }
+
+        .lock-dialog .confirm-box {
+            max-width: 400px;
+        }
+
+        .lock-input {
+            width: 100%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .lock-input:focus {
+            border-color: var(--accent);
+        }
+
+        .lock-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        .lock-error {
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: -8px;
+            margin-bottom: 12px;
+            display: none;
+        }
+
+        .lock-error.visible {
+            display: block;
+        }
+
+        /* ===== LOCK ICON IN TOPBAR ===== */
+        .lock-toggle {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1;
+            transition: all 0.15s;
+            margin-left: 4px;
+        }
+
+        .lock-toggle:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        /* ===== ENCRYPTED PAGE INDICATOR ===== */
+        .page-item-lock {
+            font-size: 12px;
+            flex-shrink: 0;
+            opacity: 0.6;
+        }
+
         /* ===== DRAG HANDLE ===== */
         .block-handle {
             position: absolute;
@@ -907,6 +995,7 @@
                 <span class="breadcrumb-icon">&#128196;</span>
                 <span class="breadcrumb-sep">/</span>
                 <span class="breadcrumb-page" id="breadcrumbPage">Loading...</span>
+                <button class="lock-toggle" id="lockToggle" title="Encrypt/Decrypt page" style="display:none;">&#128275;</button>
             </div>
             <div class="topbar-right">
                 <div class="sync-indicator">
@@ -942,6 +1031,35 @@
         </div>
     </div>
 
+    <!-- Lock Passphrase Dialog (for setting passphrase) -->
+    <div class="lock-dialog" id="lockSetDialog">
+        <div class="confirm-box">
+            <div class="confirm-title" id="lockSetTitle">Set passphrase for this page</div>
+            <div class="confirm-message">This passphrase encrypts the page content client-side. It is never sent to the server. If you lose it, the content cannot be recovered.</div>
+            <input type="password" class="lock-input" id="lockSetInput" placeholder="Enter passphrase..." autocomplete="off">
+            <input type="password" class="lock-input" id="lockSetConfirmInput" placeholder="Confirm passphrase..." autocomplete="off">
+            <div class="lock-error" id="lockSetError">Passphrases do not match</div>
+            <div class="confirm-buttons">
+                <button class="confirm-btn cancel" id="lockSetCancel">Cancel</button>
+                <button class="confirm-btn accent" id="lockSetConfirm">Encrypt Page</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Passphrase Prompt Dialog (for opening encrypted pages) -->
+    <div class="lock-dialog" id="lockPromptDialog">
+        <div class="confirm-box">
+            <div class="confirm-title">Enter passphrase</div>
+            <div class="confirm-message">This page is encrypted. Enter the passphrase to decrypt and view it.</div>
+            <input type="password" class="lock-input" id="lockPromptInput" placeholder="Passphrase..." autocomplete="off">
+            <div class="lock-error" id="lockPromptError">Wrong passphrase</div>
+            <div class="confirm-buttons">
+                <button class="confirm-btn cancel" id="lockPromptCancel">Cancel</button>
+                <button class="confirm-btn accent" id="lockPromptConfirm">Unlock</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script>
     (function() {
@@ -969,6 +1087,11 @@
         let isOnline = true;
         let focusedBlockId = null;      // Block ID currently focused by user
         let queuedUpdates = new Map();  // blockId -> payload for updates that arrived while focused
+
+        // Encryption state
+        const pageKeys = new Map();     // pageId -> CryptoKey (in-memory only, never persisted)
+        let lockPendingPageId = null;   // page ID waiting for passphrase prompt
+        let lockMode = null;            // 'set' | 'prompt' | 'unlock'
 
         // Slash menu state
         let slashMenuVisible = false;
@@ -1002,6 +1125,19 @@
         const exportBtn = document.getElementById('exportBtn');
         const syncDot = document.getElementById('syncDot');
         const syncLabel = document.getElementById('syncLabel');
+        const lockToggle = document.getElementById('lockToggle');
+        const lockSetDialog = document.getElementById('lockSetDialog');
+        const lockSetInput = document.getElementById('lockSetInput');
+        const lockSetConfirmInput = document.getElementById('lockSetConfirmInput');
+        const lockSetError = document.getElementById('lockSetError');
+        const lockSetCancel = document.getElementById('lockSetCancel');
+        const lockSetConfirm = document.getElementById('lockSetConfirm');
+        const lockSetTitle = document.getElementById('lockSetTitle');
+        const lockPromptDialog = document.getElementById('lockPromptDialog');
+        const lockPromptInput = document.getElementById('lockPromptInput');
+        const lockPromptError = document.getElementById('lockPromptError');
+        const lockPromptCancel = document.getElementById('lockPromptCancel');
+        const lockPromptConfirm = document.getElementById('lockPromptConfirm');
 
         // Slash commands definition
         const slashCommands = [
@@ -1037,6 +1173,73 @@
                     const r = Math.random() * 16 | 0;
                     return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
                 });
+        }
+
+        // =========================================================================
+        // ENCRYPTION ENGINE (Web Crypto API — AES-256-GCM)
+        // =========================================================================
+        function generateSalt() {
+            const bytes = crypto.getRandomValues(new Uint8Array(16));
+            return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function hexToBytes(hex) {
+            const bytes = new Uint8Array(hex.length / 2);
+            for (let i = 0; i < hex.length; i += 2) {
+                bytes[i / 2] = parseInt(hex.substr(i, 2), 16);
+            }
+            return bytes;
+        }
+
+        async function deriveKey(passphrase, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey(
+                'raw', enc.encode(passphrase), 'PBKDF2', false, ['deriveKey']
+            );
+            return crypto.subtle.deriveKey(
+                { name: 'PBKDF2', salt: hexToBytes(salt), iterations: 310000, hash: 'SHA-256' },
+                keyMaterial,
+                { name: 'AES-GCM', length: 256 },
+                false,
+                ['encrypt', 'decrypt']
+            );
+        }
+
+        async function encryptText(plaintext, key) {
+            const enc = new TextEncoder();
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const cipherBuf = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv }, key, enc.encode(plaintext)
+            );
+            // Prepend IV to ciphertext, then base64-encode everything
+            const combined = new Uint8Array(iv.byteLength + cipherBuf.byteLength);
+            combined.set(iv, 0);
+            combined.set(new Uint8Array(cipherBuf), iv.byteLength);
+            return btoa(String.fromCharCode(...combined));
+        }
+
+        async function decryptText(ciphertext, key) {
+            const raw = Uint8Array.from(atob(ciphertext), c => c.charCodeAt(0));
+            const iv = raw.slice(0, 12);
+            const data = raw.slice(12);
+            const decBuf = await crypto.subtle.decrypt(
+                { name: 'AES-GCM', iv }, key, data
+            );
+            return new TextDecoder().decode(decBuf);
+        }
+
+        function isPageEncrypted(pageId) {
+            const page = pages.find(p => p.id === pageId);
+            return page && page.encrypted === true;
+        }
+
+        function getPageSalt(pageId) {
+            const page = pages.find(p => p.id === pageId);
+            return page ? page.salt : null;
+        }
+
+        function hasKeyForPage(pageId) {
+            return pageKeys.has(pageId);
         }
 
         // =========================================================================
@@ -1120,6 +1323,7 @@
                         if (document.activeElement !== pageTitle) {
                             pageTitle.textContent = newRow.title || '';
                         }
+                        updateLockToggle();
                     }
                 }
             } else if (eventType === 'DELETE') {
@@ -1137,7 +1341,7 @@
             }
         }
 
-        function handleBlockRealtimeEvent(payload) {
+        async function handleBlockRealtimeEvent(payload) {
             const { eventType, new: newRow, old: oldRow } = payload;
 
             // Only process blocks for the currently active page
@@ -1146,6 +1350,19 @@
             }
             if (eventType === 'DELETE') {
                 if (!blocks.find(b => b.id === (oldRow && oldRow.id))) return;
+            }
+
+            // Decrypt incoming content if page is encrypted and we have the key
+            if ((eventType === 'INSERT' || eventType === 'UPDATE') && newRow.content && newRow.type !== 'divider') {
+                const pageId = newRow.page_id;
+                if (isPageEncrypted(pageId) && hasKeyForPage(pageId)) {
+                    try {
+                        const key = pageKeys.get(pageId);
+                        newRow.content = await decryptText(newRow.content, key);
+                    } catch (e) {
+                        // Might already be plaintext (e.g., our own optimistic update)
+                    }
+                }
             }
 
             if (eventType === 'INSERT') {
@@ -1444,20 +1661,34 @@
                 content = el.innerHTML;
             }
 
-            // Update local state
+            // Update local state (plaintext in memory)
             blockData.content = content;
             blockData.type = type;
             if (checked !== null) blockData.checked = checked;
 
-            // Persist to Supabase
-            const updatePayload = {
-                content,
-                type,
-                updated_at: new Date().toISOString()
-            };
-            if (checked !== null) updatePayload.checked = checked;
-
-            trackSave(sb.from('notion_blocks').update(updatePayload).eq('id', blockId).then());
+            // Persist to Supabase — encrypt if page is encrypted
+            const pageId = blockData.page_id || activePageId;
+            if (isPageEncrypted(pageId) && hasKeyForPage(pageId)) {
+                const key = pageKeys.get(pageId);
+                const contentToEncrypt = content || '';
+                encryptText(contentToEncrypt, key).then(encrypted => {
+                    const updatePayload = {
+                        content: encrypted,
+                        type,
+                        updated_at: new Date().toISOString()
+                    };
+                    if (checked !== null) updatePayload.checked = checked;
+                    trackSave(sb.from('notion_blocks').update(updatePayload).eq('id', blockId).then());
+                });
+            } else {
+                const updatePayload = {
+                    content,
+                    type,
+                    updated_at: new Date().toISOString()
+                };
+                if (checked !== null) updatePayload.checked = checked;
+                trackSave(sb.from('notion_blocks').update(updatePayload).eq('id', blockId).then());
+            }
         }
 
         async function insertBlock(type, content, afterBlockId, checked) {
@@ -1511,15 +1742,30 @@
                 editorContent.appendChild(el);
             }
 
-            // Persist
-            trackSave(sb.from('notion_blocks').insert({
-                id: newBlock.id,
-                page_id: newBlock.page_id,
-                type: newBlock.type,
-                content: newBlock.content,
-                checked: newBlock.checked,
-                sort_order: newBlock.sort_order
-            }).then());
+            // Persist — encrypt if page is encrypted
+            const pageId = newBlock.page_id;
+            if (isPageEncrypted(pageId) && hasKeyForPage(pageId)) {
+                const key = pageKeys.get(pageId);
+                encryptText(newBlock.content || '', key).then(encrypted => {
+                    trackSave(sb.from('notion_blocks').insert({
+                        id: newBlock.id,
+                        page_id: newBlock.page_id,
+                        type: newBlock.type,
+                        content: encrypted,
+                        checked: newBlock.checked,
+                        sort_order: newBlock.sort_order
+                    }).then());
+                });
+            } else {
+                trackSave(sb.from('notion_blocks').insert({
+                    id: newBlock.id,
+                    page_id: newBlock.page_id,
+                    type: newBlock.type,
+                    content: newBlock.content,
+                    checked: newBlock.checked,
+                    sort_order: newBlock.sort_order
+                }).then());
+            }
 
             return el;
         }
@@ -1538,13 +1784,27 @@
             blockData.type = newType;
             blockData.content = '';
 
-            trackSave(
-                sb.from('notion_blocks').update({
-                    type: newType,
-                    content: '',
-                    updated_at: new Date().toISOString()
-                }).eq('id', blockId).then()
-            );
+            const pageId = blockData.page_id || activePageId;
+            if (isPageEncrypted(pageId) && hasKeyForPage(pageId)) {
+                const key = pageKeys.get(pageId);
+                encryptText('', key).then(encrypted => {
+                    trackSave(
+                        sb.from('notion_blocks').update({
+                            type: newType,
+                            content: encrypted,
+                            updated_at: new Date().toISOString()
+                        }).eq('id', blockId).then()
+                    );
+                });
+            } else {
+                trackSave(
+                    sb.from('notion_blocks').update({
+                        type: newType,
+                        content: '',
+                        updated_at: new Date().toISOString()
+                    }).eq('id', blockId).then()
+                );
+            }
         }
 
         async function updateBlockChecked(blockId, checked) {
@@ -1788,13 +2048,27 @@
             focusBlock(newEl);
             reindexNumberedList();
 
-            trackSave(
-                sb.from('notion_blocks').update({
-                    type: newType,
-                    content: content || '',
-                    updated_at: new Date().toISOString()
-                }).eq('id', blockId).then()
-            );
+            const pageId = blockData.page_id || activePageId;
+            if (isPageEncrypted(pageId) && hasKeyForPage(pageId)) {
+                const key = pageKeys.get(pageId);
+                encryptText(content || '', key).then(encrypted => {
+                    trackSave(
+                        sb.from('notion_blocks').update({
+                            type: newType,
+                            content: encrypted,
+                            updated_at: new Date().toISOString()
+                        }).eq('id', blockId).then()
+                    );
+                });
+            } else {
+                trackSave(
+                    sb.from('notion_blocks').update({
+                        type: newType,
+                        content: content || '',
+                        updated_at: new Date().toISOString()
+                    }).eq('id', blockId).then()
+                );
+            }
         }
 
         function focusBlock(block) {
@@ -2041,9 +2315,10 @@
             let html = '<div class="sidebar-section-label">Pages</div>';
             filteredPages.forEach(page => {
                 const isActive = page.id === activePageId;
+                const lockIcon = page.encrypted ? '<span class="page-item-lock">\uD83D\uDD12</span>' : '';
                 html += `
                     <div class="page-item ${isActive ? 'active' : ''}" data-id="${page.id}">
-                        <span class="page-item-icon">${page.icon || '\uD83D\uDCC4'}</span>
+                        ${lockIcon}<span class="page-item-icon">${page.icon || '\uD83D\uDCC4'}</span>
                         <span class="page-item-name">${escapeHtml(page.title) || 'Untitled'}</span>
                         <div class="page-item-actions">
                             <button class="page-item-btn rename" data-id="${page.id}" title="Rename">\u270F</button>
@@ -2092,18 +2367,43 @@
             });
             blockSaveTimers.clear();
 
-            activePageId = id;
             const page = pages.find(p => p.id === id);
             if (!page) return;
 
+            // If the page is encrypted and we don't have the key, prompt for passphrase
+            if (page.encrypted && !hasKeyForPage(id)) {
+                lockPendingPageId = id;
+                showLockPromptDialog();
+                return;
+            }
+
+            activePageId = id;
+
             breadcrumbPage.textContent = page.title || 'Untitled';
             pageTitle.textContent = page.title || '';
+            updateLockToggle();
 
             // Show loading state
             editorContent.innerHTML = '<div class="loading-state"><div class="loading-spinner"></div><span style="font-size:13px;">Loading blocks...</span></div>';
 
             // Load blocks from Supabase
             blocks = await loadBlocksForPage(id);
+
+            // Decrypt blocks if page is encrypted and we have the key
+            if (page.encrypted && hasKeyForPage(id)) {
+                const key = pageKeys.get(id);
+                for (const block of blocks) {
+                    if (block.content && block.type !== 'divider') {
+                        try {
+                            block.content = await decryptText(block.content, key);
+                        } catch (e) {
+                            // Content might already be plaintext or corrupted, leave as-is
+                            console.warn('Failed to decrypt block', block.id, e);
+                        }
+                    }
+                }
+            }
+
             renderAllBlocks();
             renderSidebar();
             updateWordCount();
@@ -2202,6 +2502,226 @@
             a.download = (page.title || 'untitled').replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() + '.md';
             a.click();
             URL.revokeObjectURL(url);
+        }
+
+        // =========================================================================
+        // ENCRYPTION UI
+        // =========================================================================
+        function updateLockToggle() {
+            if (!activePageId) {
+                lockToggle.style.display = 'none';
+                return;
+            }
+            lockToggle.style.display = 'inline-flex';
+            if (isPageEncrypted(activePageId)) {
+                lockToggle.innerHTML = '&#128274;'; // 🔒
+                lockToggle.title = 'Page is encrypted — click to remove encryption';
+            } else {
+                lockToggle.innerHTML = '&#128275;'; // 🔓
+                lockToggle.title = 'Encrypt this page';
+            }
+        }
+
+        function showLockSetDialog() {
+            lockSetInput.value = '';
+            lockSetConfirmInput.value = '';
+            lockSetError.classList.remove('visible');
+            if (isPageEncrypted(activePageId)) {
+                lockSetTitle.textContent = 'Remove encryption from this page';
+                lockSetConfirmInput.style.display = 'none';
+                lockSetInput.placeholder = 'Enter current passphrase...';
+                lockSetConfirm.textContent = 'Decrypt Page';
+                lockMode = 'unlock';
+            } else {
+                lockSetTitle.textContent = 'Set passphrase for this page';
+                lockSetConfirmInput.style.display = '';
+                lockSetInput.placeholder = 'Enter passphrase...';
+                lockSetConfirm.textContent = 'Encrypt Page';
+                lockMode = 'set';
+            }
+            lockSetDialog.classList.add('visible');
+            setTimeout(() => lockSetInput.focus(), 50);
+        }
+
+        function hideLockSetDialog() {
+            lockSetDialog.classList.remove('visible');
+            lockSetInput.value = '';
+            lockSetConfirmInput.value = '';
+            lockSetError.classList.remove('visible');
+        }
+
+        function showLockPromptDialog() {
+            lockPromptInput.value = '';
+            lockPromptError.classList.remove('visible');
+            lockPromptDialog.classList.add('visible');
+            setTimeout(() => lockPromptInput.focus(), 50);
+        }
+
+        function hideLockPromptDialog() {
+            lockPromptDialog.classList.remove('visible');
+            lockPromptInput.value = '';
+            lockPromptError.classList.remove('visible');
+            lockPendingPageId = null;
+        }
+
+        async function encryptPage(passphrase) {
+            if (!activePageId) return;
+
+            const salt = generateSalt();
+            const key = await deriveKey(passphrase, salt);
+
+            // Encrypt all block content
+            setSyncStatus('saving');
+            for (const block of blocks) {
+                if (block.content && block.type !== 'divider') {
+                    const encrypted = await encryptText(block.content, key);
+                    await trackSave(
+                        sb.from('notion_blocks').update({
+                            content: encrypted,
+                            updated_at: new Date().toISOString()
+                        }).eq('id', block.id).then()
+                    );
+                }
+            }
+
+            // Update page metadata
+            const page = pages.find(p => p.id === activePageId);
+            if (page) {
+                page.encrypted = true;
+                page.salt = salt;
+            }
+            await trackSave(
+                sb.from('notion_pages').update({
+                    encrypted: true,
+                    salt: salt,
+                    updated_at: new Date().toISOString()
+                }).eq('id', activePageId).then()
+            );
+
+            // Store key in memory
+            pageKeys.set(activePageId, key);
+
+            renderSidebar();
+            updateLockToggle();
+        }
+
+        async function decryptPage(passphrase) {
+            if (!activePageId) return false;
+
+            const page = pages.find(p => p.id === activePageId);
+            if (!page || !page.salt) return false;
+
+            const key = await deriveKey(passphrase, page.salt);
+
+            // Load raw (encrypted) blocks from DB to decrypt
+            const rawBlocks = await loadBlocksForPage(activePageId);
+
+            // Test decryption on the first non-empty, non-divider block
+            const testBlock = rawBlocks.find(b => b.content && b.type !== 'divider');
+            if (testBlock) {
+                try {
+                    await decryptText(testBlock.content, key);
+                } catch (e) {
+                    return false; // Wrong passphrase
+                }
+            }
+
+            // Decrypt all blocks and save as plaintext
+            setSyncStatus('saving');
+            for (const block of rawBlocks) {
+                if (block.content && block.type !== 'divider') {
+                    try {
+                        const decrypted = await decryptText(block.content, key);
+                        block.content = decrypted;
+                        await trackSave(
+                            sb.from('notion_blocks').update({
+                                content: decrypted,
+                                updated_at: new Date().toISOString()
+                            }).eq('id', block.id).then()
+                        );
+                    } catch (e) {
+                        console.warn('Failed to decrypt block during unlock:', block.id, e);
+                    }
+                }
+            }
+
+            // Update page metadata
+            page.encrypted = false;
+            page.salt = null;
+            await trackSave(
+                sb.from('notion_pages').update({
+                    encrypted: false,
+                    salt: null,
+                    updated_at: new Date().toISOString()
+                }).eq('id', activePageId).then()
+            );
+
+            // Clear the key from memory
+            pageKeys.delete(activePageId);
+
+            // Refresh blocks in memory
+            blocks = rawBlocks;
+            renderAllBlocks();
+            renderSidebar();
+            updateLockToggle();
+            return true;
+        }
+
+        async function handleLockPromptSubmit() {
+            const passphrase = lockPromptInput.value;
+            if (!passphrase) return;
+
+            const pageId = lockPendingPageId;
+            const page = pages.find(p => p.id === pageId);
+            if (!page || !page.salt) { hideLockPromptDialog(); return; }
+
+            const key = await deriveKey(passphrase, page.salt);
+
+            // Try to decrypt first block to verify passphrase
+            const rawBlocks = await loadBlocksForPage(pageId);
+            const testBlock = rawBlocks.find(b => b.content && b.type !== 'divider');
+            if (testBlock) {
+                try {
+                    await decryptText(testBlock.content, key);
+                } catch (e) {
+                    lockPromptError.classList.add('visible');
+                    lockPromptInput.value = '';
+                    lockPromptInput.focus();
+                    return;
+                }
+            }
+
+            // Passphrase is correct — store key and open the page
+            pageKeys.set(pageId, key);
+            hideLockPromptDialog();
+            selectPage(pageId);
+        }
+
+        async function handleLockSetSubmit() {
+            if (lockMode === 'set') {
+                const pass = lockSetInput.value;
+                const confirm = lockSetConfirmInput.value;
+                if (!pass) return;
+                if (pass !== confirm) {
+                    lockSetError.textContent = 'Passphrases do not match';
+                    lockSetError.classList.add('visible');
+                    return;
+                }
+                hideLockSetDialog();
+                await encryptPage(pass);
+            } else if (lockMode === 'unlock') {
+                const pass = lockSetInput.value;
+                if (!pass) return;
+                const success = await decryptPage(pass);
+                if (!success) {
+                    lockSetError.textContent = 'Wrong passphrase';
+                    lockSetError.classList.add('visible');
+                    lockSetInput.value = '';
+                    lockSetInput.focus();
+                    return;
+                }
+                hideLockSetDialog();
+            }
         }
 
         // =========================================================================
@@ -2376,6 +2896,41 @@
         });
 
         exportBtn.addEventListener('click', exportPage);
+
+        // Lock toggle
+        lockToggle.addEventListener('click', () => {
+            if (!activePageId) return;
+            showLockSetDialog();
+        });
+
+        // Lock set dialog
+        lockSetCancel.addEventListener('click', hideLockSetDialog);
+        lockSetConfirm.addEventListener('click', handleLockSetSubmit);
+        lockSetDialog.addEventListener('click', (e) => {
+            if (e.target === lockSetDialog) hideLockSetDialog();
+        });
+        lockSetInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (lockMode === 'set') lockSetConfirmInput.focus();
+                else handleLockSetSubmit();
+            }
+            if (e.key === 'Escape') hideLockSetDialog();
+        });
+        lockSetConfirmInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleLockSetSubmit();
+            if (e.key === 'Escape') hideLockSetDialog();
+        });
+
+        // Lock prompt dialog
+        lockPromptCancel.addEventListener('click', hideLockPromptDialog);
+        lockPromptConfirm.addEventListener('click', handleLockPromptSubmit);
+        lockPromptDialog.addEventListener('click', (e) => {
+            if (e.target === lockPromptDialog) hideLockPromptDialog();
+        });
+        lockPromptInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') handleLockPromptSubmit();
+            if (e.key === 'Escape') hideLockPromptDialog();
+        });
 
         // Close slash menu on click outside
         document.addEventListener('click', (e) => {
