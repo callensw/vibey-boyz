@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibey Notes API</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a0a0f; --bg2: #111118; --bg3: #1a1a24;
+            --border: rgba(255,255,255,0.08); --text: rgba(255,255,255,0.92);
+            --text2: rgba(255,255,255,0.55); --text3: rgba(255,255,255,0.3);
+            --accent: #7c5bf0; --accent2: rgba(124,91,240,0.12);
+            --green: #34d399; --green-bg: rgba(52,211,153,0.1);
+            --blue: #60a5fa; --blue-bg: rgba(96,165,250,0.1);
+            --orange: #fbbf24; --orange-bg: rgba(251,191,36,0.1);
+            --red: #f87171; --red-bg: rgba(248,113,113,0.1);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
+            background: var(--bg); color: var(--text); line-height: 1.6;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 24px 20px 80px; }
+        h1 { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 8px; }
+        .subtitle { color: var(--text2); font-size: 16px; margin-bottom: 40px; }
+        h2 { font-size: 20px; font-weight: 700; margin: 48px 0 16px; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 15px; font-weight: 600; color: var(--text2); margin: 24px 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        p { color: var(--text2); margin-bottom: 12px; font-size: 15px; }
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .base-url {
+            background: var(--bg2); border: 1px solid var(--border); border-radius: 12px;
+            padding: 16px 20px; margin-bottom: 32px; font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 14px; color: var(--accent); word-break: break-all;
+        }
+        .auth-note {
+            background: var(--accent2); border: 1px solid rgba(124,91,240,0.2); border-radius: 12px;
+            padding: 16px 20px; margin-bottom: 32px;
+        }
+        .auth-note strong { color: var(--accent); }
+
+        .endpoint {
+            background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+            margin-bottom: 16px; overflow: hidden;
+        }
+        .endpoint-header {
+            padding: 16px 20px; display: flex; align-items: center; gap: 12px;
+            cursor: pointer; transition: background 0.15s;
+        }
+        .endpoint-header:hover { background: var(--bg3); }
+        .method {
+            font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px;
+            font-family: 'SF Mono', monospace; letter-spacing: 0.5px; flex-shrink: 0;
+        }
+        .method.get { color: var(--green); background: var(--green-bg); }
+        .method.post { color: var(--blue); background: var(--blue-bg); }
+        .method.patch { color: var(--orange); background: var(--orange-bg); }
+        .method.delete { color: var(--red); background: var(--red-bg); }
+        .endpoint-path { font-family: 'SF Mono', monospace; font-size: 14px; font-weight: 600; }
+        .endpoint-desc { font-size: 13px; color: var(--text2); margin-left: auto; }
+        .endpoint-body { padding: 0 20px 20px; display: none; }
+        .endpoint.open .endpoint-body { display: block; }
+        .endpoint.open .endpoint-header { border-bottom: 1px solid var(--border); }
+
+        pre {
+            background: var(--bg3); border-radius: 10px; padding: 16px;
+            overflow-x: auto; font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 13px; line-height: 1.7; margin: 8px 0 16px;
+            border: 1px solid var(--border);
+        }
+        code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+        .inline-code {
+            background: var(--bg3); padding: 2px 8px; border-radius: 5px;
+            font-size: 13px; color: var(--accent);
+        }
+
+        .param-table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; }
+        .param-table th {
+            text-align: left; font-size: 11px; color: var(--text3); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .param-table td { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .param-table td:first-child { font-family: 'SF Mono', monospace; color: var(--accent); font-weight: 600; font-size: 13px; }
+        .param-table td:nth-child(2) { color: var(--text3); font-size: 12px; font-family: 'SF Mono', monospace; }
+        .param-table td:last-child { color: var(--text2); }
+        .required { color: var(--red); font-size: 10px; font-weight: 700; margin-left: 4px; }
+
+        .shortcut-section {
+            background: var(--bg2); border: 1px solid var(--border); border-radius: 14px;
+            padding: 24px; margin: 16px 0;
+        }
+        .step { display: flex; gap: 14px; margin: 16px 0; }
+        .step-num {
+            width: 28px; height: 28px; border-radius: 8px; background: var(--accent);
+            color: white; display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 800; flex-shrink: 0;
+        }
+        .step-text { font-size: 14px; color: var(--text2); }
+        .step-text strong { color: var(--text); }
+
+        .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 2px 8px; border-radius: 6px; }
+        .badge.ios { background: var(--blue-bg); color: var(--blue); }
+        .badge.widget { background: var(--green-bg); color: var(--green); }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 26px; }
+            .endpoint-desc { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Vibey Notes API</h1>
+    <p class="subtitle">REST API for iOS Shortcuts, Widgets, and native app integration</p>
+
+    <div class="base-url">https://kakjbyoxqjvwnsdbqcnb.supabase.co/functions/v1/notes-api</div>
+
+    <div class="auth-note">
+        <p style="margin:0"><strong>Authentication:</strong> Include <code class="inline-code">x-api-key: vibey-notes-2026</code> header with every request. Also works as <code class="inline-code">Authorization: Bearer vibey-notes-2026</code>.</p>
+    </div>
+
+    <!-- ===== ENDPOINTS ===== -->
+    <h2>Endpoints</h2>
+
+    <div class="endpoint" onclick="this.classList.toggle('open')">
+        <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/</span>
+            <span class="endpoint-desc">List all notes</span>
+        </div>
+        <div class="endpoint-body">
+            <h3>Query Parameters</h3>
+            <table class="param-table">
+                <tr><th>Param</th><th>Type</th><th>Description</th></tr>
+                <tr><td>limit</td><td>number</td><td>Max notes to return (default 50)</td></tr>
+            </table>
+            <h3>Response</h3>
+<pre>{
+  "notes": [
+    {
+      "id": "uuid",
+      "title": "My Note",
+      "icon": "📄",
+      "created_at": "2026-04-06T...",
+      "updated_at": "2026-04-06T..."
+    }
+  ]
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint" onclick="this.classList.toggle('open')">
+        <div class="endpoint-header">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/capture</span>
+            <span class="endpoint-desc">Quick capture a note</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Creates a new note with text content split into blocks by newline. Perfect for iOS Shortcuts quick capture.</p>
+            <h3>Body (JSON)</h3>
+            <table class="param-table">
+                <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+                <tr><td>title</td><td>string</td><td>Note title (default "Quick Note")</td></tr>
+                <tr><td>content</td><td>string</td><td>Text content, newlines become separate blocks</td></tr>
+                <tr><td>icon</td><td>string</td><td>Emoji icon (default 📝)</td></tr>
+            </table>
+            <h3>Example</h3>
+<pre>curl -X POST \
+  -H "x-api-key: vibey-notes-2026" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Meeting Notes","content":"Discussed roadmap\nAction items pending"}' \
+  BASE_URL/capture</pre>
+            <h3>Response (201)</h3>
+<pre>{
+  "id": "uuid",
+  "title": "Meeting Notes",
+  "message": "Note captured"
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint" onclick="this.classList.toggle('open')">
+        <div class="endpoint-header">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/todo</span>
+            <span class="endpoint-desc">Quick add a to-do</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Adds a to-do checkbox item. If no page_id is given, creates or reuses a "To-dos [Today's Date]" page automatically.</p>
+            <h3>Body (JSON)</h3>
+            <table class="param-table">
+                <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+                <tr><td>text<span class="required">REQUIRED</span></td><td>string</td><td>The to-do text</td></tr>
+                <tr><td>page_id</td><td>string</td><td>Add to a specific page (optional)</td></tr>
+            </table>
+            <h3>Example</h3>
+<pre>curl -X POST \
+  -H "x-api-key: vibey-notes-2026" \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Buy groceries"}' \
+  BASE_URL/todo</pre>
+        </div>
+    </div>
+
+    <div class="endpoint" onclick="this.classList.toggle('open')">
+        <div class="endpoint-header">
+            <span class="method post">POST</span>
+            <span class="endpoint-path">/block</span>
+            <span class="endpoint-desc">Add a block to a page</span>
+        </div>
+        <div class="endpoint-body">
+            <h3>Body (JSON)</h3>
+            <table class="param-table">
+                <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+                <tr><td>page_id<span class="required">REQUIRED</span></td><td>string</td><td>Target page ID</td></tr>
+                <tr><td>content</td><td>string</td><td>Block text content</td></tr>
+                <tr><td>type</td><td>string</td><td>Block type: p, h1, h2, todo, bullet, divider</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="endpoint" onclick="this.classList.toggle('open')">
+        <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/{id}</span>
+            <span class="endpoint-desc">Get note with blocks</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Returns the full note including all blocks, ordered by sort_order.</p>
+            <h3>Response</h3>
+<pre>{
+  "id": "uuid",
+  "title": "My Note",
+  "icon": "📄",
+  "blocks": [
+    { "id": "uuid", "type": "p", "content": "Hello", "checked": false, "sort_order": 0 },
+    { "id": "uuid", "type": "todo", "content": "Do this", "checked": true, "sort_order": 1 }
+  ]
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint" onclick="this.classList.toggle('open')">
+        <div class="endpoint-header">
+            <span class="method patch">PATCH</span>
+            <span class="endpoint-path">/{id}</span>
+            <span class="endpoint-desc">Update note title/icon</span>
+        </div>
+        <div class="endpoint-body">
+            <h3>Body (JSON)</h3>
+            <table class="param-table">
+                <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+                <tr><td>title</td><td>string</td><td>New title</td></tr>
+                <tr><td>icon</td><td>string</td><td>New emoji icon</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="endpoint" onclick="this.classList.toggle('open')">
+        <div class="endpoint-header">
+            <span class="method delete">DELETE</span>
+            <span class="endpoint-path">/{id}</span>
+            <span class="endpoint-desc">Delete note and blocks</span>
+        </div>
+        <div class="endpoint-body">
+            <p>Permanently deletes the note and all its blocks. Not reversible.</p>
+        </div>
+    </div>
+
+    <div class="endpoint" onclick="this.classList.toggle('open')">
+        <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="endpoint-path">/search?q=term</span>
+            <span class="endpoint-desc">Search notes by title</span>
+        </div>
+        <div class="endpoint-body">
+            <h3>Query Parameters</h3>
+            <table class="param-table">
+                <tr><th>Param</th><th>Type</th><th>Description</th></tr>
+                <tr><td>q<span class="required">REQUIRED</span></td><td>string</td><td>Search term (case insensitive, matches partial titles)</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===== iOS SHORTCUTS ===== -->
+    <h2><span class="badge ios">iOS</span> Shortcuts Setup</h2>
+    <p>These endpoints are designed to work with the iOS Shortcuts app. Here's how to set up the most useful ones.</p>
+
+    <div class="shortcut-section">
+        <h3 style="margin-top:0">Quick Capture Shortcut</h3>
+        <p>Capture a note from anywhere on your phone — share sheet, lock screen, or Siri.</p>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text">Open <strong>Shortcuts</strong> → tap <strong>+</strong> → name it <strong>"Quick Note"</strong></div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text">Add <strong>"Ask for Input"</strong> action → set type to <strong>Text</strong>, prompt: <strong>"What's on your mind?"</strong></div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text">Add <strong>"Get Contents of URL"</strong> action:</div>
+        </div>
+<pre style="margin-left:42px">URL: https://kakjbyoxqjvwnsdbqcnb.supabase.co/functions/v1/notes-api/capture
+Method: POST
+Headers:
+  x-api-key: vibey-notes-2026
+  Content-Type: application/json
+Body (JSON):
+  title: Quick Note
+  content: [Provided Input]</pre>
+        <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-text">Add <strong>"Show Notification"</strong> → <strong>"Note saved ✓"</strong></div>
+        </div>
+        <p style="margin-top:12px">Then add it to your <strong>Home Screen</strong>, <strong>Lock Screen</strong>, or trigger via <strong>"Hey Siri, Quick Note"</strong>.</p>
+    </div>
+
+    <div class="shortcut-section">
+        <h3 style="margin-top:0">Quick To-Do Shortcut</h3>
+        <p>Add a to-do item in one tap. Auto-groups into daily to-do pages.</p>
+        <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text">Add <strong>"Ask for Input"</strong> → prompt: <strong>"To-do item"</strong></div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text">Add <strong>"Get Contents of URL"</strong>:</div>
+        </div>
+<pre style="margin-left:42px">URL: https://kakjbyoxqjvwnsdbqcnb.supabase.co/functions/v1/notes-api/todo
+Method: POST
+Headers:
+  x-api-key: vibey-notes-2026
+  Content-Type: application/json
+Body (JSON):
+  text: [Provided Input]</pre>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text">Add <strong>"Show Notification"</strong> → <strong>"Added ✓"</strong></div>
+        </div>
+    </div>
+
+    <div class="shortcut-section">
+        <h3 style="margin-top:0"><span class="badge widget">Widget</span> For Native App Developers</h3>
+        <p>If you're building the native iOS wrapper, these endpoints power your widgets:</p>
+        <p><strong>Lock Screen Widget:</strong> GET / with limit=3 → show recent note titles</p>
+        <p><strong>Home Screen Widget:</strong> GET /{id} → show a specific note's to-do items with check status</p>
+        <p><strong>App Intent (Siri):</strong> POST /capture or POST /todo → voice-triggered capture</p>
+        <p><strong>Share Extension:</strong> POST /capture with shared text as content</p>
+        <p style="margin-bottom:0">All responses are JSON. Auth via x-api-key header. No OAuth, no tokens, no complexity.</p>
+    </div>
+
+    <h2>Block Types</h2>
+    <table class="param-table">
+        <tr><th>Type</th><th>Render</th><th>Notes</th></tr>
+        <tr><td>p</td><td>Paragraph</td><td>Default text block</td></tr>
+        <tr><td>h1</td><td>Heading</td><td>Large heading</td></tr>
+        <tr><td>h2</td><td>Subheading</td><td>Smaller heading</td></tr>
+        <tr><td>todo</td><td>Checkbox</td><td>Has checked: true/false</td></tr>
+        <tr><td>bullet</td><td>Bullet point</td><td>Unordered list item</td></tr>
+        <tr><td>divider</td><td>Divider line</td><td>Visual separator</td></tr>
+    </table>
+</div>
+</body>
+</html>

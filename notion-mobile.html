@@ -202,8 +202,8 @@
         }
         .block-content[contenteditable] { outline: none; }
         .block-content.checked-text { color: var(--text2); text-decoration: line-through; }
-        .block.heading .block-content { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
-        .block.subheading .block-content { font-size: 18px; font-weight: 600; }
+        .block.h1 .block-content { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; }
+        .block.h2 .block-content { font-size: 18px; font-weight: 600; }
 
         /* ===== BLOCK TYPE MENU ===== */
         .block-type-menu {
@@ -432,9 +432,9 @@
             </button>
         </div>
         <div class="block-type-menu" id="blockTypeMenu">
-            <button class="block-type-btn" data-type="text">Aa Text</button>
-            <button class="block-type-btn" data-type="heading">H1 Heading</button>
-            <button class="block-type-btn" data-type="subheading">H2 Sub</button>
+            <button class="block-type-btn" data-type="p">Aa Text</button>
+            <button class="block-type-btn" data-type="h1">H1 Heading</button>
+            <button class="block-type-btn" data-type="h2">H2 Sub</button>
             <button class="block-type-btn" data-type="todo">☑ To-do</button>
             <button class="block-type-btn" data-type="bullet">• Bullet</button>
         </div>
@@ -842,7 +842,7 @@
             }
 
             renderBlocks();
-            if (blocks.length === 0) addBlock('text', '', true);
+            if (blocks.length === 0) addBlock('p', '', true);
         }
 
         function closeEditor() {
@@ -885,7 +885,7 @@
 
         function createBlockEl(block) {
             const div = document.createElement('div');
-            div.className = `block ${block.type === 'heading' ? 'heading' : block.type === 'subheading' ? 'subheading' : ''}`;
+            div.className = `block ${block.type === 'h1' ? 'h1' : block.type === 'h2' ? 'h2' : ''}`;
             div.dataset.id = block.id;
 
             let prefix = '';
@@ -899,7 +899,7 @@
                 prefix = `<div class="block-handle"><svg viewBox="0 0 24 24"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></svg></div>`;
             }
 
-            const placeholder = block.type === 'heading' ? 'Heading' : block.type === 'subheading' ? 'Subheading' : block.type === 'todo' ? 'To-do' : 'Type something...';
+            const placeholder = block.type === 'h1' ? 'Heading' : block.type === 'h2' ? 'Subheading' : block.type === 'todo' ? 'To-do' : 'Type something...';
 
             div.innerHTML = `${prefix}<div class="block-content ${block.type === 'todo' && block.checked ? 'checked-text' : ''}" contenteditable="true" data-placeholder="${placeholder}" data-block-id="${block.id}">${escHtml(block.content || '')}</div>`;
 
@@ -922,7 +922,7 @@
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     const idx = blocks.findIndex(b => b.id === block.id);
-                    const type = blocks[idx]?.type === 'todo' ? 'todo' : blocks[idx]?.type === 'bullet' ? 'bullet' : 'text';
+                    const type = blocks[idx]?.type === 'todo' ? 'todo' : blocks[idx]?.type === 'bullet' ? 'bullet' : 'p';
                     addBlock(type, '', true, idx + 1);
                 }
                 if (e.key === 'Backspace' && content.textContent === '' && blocks.length > 1) {
@@ -982,7 +982,7 @@
             }
         }
 
-        async function addBlock(type = 'text', content = '', focus = false, insertAt = null) {
+        async function addBlock(type = 'p', content = '', focus = false, insertAt = null) {
             const id = crypto.randomUUID();
             const sortOrder = insertAt != null ? insertAt : blocks.length;
 
@@ -1068,7 +1068,7 @@
         // =========================================================================
         // TOOLBAR ACTIONS
         // =========================================================================
-        $('addBlockBtn').addEventListener('click', () => addBlock('text', '', true));
+        $('addBlockBtn').addEventListener('click', () => addBlock('p', '', true));
 
         $('toggleTypeBtn').addEventListener('click', () => {
             blockTypeMenu.classList.toggle('open');
@@ -1078,7 +1078,7 @@
             if (focusedBlockId) {
                 const block = blocks.find(b => b.id === focusedBlockId);
                 if (block) {
-                    block.type = block.type === 'todo' ? 'text' : 'todo';
+                    block.type = block.type === 'todo' ? 'p' : 'todo';
                     block.checked = false;
                     renderBlocks();
                     debounceSaveBlock(block.id);
@@ -1137,7 +1137,7 @@
                 for (let i = 0; i < lines.length; i++) {
                     const blockId = crypto.randomUUID();
                     const block = {
-                        id: blockId, page_id: id, type: 'text',
+                        id: blockId, page_id: id, type: 'p',
                         content: lines[i], checked: false, sort_order: i,
                         created_at: now, updated_at: now
                     };
