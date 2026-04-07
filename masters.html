@@ -176,6 +176,8 @@
         <h2>The Field</h2>
         <div class="tabs" id="viewTabs">
             <div class="tab active" data-view="overview">Overview</div>
+            <div class="tab" data-view="predictions">Predictions</div>
+            <div class="tab" data-view="value">Value Picks</div>
             <div class="tab" data-view="stats">Strokes Gained</div>
             <div class="tab" data-view="augusta">Augusta History</div>
             <div class="tab" data-view="fit">Course Fit</div>
@@ -226,18 +228,41 @@
 
         let field = [];
         let history = [];
+        let predictions = [];
         let currentView = 'overview';
         let sortKey = 'course_fit_score';
         let sortDir = 'desc';
         let searchQuery = '';
 
         async function load() {
-            const [fieldRes, histRes] = await Promise.all([
+            const [fieldRes, histRes, predRes] = await Promise.all([
                 sb.from('masters_field_2026').select('*'),
-                sb.from('masters_history').select('*').order('year', { ascending: false })
+                sb.from('masters_history').select('*').order('year', { ascending: false }),
+                sb.from('masters_predictions').select('*').eq('model_name', 'xgb_ensemble_v2').order('win_probability', { ascending: false })
             ]);
             field = fieldRes.data || [];
             history = histRes.data || [];
+            predictions = predRes.data || [];
+
+            // Merge predictions into field data
+            predictions.forEach(p => {
+                const f = field.find(f => f.player_name === p.player_name);
+                if (f) {
+                    f.pred_win = p.win_probability;
+                    f.pred_top5 = p.top5_probability;
+                    f.pred_top10 = p.top10_probability;
+                    f.pred_top20 = p.top20_probability;
+                    f.pred_cut = p.make_cut_probability;
+                    f.pred_finish = p.predicted_finish;
+                    f.confidence = p.confidence_score;
+                    // Calculate value edge vs market
+                    const mktWin = (f.implied_probability || 0) / 100;
+                    const mktTop10 = Math.min(mktWin * 8, 0.65);
+                    const mktTop20 = Math.min(mktWin * 14, 0.80);
+                    f.edge_top10 = p.top10_probability - mktTop10;
+                    f.edge_top20 = p.top20_probability - mktTop20;
+                }
+            });
 
             // Compute summary stats
             const pastChamps = field.filter(p => p.masters_wins > 0).length;
@@ -267,6 +292,26 @@
                     { key: 'course_fit_score', label: 'Fit Score', cls: 'num-col' },
                     { key: 'masters_wins', label: 'Wins', cls: 'num-col' },
                     { key: 'masters_appearances', label: 'Apps', cls: 'num-col' }
+                ],
+                predictions: [
+                    { key: 'rank', label: '#', cls: 'rank-col' },
+                    { key: 'player_name', label: 'Player', cls: 'player-col' },
+                    { key: 'pred_win', label: 'Win %', cls: 'num-col' },
+                    { key: 'pred_top5', label: 'Top 5', cls: 'num-col' },
+                    { key: 'pred_top10', label: 'Top 10', cls: 'num-col' },
+                    { key: 'pred_top20', label: 'Top 20', cls: 'num-col' },
+                    { key: 'pred_cut', label: 'Cut', cls: 'num-col' },
+                    { key: 'pred_finish', label: 'Finish', cls: 'num-col' }
+                ],
+                value: [
+                    { key: 'rank', label: '#', cls: 'rank-col' },
+                    { key: 'player_name', label: 'Player', cls: 'player-col' },
+                    { key: 'betting_odds', label: 'Odds', cls: 'odds-col num-col' },
+                    { key: 'pred_top10', label: 'Top 10', cls: 'num-col' },
+                    { key: 'edge_top10', label: 'T10 Edge', cls: 'num-col' },
+                    { key: 'pred_top20', label: 'Top 20', cls: 'num-col' },
+                    { key: 'edge_top20', label: 'T20 Edge', cls: 'num-col' },
+                    { key: 'confidence', label: 'Conf', cls: 'num-col' }
                 ],
                 stats: [
                     { key: 'rank', label: '#', cls: 'rank-col' },
@@ -336,6 +381,32 @@
                     }
                     if (c.key === 'betting_odds') return `<td class="${c.cls}">+${p.betting_odds}</td>`;
                     if (c.key === 'implied_probability') return `<td class="${c.cls}">${p.implied_probability ? p.implied_probability + '%' : '-'}</td>`;
+                    if (c.key === 'pred_win' || c.key === 'pred_top5' || c.key === 'pred_top10' || c.key === 'pred_top20' || c.key === 'pred_cut') {
+                        const val = p[c.key];
+                        if (val == null) return `<td class="${c.cls}">-</td>`;
+                        const pct = (parseFloat(val) * 100).toFixed(1);
+                        const brightness = Math.min(parseFloat(val) * 2, 1);
+                        const color = `rgba(74,222,128,${brightness})`;
+                        return `<td class="${c.cls}" style="color:${color};font-weight:600">${pct}%</td>`;
+                    }
+                    if (c.key === 'pred_finish') {
+                        const val = p[c.key];
+                        return `<td class="${c.cls}">${val != null ? parseFloat(val).toFixed(1) : '-'}</td>`;
+                    }
+                    if (c.key === 'edge_top10' || c.key === 'edge_top20') {
+                        const val = p[c.key];
+                        if (val == null) return `<td class="${c.cls}">-</td>`;
+                        const pct = (parseFloat(val) * 100).toFixed(1);
+                        const color = parseFloat(val) > 0 ? 'var(--green-light)' : 'var(--red)';
+                        return `<td class="${c.cls}" style="color:${color};font-weight:700">${parseFloat(val) > 0 ? '+' : ''}${pct}%</td>`;
+                    }
+                    if (c.key === 'confidence') {
+                        const val = p[c.key];
+                        if (val == null) return `<td class="${c.cls}">-</td>`;
+                        const label = parseFloat(val) >= 0.7 ? 'High' : parseFloat(val) >= 0.4 ? 'Med' : 'Low';
+                        const color = parseFloat(val) >= 0.7 ? 'var(--green-light)' : parseFloat(val) >= 0.4 ? 'var(--yellow)' : 'var(--text3)';
+                        return `<td class="${c.cls}" style="color:${color}">${label}</td>`;
+                    }
                     if (c.key === 'course_fit_score' && p.course_fit_score) {
                         const w = Math.min(parseFloat(p.course_fit_score) * 8, 100);
                         return `<td class="${c.cls}"><span class="fit-bar" style="width:${w}px"></span>${parseFloat(p.course_fit_score).toFixed(1)}</td>`;
@@ -392,6 +463,8 @@
 
             // Set default sort for each view
             if (currentView === 'overview') { sortKey = 'betting_odds'; sortDir = 'asc'; }
+            else if (currentView === 'predictions') { sortKey = 'pred_top10'; sortDir = 'desc'; }
+            else if (currentView === 'value') { sortKey = 'edge_top10'; sortDir = 'desc'; }
             else if (currentView === 'stats') { sortKey = 'sg_total'; sortDir = 'desc'; }
             else if (currentView === 'augusta') { sortKey = 'masters_wins'; sortDir = 'desc'; }
             else if (currentView === 'fit') { sortKey = 'course_fit_score'; sortDir = 'desc'; }
