@@ -361,8 +361,8 @@ def main():
     print("\n[3/5] Training ensemble models...")
     models, feature_cols, scaler = train_ensemble(train_df)
 
-    print("\n[4/5] Generating predictions (30% market prior blend)...")
-    preds_df = predict_with_ensemble(models, field_df, feature_cols, scaler, market_weight=0.30)
+    print("\n[4/5] Generating predictions (40% market prior blend)...")
+    preds_df = predict_with_ensemble(models, field_df, feature_cols, scaler, market_weight=0.40)
     preds_df = normalize_probs(preds_df)
     preds_df = preds_df.sort_values('top10_probability', ascending=False).reset_index(drop=True)
 
