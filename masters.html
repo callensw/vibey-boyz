@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masters 2026 — Golf Database</title>
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #0a3d0a; --bg2: #0d4d0d; --bg3: #116611;
+            --bg-card: rgba(0,0,0,0.3); --bg-card2: rgba(0,0,0,0.2);
+            --border: rgba(255,255,255,0.1); --text: #f0f0e8;
+            --text2: rgba(240,240,232,0.6); --text3: rgba(240,240,232,0.3);
+            --gold: #d4a843; --gold2: rgba(212,168,67,0.15);
+            --green-light: #4ade80; --green-accent: #22c55e;
+            --red: #ef4444; --yellow: #fbbf24;
+        }
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: linear-gradient(135deg, #032003 0%, #0a3d0a 40%, #0d4d0d 100%);
+            color: var(--text); min-height: 100vh;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+        /* Header */
+        .hero {
+            text-align: center; padding: 48px 20px 32px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%);
+        }
+        .hero-badge {
+            display: inline-block; font-size: 11px; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase; color: var(--gold);
+            border: 1px solid var(--gold); padding: 4px 16px; border-radius: 4px;
+            margin-bottom: 16px; font-family: -apple-system, sans-serif;
+        }
+        h1 {
+            font-size: clamp(32px, 6vw, 56px); font-weight: 400;
+            letter-spacing: -1px; color: var(--gold); line-height: 1.1;
+            font-style: italic;
+        }
+        h1 span { font-weight: 700; font-style: normal; }
+        .hero-sub {
+            font-size: 16px; color: var(--text2); margin-top: 8px;
+            font-family: -apple-system, sans-serif;
+        }
+
+        /* Stats overview */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px; margin: 24px 0 32px;
+        }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px; text-align: center;
+        }
+        .stat-value { font-size: 28px; font-weight: 700; color: var(--gold); font-family: -apple-system, sans-serif; }
+        .stat-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; font-family: -apple-system, sans-serif; }
+
+        /* Section headers */
+        h2 {
+            font-size: 22px; font-weight: 400; font-style: italic; color: var(--gold);
+            margin: 36px 0 16px; padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 4px; margin-bottom: 16px; overflow-x: auto;
+            padding-bottom: 4px; font-family: -apple-system, sans-serif;
+        }
+        .tab {
+            padding: 8px 16px; border-radius: 8px; font-size: 13px;
+            font-weight: 600; cursor: pointer; white-space: nowrap;
+            background: var(--bg-card); color: var(--text2); border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab:hover { color: var(--text); }
+        .tab.active { background: var(--gold2); color: var(--gold); border-color: rgba(212,168,67,0.3); }
+
+        /* Table */
+        .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; font-family: -apple-system, sans-serif; }
+        thead th {
+            background: rgba(0,0,0,0.4); padding: 10px 12px; font-size: 11px;
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text2); text-align: left; position: sticky; top: 0;
+            cursor: pointer; user-select: none; white-space: nowrap;
+        }
+        thead th:hover { color: var(--gold); }
+        thead th.sorted { color: var(--gold); }
+        tbody tr { border-top: 1px solid var(--border); transition: background 0.15s; }
+        tbody tr:hover { background: rgba(255,255,255,0.04); }
+        tbody td { padding: 10px 12px; font-size: 14px; white-space: nowrap; }
+        .rank-col { width: 40px; text-align: center; color: var(--text3); font-weight: 700; }
+        .player-col { font-weight: 600; min-width: 160px; }
+        .num-col { text-align: right; font-variant-numeric: tabular-nums; }
+        .odds-col { color: var(--green-light); font-weight: 600; }
+        .fit-bar {
+            display: inline-block; height: 6px; border-radius: 3px;
+            background: var(--green-accent); margin-right: 8px; vertical-align: middle;
+        }
+        .gold-badge {
+            display: inline-block; background: var(--gold); color: #1a1a00;
+            font-size: 10px; font-weight: 800; padding: 1px 6px; border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        /* History chart */
+        .history-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px; margin-top: 12px;
+        }
+        .history-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 14px;
+        }
+        .history-year { font-size: 12px; color: var(--text3); font-family: -apple-system, sans-serif; font-weight: 700; }
+        .history-winner { font-size: 16px; font-weight: 600; margin: 4px 0; color: var(--gold); }
+        .history-score { font-size: 13px; color: var(--text2); font-family: -apple-system, sans-serif; }
+        .history-playoff { font-size: 10px; background: var(--gold2); color: var(--gold); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 4px; }
+
+        /* Model section */
+        .model-note {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 20px; margin-top: 16px;
+            font-family: -apple-system, sans-serif;
+        }
+        .model-note h3 { font-family: Georgia, serif; font-style: italic; color: var(--gold); margin-bottom: 8px; }
+        .model-note p { font-size: 14px; color: var(--text2); line-height: 1.6; }
+        .model-note code { background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px; font-size: 13px; color: var(--green-light); }
+
+        /* Search */
+        .search-box {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 10px; padding: 10px 16px;
+        }
+        .search-box input {
+            flex: 1; background: none; border: none; color: var(--text);
+            font-size: 15px; outline: none; font-family: -apple-system, sans-serif;
+        }
+        .search-box input::placeholder { color: var(--text3); }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 12px; }
+            .hero { padding: 32px 12px 24px; }
+            tbody td, thead th { padding: 8px 8px; font-size: 12px; }
+        }
+
+        /* Loading */
+        .loading { text-align: center; padding: 40px; color: var(--text2); }
+        .loading-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); margin: 0 4px; animation: bounce 1.4s infinite ease-in-out both; }
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="hero-badge">Augusta National Golf Club</div>
+        <h1>The <span>Masters</span> 2026</h1>
+        <p class="hero-sub">April 9–12 &nbsp;|&nbsp; 91 Players &nbsp;|&nbsp; Par 72 &nbsp;|&nbsp; 7,565 yards</p>
+    </div>
+
+    <div class="container">
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card"><div class="stat-value" id="fieldSize">91</div><div class="stat-label">Players</div></div>
+            <div class="stat-card"><div class="stat-value" id="pastChamps">--</div><div class="stat-label">Past Champions</div></div>
+            <div class="stat-card"><div class="stat-value" id="debutants">--</div><div class="stat-label">Debutants</div></div>
+            <div class="stat-card"><div class="stat-value">$20M</div><div class="stat-label">Purse</div></div>
+            <div class="stat-card"><div class="stat-value" id="avgOdds">--</div><div class="stat-label">Avg Fav Odds</div></div>
+        </div>
+
+        <!-- Field Table -->
+        <h2>The Field</h2>
+        <div class="tabs" id="viewTabs">
+            <div class="tab active" data-view="overview">Overview</div>
+            <div class="tab" data-view="stats">Strokes Gained</div>
+            <div class="tab" data-view="augusta">Augusta History</div>
+            <div class="tab" data-view="fit">Course Fit</div>
+        </div>
+
+        <div class="search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(240,240,232,0.3)" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="searchInput" placeholder="Search players...">
+        </div>
+
+        <div class="table-wrap">
+            <table id="fieldTable">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="8" class="loading"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Historical Winners -->
+        <h2>Champions (2015–2025)</h2>
+        <div class="history-grid" id="historyGrid"></div>
+
+        <!-- ML Model Section -->
+        <h2>Prediction Model</h2>
+        <div class="model-note">
+            <h3>Building the Model</h3>
+            <p>The database is live with <strong>91 players</strong>, betting odds, Augusta history, and 2026 season strokes gained data for the top 20 contenders. Key features for the ML model:</p>
+            <p style="margin-top:12px">
+                <code>sg_approach</code> (35% weight) &nbsp;
+                <code>sg_off_tee</code> (25%) &nbsp;
+                <code>sg_around_green</code> (20%) &nbsp;
+                <code>spike_events</code> &nbsp;
+                <code>masters_history</code> &nbsp;
+                <code>owgr</code>
+            </p>
+            <p style="margin-top:12px">The <strong>course_fit_score</strong> already encodes these weights. Historical data shows approach play has the largest influence — the average winner gains +5.8 strokes on approach across 4 rounds. Only 3 of the last 10 winners ranked top-10 in putting that week.</p>
+            <p style="margin-top:12px">Next step: train an XGBoost classifier on historical finishes to predict win %, top-5, top-10, and make-cut probabilities. The <code>masters_predictions</code> table is ready for model output.</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script>
+    (function() {
+        const SB_URL = 'https://kakjbyoxqjvwnsdbqcnb.supabase.co';
+        const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtha2pieW94cWp2d25zZGJxY25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0NzQxMjgsImV4cCI6MjA4NTA1MDEyOH0.6kkaabg_8D2qKcIsuEUVuZWja3LIdx8-a2wwoTmu30k';
+        const sb = supabase.createClient(SB_URL, SB_KEY);
+
+        let field = [];
+        let history = [];
+        let currentView = 'overview';
+        let sortKey = 'course_fit_score';
+        let sortDir = 'desc';
+        let searchQuery = '';
+
+        async function load() {
+            const [fieldRes, histRes] = await Promise.all([
+                sb.from('masters_field_2026').select('*'),
+                sb.from('masters_history').select('*').order('year', { ascending: false })
+            ]);
+            field = fieldRes.data || [];
+            history = histRes.data || [];
+
+            // Compute summary stats
+            const pastChamps = field.filter(p => p.masters_wins > 0).length;
+            const debutants = field.filter(p => p.masters_appearances === 0).length;
+            const top5odds = field.filter(p => p.betting_odds <= 2000).slice(0, 5);
+            const avgOdds = top5odds.length ? Math.round(top5odds.reduce((s, p) => s + p.betting_odds, 0) / top5odds.length) : 0;
+
+            document.getElementById('pastChamps').textContent = pastChamps;
+            document.getElementById('debutants').textContent = debutants;
+            document.getElementById('avgOdds').textContent = '+' + avgOdds;
+
+            renderTable();
+            renderHistory();
+        }
+
+        function renderTable() {
+            const thead = document.getElementById('tableHead');
+            const tbody = document.getElementById('tableBody');
+
+            const columns = {
+                overview: [
+                    { key: 'rank', label: '#', cls: 'rank-col' },
+                    { key: 'player_name', label: 'Player', cls: 'player-col' },
+                    { key: 'owgr', label: 'OWGR', cls: 'num-col' },
+                    { key: 'betting_odds', label: 'Odds', cls: 'odds-col num-col' },
+                    { key: 'implied_probability', label: 'Win %', cls: 'num-col' },
+                    { key: 'course_fit_score', label: 'Fit Score', cls: 'num-col' },
+                    { key: 'masters_wins', label: 'Wins', cls: 'num-col' },
+                    { key: 'masters_appearances', label: 'Apps', cls: 'num-col' }
+                ],
+                stats: [
+                    { key: 'rank', label: '#', cls: 'rank-col' },
+                    { key: 'player_name', label: 'Player', cls: 'player-col' },
+                    { key: 'sg_total', label: 'SG Total', cls: 'num-col' },
+                    { key: 'sg_approach', label: 'SG App', cls: 'num-col' },
+                    { key: 'sg_off_tee', label: 'SG OTT', cls: 'num-col' },
+                    { key: 'sg_around_green', label: 'SG ARG', cls: 'num-col' },
+                    { key: 'sg_putting', label: 'SG Putt', cls: 'num-col' },
+                    { key: 'scoring_avg', label: 'Scoring', cls: 'num-col' }
+                ],
+                augusta: [
+                    { key: 'rank', label: '#', cls: 'rank-col' },
+                    { key: 'player_name', label: 'Player', cls: 'player-col' },
+                    { key: 'masters_appearances', label: 'Apps', cls: 'num-col' },
+                    { key: 'masters_wins', label: 'Wins', cls: 'num-col' },
+                    { key: 'masters_top5', label: 'Top 5', cls: 'num-col' },
+                    { key: 'masters_top10', label: 'Top 10', cls: 'num-col' },
+                    { key: 'masters_cuts_made', label: 'Cuts', cls: 'num-col' },
+                    { key: 'best_masters_finish', label: 'Best', cls: 'num-col' }
+                ],
+                fit: [
+                    { key: 'rank', label: '#', cls: 'rank-col' },
+                    { key: 'player_name', label: 'Player', cls: 'player-col' },
+                    { key: 'course_fit_score', label: 'Fit Score', cls: 'num-col' },
+                    { key: 'sg_approach', label: 'SG App (35%)', cls: 'num-col' },
+                    { key: 'sg_off_tee', label: 'SG OTT (25%)', cls: 'num-col' },
+                    { key: 'sg_around_green', label: 'SG ARG (20%)', cls: 'num-col' },
+                    { key: 'spike_approach_events', label: 'Spikes', cls: 'num-col' },
+                    { key: 'driving_distance', label: 'Dist', cls: 'num-col' }
+                ]
+            };
+
+            const cols = columns[currentView];
+
+            // Header
+            thead.innerHTML = '<tr>' + cols.map(c =>
+                `<th class="${c.cls} ${sortKey === c.key ? 'sorted' : ''}" data-key="${c.key}">${c.label}${sortKey === c.key ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}</th>`
+            ).join('') + '</tr>';
+
+            // Sort data
+            let sorted = [...field];
+            if (searchQuery) {
+                sorted = sorted.filter(p => p.player_name.toLowerCase().includes(searchQuery));
+            }
+
+            if (sortKey === 'player_name') {
+                sorted.sort((a, b) => sortDir === 'asc' ? a.player_name.localeCompare(b.player_name) : b.player_name.localeCompare(a.player_name));
+            } else if (sortKey === 'betting_odds') {
+                sorted.sort((a, b) => sortDir === 'asc' ? (a[sortKey] || 99999) - (b[sortKey] || 99999) : (a[sortKey] || 99999) - (b[sortKey] || 99999));
+            } else {
+                sorted.sort((a, b) => {
+                    const av = a[sortKey] ?? (sortDir === 'desc' ? -Infinity : Infinity);
+                    const bv = b[sortKey] ?? (sortDir === 'desc' ? -Infinity : Infinity);
+                    return sortDir === 'asc' ? av - bv : bv - av;
+                });
+            }
+
+            // Rows
+            tbody.innerHTML = sorted.map((p, i) => {
+                return '<tr>' + cols.map(c => {
+                    if (c.key === 'rank') return `<td class="${c.cls}">${i + 1}</td>`;
+                    if (c.key === 'player_name') {
+                        let badges = '';
+                        if (p.masters_wins > 0) badges += `<span class="gold-badge">${p.masters_wins > 1 ? p.masters_wins + 'x' : ''} Champion</span>`;
+                        return `<td class="${c.cls}">${p.player_name}${badges}</td>`;
+                    }
+                    if (c.key === 'betting_odds') return `<td class="${c.cls}">+${p.betting_odds}</td>`;
+                    if (c.key === 'implied_probability') return `<td class="${c.cls}">${p.implied_probability ? p.implied_probability + '%' : '-'}</td>`;
+                    if (c.key === 'course_fit_score' && p.course_fit_score) {
+                        const w = Math.min(parseFloat(p.course_fit_score) * 8, 100);
+                        return `<td class="${c.cls}"><span class="fit-bar" style="width:${w}px"></span>${parseFloat(p.course_fit_score).toFixed(1)}</td>`;
+                    }
+                    if (c.key === 'scoring_avg' && p.scoring_avg) return `<td class="${c.cls}">${parseFloat(p.scoring_avg).toFixed(1)}</td>`;
+                    if (c.key === 'driving_distance' && p.driving_distance) return `<td class="${c.cls}">${parseFloat(p.driving_distance).toFixed(0)}</td>`;
+
+                    const val = p[c.key];
+                    if (val === null || val === undefined) return `<td class="${c.cls}">-</td>`;
+                    if (typeof val === 'number' || (typeof val === 'string' && !isNaN(val))) {
+                        const num = parseFloat(val);
+                        if (c.key.startsWith('sg_')) {
+                            const color = num > 0 ? 'var(--green-light)' : num < 0 ? 'var(--red)' : 'var(--text2)';
+                            return `<td class="${c.cls}" style="color:${color}">${num > 0 ? '+' : ''}${num.toFixed(2)}</td>`;
+                        }
+                        return `<td class="${c.cls}">${Number.isInteger(num) ? num : num.toFixed(2)}</td>`;
+                    }
+                    return `<td class="${c.cls}">${val}</td>`;
+                }).join('') + '</tr>';
+            }).join('');
+
+            // Click handlers for sorting
+            thead.querySelectorAll('th').forEach(th => {
+                th.addEventListener('click', () => {
+                    const key = th.dataset.key;
+                    if (key === 'rank') return;
+                    if (sortKey === key) sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+                    else { sortKey = key; sortDir = key === 'player_name' ? 'asc' : 'desc'; }
+                    renderTable();
+                });
+            });
+        }
+
+        function renderHistory() {
+            const grid = document.getElementById('historyGrid');
+            const recent = history.filter(h => h.year >= 2015);
+            grid.innerHTML = recent.map(h => `
+                <div class="history-card">
+                    <div class="history-year">${h.year}</div>
+                    <div class="history-winner">${h.winner}</div>
+                    <div class="history-score">${h.winning_score} (${h.to_par > 0 ? '+' : ''}${h.to_par})</div>
+                    ${h.playoff ? '<div class="history-playoff">Playoff</div>' : ''}
+                </div>
+            `).join('');
+        }
+
+        // Tab switching
+        document.getElementById('viewTabs').addEventListener('click', e => {
+            const tab = e.target.closest('.tab');
+            if (!tab) return;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentView = tab.dataset.view;
+
+            // Set default sort for each view
+            if (currentView === 'overview') { sortKey = 'betting_odds'; sortDir = 'asc'; }
+            else if (currentView === 'stats') { sortKey = 'sg_total'; sortDir = 'desc'; }
+            else if (currentView === 'augusta') { sortKey = 'masters_wins'; sortDir = 'desc'; }
+            else if (currentView === 'fit') { sortKey = 'course_fit_score'; sortDir = 'desc'; }
+
+            renderTable();
+        });
+
+        // Search
+        document.getElementById('searchInput').addEventListener('input', e => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            renderTable();
+        });
+
+        // Init
+        sortKey = 'betting_odds'; sortDir = 'asc';
+        load();
+    })();
+    </script>
+</body>
+</html>
