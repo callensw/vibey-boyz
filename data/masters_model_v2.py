@@ -65,7 +65,8 @@ FEATURES = [
     'spike_approach_events', 'masters_appearances', 'masters_cuts_made',
     'best_masters_finish', 'betting_odds', 'recent_form_avg_finish',
     'par5_scoring_avg', 'scrambling_pct', 'days_since_last_event',
-    'age', 'form_trend', 'recent_masters_score'
+    'age', 'form_trend', 'recent_masters_score',
+    'conditions_boost', 'injury_discount'
 ]
 
 
