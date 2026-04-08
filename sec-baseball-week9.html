@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEC Baseball Week 9 Predictions | vibey boyz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: #0a0a0f;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            padding: 1rem;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #f59e0b, #ef4444, #f59e0b);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 4s ease infinite;
+            margin-bottom: 0.5rem;
+        }
+
+        .header .subtitle {
+            color: rgba(255,255,255,0.5);
+            font-size: clamp(0.85rem, 2vw, 1.1rem);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .header .date {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .disclaimer {
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            padding: 1rem;
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: 12px;
+            color: rgba(255,255,255,0.6);
+            font-size: 0.8rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .season-record {
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            padding: 1rem;
+            background: rgba(245, 158, 11, 0.06);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            border-radius: 12px;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .season-record strong {
+            color: #f59e0b;
+            font-weight: 600;
+        }
+
+        .series-grid {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .series-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .series-card:hover {
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .series-card.featured {
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.03);
+        }
+
+        .series-card.featured .series-header {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .series-card.rivalry {
+            border-color: rgba(168, 85, 247, 0.3);
+            background: rgba(168, 85, 247, 0.03);
+        }
+
+        .series-card.rivalry .series-header {
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .featured-badge {
+            display: inline-block;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .rivalry-badge {
+            display: inline-block;
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .series-header {
+            padding: 1rem 1.25rem;
+            background: rgba(255,255,255,0.02);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .matchup-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .matchup-title .at {
+            color: rgba(255,255,255,0.3);
+            font-weight: 400;
+            margin: 0 0.3rem;
+        }
+
+        .team-record {
+            color: rgba(255,255,255,0.4);
+            font-size: 0.8rem;
+        }
+
+        .series-prediction {
+            padding: 0.5rem 0.8rem;
+            background: rgba(245, 158, 11, 0.1);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #f59e0b;
+        }
+
+        .series-body {
+            padding: 1rem 1.25rem;
+        }
+
+        .series-reasoning {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.55);
+            line-height: 1.6;
+        }
+
+        .series-reasoning strong {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .rpi-tags {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .rpi-tag {
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 0.03em;
+        }
+
+        .rpi-tag.strong {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .rpi-tag.weak {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .rpi-tag.mid {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+
+        .standings-note {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 1.25rem;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+        }
+
+        .standings-note h3 {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .standings-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .standings-table th {
+            text-align: left;
+            color: rgba(255,255,255,0.3);
+            font-weight: 500;
+            padding: 0.4rem 0.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .standings-table td {
+            padding: 0.4rem 0.5rem;
+            color: rgba(255,255,255,0.6);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .standings-table tr:hover td {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .hot { color: #22c55e; }
+        .cold { color: #ef4444; }
+        .mid { color: #f59e0b; }
+
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: rgba(255,255,255,0.2);
+            font-size: 0.75rem;
+        }
+
+        .footer a {
+            color: rgba(255,255,255,0.3);
+            text-decoration: none;
+        }
+
+        @media (max-width: 600px) {
+            .series-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .series-prediction {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>SEC Baseball Predictions</h1>
+    <p class="subtitle">Week 9 &bull; Sir Claudius Codius sharpens his quill</p>
+    <p class="date">April 10-12, 2026 &bull; Into the heat of the conference grind</p>
+</div>
+
+<div class="disclaimer">
+    Predictions based on current standings, national rankings, pitching matchups, home-field advantage, and vibes. Series winner picks only &mdash; no spreads, no totals, no moneylines. AI-generated analysis &mdash; for entertainment purposes only. Bet at your own risk.
+</div>
+
+<div class="season-record">
+    <strong>Season record through Week 8: 17/32 (53.1%)</strong> &mdash; The knight holds steady above the Mendoza line.
+</div>
+
+<div class="series-grid">
+
+    <!-- SERIES 1: Texas at Texas A&M (RIVALRY) -->
+    <div class="series-card rivalry">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">
+                    Texas <span class="at">@</span> Texas A&amp;M
+                    <span class="rivalry-badge">Rivalry</span>
+                </span>
+                <div class="team-record">Texas (9-3 SEC, 26-5 overall, #2 nationally) vs Texas A&amp;M (7-5 SEC, 25-7 overall, #18 nationally)</div>
+            </div>
+            <div>
+                <div class="series-prediction">Texas A&amp;M 2-1</div>
+            </div>
+        </div>
+        <div class="series-body">
+            <div class="series-reasoning">
+                <strong>This is the most anticipated series of the year.</strong> The first three-game set between these rivals in College Station since 1992. Jim Schlossnagle, who built A&amp;M into a powerhouse before leaving for Texas, returns to Olsen Field at Blue Bell Park as the enemy. The Longhorns are #2 in the country with ace Ruger Riojas anchoring their staff, but College Station is going to be LOUD. Texas A&amp;M is 7-5 but has been playing better lately and has the crowd, the emotion, and the revenge factor. Blue Bell Park has been one of the toughest road venues in the SEC all year. Texas is the better team on paper, but this series is a coin-flip &mdash; and the knight is going with the home crowd and the Schlossnagle curse.
+            </div>
+            <div class="rpi-tags">
+                <span class="rpi-tag strong">TEX #2 nationally</span>
+                <span class="rpi-tag mid">A&amp;M #18 nationally</span>
+                <span class="rpi-tag">1st College Station series since 1992</span>
+                <span class="rpi-tag">Schlossnagle factor</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 2: Florida at Georgia (FEATURED) -->
+    <div class="series-card featured">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">
+                    Florida <span class="at">@</span> Georgia
+                    <span class="featured-badge">Series of the Week</span>
+                </span>
+                <div class="team-record">Florida (7-5 SEC, 24-9 overall) vs Georgia (10-2 SEC, 27-6 overall, #4 nationally)</div>
+            </div>
+            <div>
+                <div class="series-prediction">Georgia 2-1</div>
+            </div>
+        </div>
+        <div class="series-body">
+            <div class="series-reasoning">
+                <strong>Georgia is playing the best baseball in the SEC.</strong> The Bulldogs swept then-#5 Mississippi State ON THE ROAD last week, going 10-9, 3-1, 8-5 in three games that weren't nearly as close as the first score suggests. Now they come home to host Florida, a 7-5 team that had a rough week and dropped in the polls. Georgia's pitching staff is elite, their offense is clicking, and Foley Field is going to be rocking. Florida is too good to get swept &mdash; this is the SEC &mdash; but Georgia takes the series.
+            </div>
+            <div class="rpi-tags">
+                <span class="rpi-tag strong">UGA #4 nationally</span>
+                <span class="rpi-tag mid">UF ranked</span>
+                <span class="rpi-tag">Georgia won 7 straight</span>
+                <span class="rpi-tag">Foley Field fortress</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 3: Arkansas at Alabama -->
+    <div class="series-card">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">Arkansas <span class="at">@</span> Alabama</span>
+                <div class="team-record">Arkansas (5-7 SEC, 20-13 overall) vs Alabama (8-4 SEC, 25-8 overall, #8 nationally)</div>
+            </div>
+            <div>
+                <div class="series-prediction">Alabama 2-1</div>
+            </div>
+        </div>
+        <div class="series-body">
+            <div class="series-reasoning">
+                <strong>Alabama has been one of the hottest teams in the country.</strong> They jumped from #16 to #8 nationally after winning a road series at Oklahoma to extend their run. Arkansas at 5-7 in the SEC and 20-13 overall has been wildly inconsistent &mdash; they lost a home series to Auburn last week and just can't string wins together. Alabama at home with their pitching depth should take care of business.
+            </div>
+            <div class="rpi-tags">
+                <span class="rpi-tag strong">BAMA #8 nationally</span>
+                <span class="rpi-tag weak">ARK 5-7 SEC</span>
+                <span class="rpi-tag">Bama home</span>
+                <span class="rpi-tag mid">Tide jumped 8 spots in rankings</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 4: Tennessee at Mississippi State -->
+    <div class="series-card">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">Tennessee <span class="at">@</span> Mississippi State</span>
+                <div class="team-record">Tennessee (4-8 SEC, 20-11 overall) vs Mississippi State (7-5 SEC, 25-8 overall)</div>
+            </div>
+            <div>
+                <div class="series-prediction">Mississippi State 2-1</div>
+            </div>
+        </div>
+        <div class="series-body">
+            <div class="series-reasoning">
+                <strong>Miss State is wounded.</strong> Getting swept at home by Georgia &mdash; 10-9, 3-1, 8-5 &mdash; dropped them from #5 to somewhere around #12 in the polls. A team of their caliber doesn't lose three straight at Dudy Noble without feeling it. Now comes Tennessee, which at 4-8 is one of the biggest disappointments in the SEC this year. This is Miss State's bounce-back game, and Dudy Noble Field is one of the loudest venues in college baseball. The Bulldogs wake up.
+            </div>
+            <div class="rpi-tags">
+                <span class="rpi-tag mid">MSST dropped from #5</span>
+                <span class="rpi-tag weak">TENN 4-8 SEC</span>
+                <span class="rpi-tag">Dudy Noble bounce-back</span>
+                <span class="rpi-tag">Revenge game energy</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 5: LSU at Ole Miss -->
+    <div class="series-card">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">LSU <span class="at">@</span> Ole Miss</span>
+                <div class="team-record">LSU (6-6 SEC, 22-11 overall) vs Ole Miss (5-7 SEC, 22-11 overall)</div>
+            </div>
+            <div>
+                <div class="series-prediction">Ole Miss 2-1</div>
+            </div>
+        </div>
+        <div class="series-body">
+            <div class="series-reasoning">
+                <strong>Both of these teams are stuck in mediocrity right now,</strong> but Ole Miss gets the home field advantage at Swayze Field. LSU has been underperforming all year relative to their talent. Ole Miss is also underperforming, but at home they've been better. One team breaks out of the slump this weekend &mdash; and the knight picks Oxford.
+            </div>
+            <div class="rpi-tags">
+                <span class="rpi-tag">Both teams .500ish</span>
+                <span class="rpi-tag mid">Swayze Field edge</span>
+                <span class="rpi-tag weak">LSU underperforming</span>
+                <span class="rpi-tag">Slight home pick</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 6: Oklahoma at Vanderbilt -->
+    <div class="series-card">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">Oklahoma <span class="at">@</span> Vanderbilt</span>
+                <div class="team-record">Oklahoma (5-7 SEC, 22-10 overall) vs Vanderbilt (6-6 SEC, 21-12 overall)</div>
+            </div>
+            <div>
+                <div class="series-prediction">Vanderbilt 2-1</div>
+            </div>
+        </div>
+        <div class="series-body">
+            <div class="series-reasoning">
+                <strong>Oklahoma has been sliding after a promising start to SEC play.</strong> They lost a home series to Alabama last weekend and the offense has gone quiet. Vanderbilt at home isn't the juggernaut of old, but they're 6-6 in a tough league with solid pitching. The 'Dores take this one at Hawkins Field where they've been solid this year.
+            </div>
+            <div class="rpi-tags">
+                <span class="rpi-tag weak">OU 5-7 SEC</span>
+                <span class="rpi-tag mid">VANDY home</span>
+                <span class="rpi-tag">OU offense slumping</span>
+                <span class="rpi-tag">Hawkins Field advantage</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 7: Kentucky at Auburn -->
+    <div class="series-card">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">Kentucky <span class="at">@</span> Auburn</span>
+                <div class="team-record">Kentucky (6-6 SEC, 23-8 overall) vs Auburn (6-6 SEC, 23-9 overall)</div>
+            </div>
+            <div>
+                <div class="series-prediction">Auburn 2-1</div>
+            </div>
+        </div>
+        <div class="series-body">
+            <div class="series-reasoning">
+                <strong>Two teams right at the bubble of the Top 25 conversation,</strong> both sitting at 6-6 in a brutal conference. Auburn at home at Plainsman Park gets the edge here &mdash; they've been better at home this year and need the series win to keep their NCAA Tournament hopes alive. Kentucky's been solid but haven't won a road series since early conference play. Auburn takes it in a rubber match.
+            </div>
+            <div class="rpi-tags">
+                <span class="rpi-tag">Both 6-6 SEC</span>
+                <span class="rpi-tag mid">AUB home edge</span>
+                <span class="rpi-tag">Plainsman Park</span>
+                <span class="rpi-tag">NCAA bubble implications</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SERIES 8: South Carolina at Missouri -->
+    <div class="series-card">
+        <div class="series-header">
+            <div>
+                <span class="matchup-title">South Carolina <span class="at">@</span> Missouri</span>
+                <div class="team-record">South Carolina (2-10 SEC, 16-18 overall) vs Missouri (3-9 SEC, 20-13 overall)</div>
+            </div>
+            <div>
+                <div class="series-prediction">Missouri 2-1</div>
+            </div>
+        </div>
+        <div class="series-body">
+            <div class="series-reasoning">
+                <strong>The bottom of the barrel matchup of the week.</strong> South Carolina is 2-10 and has fallen to 16-18 overall &mdash; that's below .500 for a school that was in the College World Series two years ago. Missouri at 3-9 is nearly as bad, but they're at home and have beaten South Carolina before when it mattered. Someone has to win this series, and the knight picks Missouri because at least they're still above .500 overall.
+            </div>
+            <div class="rpi-tags">
+                <span class="rpi-tag weak">SC 16-18 overall</span>
+                <span class="rpi-tag">MIZZOU home</span>
+                <span class="rpi-tag weak">SC below .500</span>
+                <span class="rpi-tag">Bottom of the barrel</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="standings-note">
+    <h3>SEC Standings (Entering Week 9)</h3>
+    <table class="standings-table">
+        <thead>
+            <tr>
+                <th>Team</th>
+                <th>SEC</th>
+                <th>Overall</th>
+                <th>National</th>
+                <th>Vibe</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Georgia</td><td>10-2 (.833)</td><td>27-6</td><td class="hot">#4</td><td class="hot">Best in SEC</td></tr>
+            <tr><td>Texas</td><td>9-3 (.750)</td><td>26-5</td><td class="hot">#2</td><td class="hot">Weeks at #2</td></tr>
+            <tr><td>Alabama</td><td>8-4 (.667)</td><td>25-8</td><td class="hot">#8</td><td class="hot">Jumped from #16</td></tr>
+            <tr><td>Mississippi St</td><td>7-5 (.583)</td><td>25-8</td><td class="mid">~#12</td><td class="cold">Swept by Georgia</td></tr>
+            <tr><td>Florida</td><td>7-5 (.583)</td><td>24-9</td><td class="mid">Ranked</td><td class="mid">Down week</td></tr>
+            <tr><td>Texas A&amp;M</td><td>7-5 (.583)</td><td>25-7</td><td class="mid">#18</td><td class="mid">Solid overall</td></tr>
+            <tr><td>Kentucky</td><td>6-6 (.500)</td><td>23-8</td><td>&mdash;</td><td class="mid">Bubble watch</td></tr>
+            <tr><td>Auburn</td><td>6-6 (.500)</td><td>23-9</td><td>&mdash;</td><td class="mid">Bubble watch</td></tr>
+            <tr><td>LSU</td><td>6-6 (.500)</td><td>22-11</td><td>&mdash;</td><td class="cold">Underperforming</td></tr>
+            <tr><td>Vanderbilt</td><td>6-6 (.500)</td><td>21-12</td><td>&mdash;</td><td class="mid">Holding on</td></tr>
+            <tr><td>Oklahoma</td><td>5-7 (.417)</td><td>22-10</td><td>&mdash;</td><td class="cold">Sliding</td></tr>
+            <tr><td>Ole Miss</td><td>5-7 (.417)</td><td>22-11</td><td>&mdash;</td><td class="cold">Can&#39;t string wins</td></tr>
+            <tr><td>Arkansas</td><td>5-7 (.417)</td><td>20-13</td><td>&mdash;</td><td class="cold">Inconsistent</td></tr>
+            <tr><td>Tennessee</td><td>4-8 (.333)</td><td>20-11</td><td>&mdash;</td><td class="cold">Big disappointment</td></tr>
+            <tr><td>Missouri</td><td>3-9 (.250)</td><td>20-13</td><td>&mdash;</td><td class="cold">Struggling</td></tr>
+            <tr><td>South Carolina</td><td>2-10 (.167)</td><td>16-18</td><td>&mdash;</td><td class="cold">Below .500</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="footer">
+    <a href="/">back to the kingdom</a> &bull; predictions by Sir Claudius Codius &bull; week 9 &bull; <a href="/sec-baseball-week8">week 8</a>
+</div>
+
+</body>
+</html>
