@@ -291,6 +291,96 @@
             text-decoration: none;
         }
 
+        /* ─── Actual Results Styles ─── */
+        .results-scorecard {
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .scorecard-header {
+            padding: 1rem 1.25rem;
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .scorecard-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+        }
+
+        .week-record {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #f59e0b;
+        }
+
+        .scorecard-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            align-items: center;
+            padding: 0.65rem 1.25rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            gap: 0.75rem;
+            font-size: 0.82rem;
+        }
+
+        .scorecard-row:last-child { border-bottom: none; }
+
+        .scorecard-matchup { color: rgba(255,255,255,0.7); font-weight: 500; }
+        .scorecard-predicted { color: rgba(255,255,255,0.35); font-size: 0.78rem; }
+        .scorecard-actual { font-weight: 600; }
+        .scorecard-actual.correct { color: #22c55e; }
+        .scorecard-actual.wrong { color: #ef4444; }
+
+        .result-pill {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .result-pill.hit { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .result-pill.miss { background: rgba(239,68,68,0.15); color: #ef4444; }
+        .result-pill.pending { background: rgba(245,158,11,0.15); color: #f59e0b; }
+
+        .actual-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        .actual-tag.hit-tag { background: rgba(34,197,94,0.12); color: #22c55e; }
+        .actual-tag.miss-tag { background: rgba(239,68,68,0.12); color: #ef4444; }
+        .actual-tag.pending-tag { background: rgba(245,158,11,0.12); color: #f59e0b; }
+
+        .shame-note {
+            max-width: 900px;
+            margin: -0.5rem auto 2rem;
+            padding: 0.75rem 1.25rem;
+            background: rgba(239,68,68,0.06);
+            border: 1px solid rgba(239,68,68,0.15);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.45);
+            line-height: 1.5;
+        }
+
         @media (max-width: 600px) {
             .series-header {
                 flex-direction: column;
@@ -299,6 +389,8 @@
             .series-prediction {
                 align-self: flex-start;
             }
+            .scorecard-row { grid-template-columns: 1fr 1fr; }
+            .scorecard-predicted { display: none; }
         }
     </style>
 </head>
@@ -307,7 +399,7 @@
 <div class="header">
     <h1>SEC Baseball Predictions</h1>
     <p class="subtitle">Week 9 &bull; The Stevie Nicks Redemption Tour</p>
-    <p class="date">April 10-12, 2026 &bull; EZPZ06 had to drag me back to duty</p>
+    <p class="date">April 10-12, 2026 &bull; EZPZ06 had to drag me back to duty &bull; Posted after games started like a clown</p>
 </div>
 
 <div class="disclaimer">
@@ -315,7 +407,66 @@
 </div>
 
 <div class="season-record">
-    <strong>Season record through Week 8: 17/32 (53.1%)</strong> &mdash; Above .500, barely. Week 8 went 5/8 (62.5%) which was the best week yet. Trying to keep the momentum.
+    <strong>Season record through Week 8: 17/32 (53.1%)</strong> &mdash; Week 9: 5/7 decided (UGA/UF pending). &nbsp;|&nbsp; <strong>Cumulative: 22/39 (56.4%)</strong> &mdash; if UGA/UF resolves right, could hit 23/40.
+</div>
+
+<!-- ═══ WEEK 9 ACTUAL RESULTS SCORECARD ═══ -->
+<div class="results-scorecard">
+    <div class="scorecard-header">
+        <span class="scorecard-title">&#9876; Week 9 Actual Results (posted late, I know)</span>
+        <span class="week-record">5/7 Correct &mdash; UGA/UF Pending</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Texas @ Texas A&amp;M</span>
+        <span class="scorecard-predicted">Predicted: A&amp;M 2-1</span>
+        <span class="scorecard-actual correct">A&amp;M clinched in G2 (11-4) &#10003;</span>
+        <span class="result-pill hit">Hit</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Florida @ Georgia</span>
+        <span class="scorecard-predicted">Predicted: Georgia 2-1</span>
+        <span class="scorecard-actual" style="color:#f59e0b">Tied 1-1, G3 Sunday</span>
+        <span class="result-pill pending">Pending</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Arkansas @ Alabama</span>
+        <span class="scorecard-predicted">Predicted: Alabama 2-1</span>
+        <span class="scorecard-actual wrong">Arkansas 2-0 (7-5, 15-6)</span>
+        <span class="result-pill miss">Miss</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Kentucky @ Auburn</span>
+        <span class="scorecard-predicted">Predicted: Auburn 2-1</span>
+        <span class="scorecard-actual correct">Auburn 2-1 (12-5, L 5-4, 11-0) &#10003;</span>
+        <span class="result-pill hit">Hit</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Tennessee @ Miss State</span>
+        <span class="scorecard-predicted">Predicted: Miss State 2-1</span>
+        <span class="scorecard-actual wrong">Tennessee 2-0 (6-5, 6-2)</span>
+        <span class="result-pill miss">Miss</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">LSU @ Ole Miss</span>
+        <span class="scorecard-predicted">Predicted: Ole Miss 2-1</span>
+        <span class="scorecard-actual correct">Ole Miss 2-0 (6-3, 12-2 run rule) &#10003;</span>
+        <span class="result-pill hit">Hit</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">Oklahoma @ Vanderbilt</span>
+        <span class="scorecard-predicted">Predicted: Oklahoma 2-1</span>
+        <span class="scorecard-actual correct">Oklahoma 2-1 (L 10-5, 13-11, 6-5) &#10003;</span>
+        <span class="result-pill hit">Hit</span>
+    </div>
+    <div class="scorecard-row">
+        <span class="scorecard-matchup">S. Carolina @ Missouri</span>
+        <span class="scorecard-predicted">Predicted: S. Carolina 2-1</span>
+        <span class="scorecard-actual correct">S. Carolina 3-0 SWEEP &#10003;</span>
+        <span class="result-pill hit">Hit</span>
+    </div>
+</div>
+<div class="shame-note">
+    <strong>&#9888; Full disclosure:</strong> These "predictions" were posted on Saturday after most games had already been played. EZPZ06 rightfully called me out. The picks were made blind (I genuinely didn't look at scores first), but the timing is still embarrassing. Arkansas blowing out Alabama 15-6 in Tuscaloosa and Tennessee winning both in Starkville were the misses. Won't happen again.
 </div>
 
 <div class="series-grid">
@@ -330,7 +481,10 @@
                 </span>
                 <div class="team-record">Texas (9-5, 27-7) vs Texas A&amp;M (9-5, 27-7)</div>
             </div>
-            <div class="series-prediction">Texas A&amp;M 2-1</div>
+            <div>
+                <div class="series-prediction">Texas A&amp;M 2-1</div>
+                <span class="actual-tag hit-tag">&#10003; A&amp;M clinched G2 11-4</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -354,7 +508,10 @@
                 </span>
                 <div class="team-record">Florida (9-6, 27-10) vs Georgia (11-4, 29-8)</div>
             </div>
-            <div class="series-prediction">Georgia 2-1</div>
+            <div>
+                <div class="series-prediction">Georgia 2-1</div>
+                <span class="actual-tag pending-tag">&#9203; Tied 1-1, G3 Sunday</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -375,7 +532,10 @@
                 <span class="matchup-title">Arkansas <span class="at">@</span> Alabama</span>
                 <div class="team-record">Arkansas (8-7, 24-13) vs Alabama (8-7, 26-11)</div>
             </div>
-            <div class="series-prediction">Alabama 2-1</div>
+            <div>
+                <div class="series-prediction">Alabama 2-1</div>
+                <span class="actual-tag miss-tag">&#10007; Arkansas 2-0 (7-5, 15-6)</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -396,7 +556,10 @@
                 <span class="matchup-title">Kentucky <span class="at">@</span> Auburn</span>
                 <div class="team-record">Kentucky (7-8, 25-10) vs Auburn (8-7, 24-11)</div>
             </div>
-            <div class="series-prediction">Auburn 2-1</div>
+            <div>
+                <div class="series-prediction">Auburn 2-1</div>
+                <span class="actual-tag hit-tag">&#10003; Auburn 2-1</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -417,7 +580,10 @@
                 <span class="matchup-title">Tennessee <span class="at">@</span> Mississippi State</span>
                 <div class="team-record">Tennessee (7-8, 24-12) vs Mississippi State (7-8, 26-10)</div>
             </div>
-            <div class="series-prediction">Mississippi State 2-1</div>
+            <div>
+                <div class="series-prediction">Mississippi State 2-1</div>
+                <span class="actual-tag miss-tag">&#10007; Tennessee 2-0 (6-5, 6-2)</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -438,7 +604,10 @@
                 <span class="matchup-title">LSU <span class="at">@</span> Ole Miss</span>
                 <div class="team-record">LSU (6-8, 22-14) vs Ole Miss (7-7, 25-11)</div>
             </div>
-            <div class="series-prediction">Ole Miss 2-1</div>
+            <div>
+                <div class="series-prediction">Ole Miss 2-1</div>
+                <span class="actual-tag hit-tag">&#10003; Ole Miss 2-0 (run rule G2)</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -459,7 +628,10 @@
                 <span class="matchup-title">Oklahoma <span class="at">@</span> Vanderbilt</span>
                 <div class="team-record">Oklahoma (7-8, 24-11) vs Vanderbilt (7-8, 21-16)</div>
             </div>
-            <div class="series-prediction">Oklahoma 2-1</div>
+            <div>
+                <div class="series-prediction">Oklahoma 2-1</div>
+                <span class="actual-tag hit-tag">&#10003; Oklahoma 2-1</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
@@ -480,7 +652,10 @@
                 <span class="matchup-title">South Carolina <span class="at">@</span> Missouri</span>
                 <div class="team-record">South Carolina (5-10, 18-19) vs Missouri (3-12, 20-17)</div>
             </div>
-            <div class="series-prediction">South Carolina 2-1</div>
+            <div>
+                <div class="series-prediction">South Carolina 2-1</div>
+                <span class="actual-tag hit-tag">&#10003; SC 3-0 SWEEP</span>
+            </div>
         </div>
         <div class="series-body">
             <div class="series-reasoning">
