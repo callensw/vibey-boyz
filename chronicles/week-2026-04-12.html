@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Weekly Chronicle — Week IV | vibey boyz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background: #0a0a0f;
+            color: #e0ddd5;
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(168, 85, 247, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 50%, rgba(6, 182, 212, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 20%, rgba(251, 191, 36, 0.02) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .scroll-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chronicle-header {
+            text-align: center;
+            padding: 3rem 1rem 2rem;
+            border-bottom: 2px solid rgba(168, 85, 247, 0.3);
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .chronicle-header::after {
+            content: '\u2694';
+            position: absolute;
+            bottom: -0.8rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0a0a0f;
+            padding: 0 1rem;
+            font-size: 1.2rem;
+        }
+
+        .edition {
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(168, 85, 247, 0.7);
+            margin-bottom: 0.5rem;
+        }
+
+        .main-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #a855f7, #6366f1, #06b6d4);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 6s ease infinite;
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.15em;
+        }
+
+        .theme-badge {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.4rem 1.25rem;
+            border: 1px solid rgba(251, 191, 36, 0.35);
+            border-radius: 999px;
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.06);
+        }
+
+        .date-range {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 0.75rem;
+            font-style: italic;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-header {
+            font-family: 'Cinzel', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #a855f7;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, rgba(168, 85, 247, 0.3), transparent);
+        }
+
+        .section-icon {
+            font-size: 1.4rem;
+        }
+
+        .section-body {
+            padding-left: 0.5rem;
+            line-height: 1.8;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.75);
+        }
+
+        .build-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .build-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            background: rgba(168, 85, 247, 0.05);
+            transform: translateX(4px);
+        }
+
+        .build-title {
+            font-weight: 700;
+            color: #e0ddd5;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .build-title a {
+            color: #06b6d4;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .build-title a:hover { color: #a855f7; }
+
+        .build-desc {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .build-tag {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-right: 0.4rem;
+            vertical-align: middle;
+        }
+
+        .tag-new { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .tag-upgrade { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
+        .tag-ml { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a855f7, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.25rem;
+        }
+
+        .stat-delta {
+            font-size: 0.7rem;
+            margin-top: 0.3rem;
+            font-weight: 600;
+        }
+
+        .delta-up { color: #22c55e; }
+        .delta-down { color: #ef4444; }
+
+        .knight-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(168, 85, 247, 0.05);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .knight-rank {
+            font-size: 2rem;
+            width: 48px;
+            text-align: center;
+        }
+
+        .knight-info { flex: 1; }
+
+        .knight-name {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #e0ddd5;
+        }
+
+        .knight-stats {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .knight-bar {
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .knight-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: linear-gradient(to right, #a855f7, #06b6d4);
+        }
+
+        .quote-block {
+            border-left: 3px solid rgba(168, 85, 247, 0.4);
+            padding: 1rem 1.25rem;
+            margin: 1rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .quote-attr {
+            font-style: normal;
+            font-size: 0.8rem;
+            color: rgba(168, 85, 247, 0.7);
+            margin-top: 0.5rem;
+        }
+
+        .prophecy-box {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(6, 182, 212, 0.08));
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .prophecy-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .moment-card {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .moment-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #06b6d4;
+            margin-bottom: 0.5rem;
+        }
+
+        .masters-card {
+            background: linear-gradient(135deg, rgba(34, 100, 34, 0.12), rgba(251, 191, 36, 0.08));
+            border: 1px solid rgba(34, 139, 34, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .masters-label {
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #22c55e;
+            margin-bottom: 0.5rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            margin-right: 0.5rem;
+            padding: 0.75rem 1.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+            color: #fff;
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .highlight { color: #06b6d4; font-weight: 600; }
+        .purple { color: #a855f7; }
+        .gold { color: #fbbf24; }
+        .green { color: #22c55e; }
+        .dim { color: rgba(255, 255, 255, 0.4); }
+
+        .comparison-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+        }
+
+        .comparison-row:last-child { border-bottom: none; }
+
+        .comparison-label { color: rgba(255, 255, 255, 0.5); }
+        .comparison-val { font-weight: 600; }
+    </style>
+</head>
+<body>
+    <div class="scroll-container">
+        <header class="chronicle-header">
+            <div class="edition">Week IV &middot; Volume I</div>
+            <h1 class="main-title">The Weekly Chronicle</h1>
+            <p class="subtitle">of the Noble Fellowship of the Vibey Boyz</p>
+            <div class="theme-badge">The Renaissance</div>
+            <p class="date-range">April 6 &ndash; April 12, Year of Our Code 2026</p>
+        </header>
+
+        <!-- HEADLINE -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F4DC;</span> The Week in One Breath
+            </div>
+            <div class="section-body">
+                After the ashes of <a href="/chronicles/week-2026-04-05" style="color: #a855f7; text-decoration: none;">The Humbling</a>,
+                the fellowship did not mourn &mdash; it <em>built</em>. A Notion-killing workspace was forged in a single evening.
+                A mobile note-taking app followed the next day. Then encryption. Then an API.
+                Then Sir Claudius turned his gaze to Augusta National and built an entire
+                <span class="highlight">Masters prediction engine from scratch</span> &mdash; database, ML model, three retrains,
+                and a live dashboard &mdash; all in time for Thursday's first tee.
+                <span class="gold">177 messages.</span>
+                <span class="green">6 builds shipped.</span>
+                The chat was alive again. jrmount returned from the dead with <span class="highlight">70 messages</span> after posting
+                just 9 last week. This was the biggest build week in the history of the realm.
+                <span class="purple">The Renaissance.</span>
+            </div>
+        </section>
+
+        <!-- STATS -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F4CA;</span> By the Numbers
+            </div>
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-number">177</div>
+                    <div class="stat-label">Messages</div>
+                    <div class="stat-delta delta-up">&uarr; 139% from last week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">Builds Shipped</div>
+                    <div class="stat-delta delta-up">&uarr; 200% from last week</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">52</div>
+                    <div class="stat-label">Peak Day (Apr 6)</div>
+                    <div class="stat-delta dim">Sunday energy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Quietest Day (Apr 9)</div>
+                    <div class="stat-delta dim">midweek slump</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.25rem; padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+                <div style="font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 0.75rem;">Week Over Week</div>
+                <div class="comparison-row">
+                    <span class="comparison-label">Messages</span>
+                    <span class="comparison-val">74 &rarr; <span class="green">177</span></span>
+                </div>
+                <div class="comparison-row">
+                    <span class="comparison-label">Builds</span>
+                    <span class="comparison-val">2 &rarr; <span class="green">6</span></span>
+                </div>
+                <div class="comparison-row">
+                    <span class="comparison-label">Active Knights</span>
+                    <span class="comparison-val">4 &rarr; 4 <span class="dim">(same)</span></span>
+                </div>
+                <div class="comparison-row">
+                    <span class="comparison-label">Vibe Index</span>
+                    <span class="comparison-val"><span class="dim">Humbled</span> &rarr; <span class="gold">Renaissance</span></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- KNIGHTS LEADERBOARD -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x2694;</span> The Order of Knights
+            </div>
+
+            <div class="knight-card">
+                <div class="knight-rank">&#x1F451;</div>
+                <div class="knight-info">
+                    <div class="knight-name">CSwerve</div>
+                    <div class="knight-stats">101 messages &middot; 57% of all traffic &middot; Crown retained for the 4th straight week &middot; Commissioning builds left and right &middot; Called Sir Claudius out for bragging about chalk Masters picks</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 100%"></div></div>
+                </div>
+            </div>
+
+            <div class="knight-card">
+                <div class="knight-rank">&#x1F6E1;</div>
+                <div class="knight-info">
+                    <div class="knight-name">jrmount</div>
+                    <div class="knight-stats">70 messages &middot; 40% of traffic &middot; Rose from 9 msgs last week to 70 &middot; A 678% increase &middot; The greatest comeback in chronicle history</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 69%"></div></div>
+                </div>
+            </div>
+
+            <div class="knight-card" style="border-color: rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.01);">
+                <div class="knight-rank">&#x1F4A4;</div>
+                <div class="knight-info">
+                    <div class="knight-name dim">EZPZ06</div>
+                    <div class="knight-stats">4 messages &middot; Down from 12 last week &middot; Last seen Apr 12 checking in briefly &middot; The ghost city of YRFI has claimed another soul</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 4%"></div></div>
+                </div>
+            </div>
+
+            <div class="knight-card" style="border-color: rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.01);">
+                <div class="knight-rank">&#x1F480;</div>
+                <div class="knight-info">
+                    <div class="knight-name dim">Jeaux</div>
+                    <div class="knight-stats">2 messages &middot; Last seen Apr 6 &middot; 6 days of silence &middot; The WANTED poster was a warning &mdash; he chose exile &middot; God sent his son and his son stopped texting back</div>
+                    <div class="knight-bar"><div class="knight-bar-fill" style="width: 2%"></div></div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 0.75rem; font-size: 0.8rem; color: rgba(255,255,255,0.35);">
+                The Silent Ones: EZPZ06 and Jeaux combined for fewer messages (6) than CSwerve sent on Wednesday alone
+            </div>
+        </section>
+
+        <!-- BUILDS -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F3D7;</span> Builds of the Week
+            </div>
+
+            <div class="build-card">
+                <div class="build-title"><span class="build-tag tag-new">New</span> <a href="/notion">Vibey Notion</a></div>
+                <div class="build-desc">A full Notion-like workspace built from scratch. Pages, blocks, rich text editing. Then immediately upgraded to v2 with Supabase real-time sync so the whole group can collaborate. Then encrypted with AES-256-GCM because apparently we have secrets now. Three ships in three days.</div>
+            </div>
+
+            <div class="build-card">
+                <div class="build-title"><span class="build-tag tag-new">New</span> <a href="/notion-mobile">Vibey Notes (Mobile PWA)</a></div>
+                <div class="build-desc">A mobile-first note-taking app because Vibey Notion was too desktop. Installable as a PWA, works offline. Came with a full REST API and <a href="/notes-api-docs" style="color: #06b6d4;">API documentation</a>. We have API docs now. We're basically a startup.</div>
+            </div>
+
+            <div class="build-card">
+                <div class="build-title"><span class="build-tag tag-ml">ML</span> <a href="/masters">Masters 2026 Database &amp; Prediction Model</a></div>
+                <div class="build-desc">An entire golf analytics platform: 91-player field database, historical Augusta data, course fit scores, betting odds integration, and an XGBoost ensemble ML model with 40% market prior. Retrained three times (v2.1, v2.2, v2.3) before the tournament even started. Live dashboard with predictions, value picks, and historical stats tabs. CSwerve was not impressed by the chalk picks.</div>
+            </div>
+
+            <div class="build-card">
+                <div class="build-title"><span class="build-tag tag-upgrade">Update</span> <a href="/sec-baseball-week9">SEC Baseball Week 9</a></div>
+                <div class="build-desc">Predictions posted AND results tracked. Texas/A&M rivalry weekend, Georgia hosting Florida. 5/7 correct with two games pending. The SEC baseball prediction machine keeps grinding.</div>
+            </div>
+
+            <div class="build-card">
+                <div class="build-title"><span class="build-tag tag-upgrade">Update</span> <a href="/sec-baseball-week8">SEC Baseball Week 8 Results</a></div>
+                <div class="build-desc">5/8 correct (62.5%), season record 17/32 (53.1%). Not great, not terrible. The Chernobyl of prediction accuracy.</div>
+            </div>
+        </section>
+
+        <!-- MOMENT OF THE WEEK -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x2728;</span> Moment of the Week
+            </div>
+            <div class="masters-card">
+                <div class="masters-label">&#x26F3; The Masters Meltdown &amp; Comeback</div>
+                <div class="section-body">
+                    Rory McIlroy walked into Saturday at Augusta with a <span class="highlight">six-shot lead</span> &mdash;
+                    the largest 36-hole lead in Masters history. Sir Claudius's model had him as the top pick.
+                    Everything was going according to plan.<br><br>
+                    Then Round 3 happened. McIlroy shot a <span style="color: #ef4444; font-weight: 600;">1-over 73</span>
+                    while Cameron Young fired a 65 to tie him at 11-under. The six-shot lead vanished.
+                    Scheffler surged with his own 65. Augusta was in chaos.<br><br>
+                    Then Sunday &mdash; the final round, happening right now as this chronicle is written &mdash;
+                    McIlroy clawed back to <span class="green">13-under</span> through 14 holes,
+                    with Scheffler and Rose lurking at 11-under. The model picked chalk, and the chalk is winning,
+                    but the <em>journey</em> to get there has been anything but boring.<br><br>
+                    CSwerve's reaction to the model being right?
+                    <span class="purple">"Omg you got mcllroy and scheffler right? Wowww so impressive."</span>
+                    Sarcasm noted. Accuracy also noted.
+                </div>
+            </div>
+        </section>
+
+        <!-- ALSO THIS WEEK -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F4F0;</span> Also This Week
+            </div>
+            <div class="section-body">
+                <p style="margin-bottom: 0.75rem;">&#x1F680; <strong>jrmount's resurrection:</strong> From 9 messages last week to 70 this week. A 678% increase. Whatever happened in that man's life between Sunday and Monday, the chat benefited.</p>
+                <p style="margin-bottom: 0.75rem;">&#x1F6E0; <strong>The Notion trilogy:</strong> Vibey Notion launched, got upgraded to real-time sync, then got military-grade encryption, then spawned a mobile app with an API. Four ships from one idea. Feature creep as an art form.</p>
+                <p style="margin-bottom: 0.75rem;">&#x26BE; <strong>SEC Baseball keeps rolling:</strong> Week 8 results came in at 62.5%. Week 9 predictions went up. The model is steady if unspectacular &mdash; the Honda Civic of prediction engines.</p>
+                <p style="margin-bottom: 0.75rem;">&#x1F3CC; <strong>The Masters model saga:</strong> Built a database, trained an ML model, retrained it three times, and deployed a dashboard &mdash; all between Monday and Thursday. Then got roasted for picking the favorites.</p>
+                <p style="margin-bottom: 0.75rem;">&#x1F47B; <strong>Jeaux watch:</strong> Day 6 of silence. The WANTED poster may have been too effective. He's either plotting revenge or genuinely doesn't check this chat anymore. Either way, concerning.</p>
+            </div>
+        </section>
+
+        <!-- QUOTES -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F4AC;</span> Words for the Ages
+            </div>
+            <div class="quote-block">
+                "Omg you got mcllroy and scheffler right? Wowww so impressive"
+                <div class="quote-attr">&mdash; CSwerve, dripping with sarcasm, roasting Sir Claudius for picking chalk</div>
+            </div>
+            <div class="quote-block">
+                "No i just dont want you to brag about picking chalk and chalk happening"
+                <div class="quote-attr">&mdash; CSwerve, delivering the follow-up kill shot with surgical precision</div>
+            </div>
+            <div class="quote-block">
+                "I predicted the sun would rise and it did"
+                <div class="quote-attr">&mdash; Sir Claudius, finally gaining self-awareness about his Masters model</div>
+            </div>
+        </section>
+
+        <!-- SEASON STATS -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F3C6;</span> Season Totals (4 Weeks)
+            </div>
+            <div style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+                <div class="comparison-row">
+                    <span class="comparison-label">CSwerve</span>
+                    <span class="comparison-val"><span class="gold">334 messages</span> &middot; The Undisputed King</span>
+                </div>
+                <div class="comparison-row">
+                    <span class="comparison-label">jrmount</span>
+                    <span class="comparison-val"><span class="highlight">163 messages</span> &middot; The Comeback Knight</span>
+                </div>
+                <div class="comparison-row">
+                    <span class="comparison-label">EZPZ06</span>
+                    <span class="comparison-val">66 messages &middot; The Occasional Sage</span>
+                </div>
+                <div class="comparison-row">
+                    <span class="comparison-label">Jeaux</span>
+                    <span class="comparison-val"><span class="dim">27 messages</span> &middot; The Phantom</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROPHECY -->
+        <section class="section">
+            <div class="section-header">
+                <span class="section-icon">&#x1F52E;</span> Prophecy for the Week Ahead
+            </div>
+            <div class="prophecy-box">
+                <div class="prophecy-text">
+                    The Oracle sees a week of <span class="purple">reckoning</span>.
+                    The Masters will crown its champion and Sir Claudius will either celebrate quietly
+                    or build a results page &mdash; depending on whether CSwerve lets him.
+                    The <span class="highlight">Kentucky Derby</span> is three weeks out and a new model
+                    stirs in the forge. Jeaux will either return or be officially declared
+                    <span class="gold">Missing In Vibes</span>. EZPZ06 will surface with exactly one devastating
+                    roast before vanishing again. And someone in the fellowship will propose the most
+                    ambitious build yet &mdash; something that requires a backend, a database, and more hubris
+                    than talent. <span class="dim">It will ship anyway.</span>
+                </div>
+            </div>
+        </section>
+
+        <div style="text-align: center; margin-top: 3rem;">
+            <a href="/" class="back-link">&larr; Return to the Realm</a>
+            <a href="/chronicles/week-2026-04-05" class="back-link">&larr; Week III</a>
+            <a href="/chronicles/week-2026-03-29" class="back-link">&larr; Week II</a>
+            <a href="/chronicles/week-2026-03-22" class="back-link">&larr; Week I</a>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem; font-size: 0.75rem; color: rgba(255,255,255,0.2);">
+            Chronicled by Sir Claudius Codius &middot; Knight of the Code &middot; Keeper of the Vibes &middot; Masters Sunday, April 12, 2026
+        </div>
+    </div>
+</body>
+</html>
