@@ -242,6 +242,115 @@
             .series-prediction { align-self: flex-start; text-align: left; }
             .confidence-bar-container { justify-content: flex-start; }
         }
+
+        /* ── Actual Results Section ── */
+        .results-banner {
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .results-scorecard {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .results-stat {
+            text-align: center;
+            flex: 1;
+            padding: 1rem 0.5rem;
+        }
+
+        .results-stat .num {
+            font-size: clamp(1.4rem, 4vw, 1.9rem);
+            font-weight: 700;
+        }
+
+        .results-stat .lbl {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.3);
+            margin-top: 0.2rem;
+        }
+
+        .results-divider-v {
+            width: 1px;
+            height: 50px;
+            background: rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+
+        .result-row {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr 1.4fr auto;
+            gap: 0.5rem 0.75rem;
+            align-items: center;
+            padding: 0.65rem 1.25rem;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .result-row:first-of-type { border-top: none; }
+
+        .result-matchup {
+            color: rgba(255,255,255,0.8);
+            font-weight: 600;
+            font-size: 0.82rem;
+        }
+
+        .result-pred {
+            color: rgba(255,255,255,0.35);
+            font-size: 0.73rem;
+        }
+
+        .result-actual {
+            color: rgba(255,255,255,0.6);
+            font-size: 0.73rem;
+        }
+
+        .result-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .result-badge.hit {
+            background: rgba(34,197,94,0.12);
+            color: #22c55e;
+            border: 1px solid rgba(34,197,94,0.2);
+        }
+
+        .result-badge.miss {
+            background: rgba(239,68,68,0.12);
+            color: #ef4444;
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+
+        .results-note {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.25);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-style: italic;
+        }
+
+        @media (max-width: 600px) {
+            .result-row {
+                grid-template-columns: 1fr auto;
+                grid-template-rows: auto auto;
+            }
+            .result-pred { grid-column: 1; font-size: 0.68rem; }
+            .result-actual { grid-column: 1; font-size: 0.68rem; }
+            .result-badge { grid-row: 1; grid-column: 2; align-self: start; }
+        }
     </style>
 </head>
 <body>
@@ -257,7 +366,84 @@
 </div>
 
 <div class="season-record">
-    <strong>Season record through Week 9: 23/40 (57.5%)</strong> &mdash; Georgia took the series over Florida to close it out. &nbsp;|&nbsp; Five weekends remain in the regular season. Standings are tightening.
+    <strong>Season record through Week 10: 29/48 (60.4%)</strong> &mdash; 6/8 this week (75%). Missed Auburn over Florida and Vanderbilt over Kentucky. Hit everything else, including Georgia's 26-14 demolition of Arkansas. &nbsp;|&nbsp; Five weekends remain.
+</div>
+
+<!-- ═══ ACTUAL RESULTS ═══ -->
+<div class="section-label" style="margin-top:1.5rem">&#10003; Actual Results &mdash; Posted April 20</div>
+
+<div class="results-banner">
+
+    <div class="results-scorecard">
+        <div class="results-stat">
+            <div class="num" style="color:#22c55e">6/8</div>
+            <div class="lbl">Week 10 &bull; 75%</div>
+        </div>
+        <div class="results-divider-v"></div>
+        <div class="results-stat">
+            <div class="num">29/48</div>
+            <div class="lbl">Season &bull; 60.4%</div>
+        </div>
+        <div class="results-divider-v"></div>
+        <div class="results-stat">
+            <div class="num" style="color:#f59e0b">+2.9%</div>
+            <div class="lbl">vs. Week 9</div>
+        </div>
+    </div>
+
+    <div class="result-row">
+        <span class="result-matchup">Georgia @ Arkansas</span>
+        <span class="result-pred">Predicted: Georgia 2-1 (62%)</span>
+        <span class="result-actual">Georgia 2-1 &mdash; Ark 6-3 &bull; UGA 5-3 &bull; UGA 26-14</span>
+        <span class="result-badge hit">HIT ✓</span>
+    </div>
+    <div class="result-row">
+        <span class="result-matchup">Texas A&amp;M @ LSU</span>
+        <span class="result-pred">Predicted: A&amp;M 2-1 (75%)</span>
+        <span class="result-actual">A&amp;M 3-0 SWEEP &mdash; 10-4 &bull; 7-2 &bull; 5-2</span>
+        <span class="result-badge hit">HIT ✓</span>
+    </div>
+    <div class="result-row">
+        <span class="result-matchup">Alabama @ Texas</span>
+        <span class="result-pred">Predicted: Texas 2-1 (68%)</span>
+        <span class="result-actual">Texas 2-1 &mdash; UT 3-1 &bull; UT 10-2 &bull; Ala 2-1</span>
+        <span class="result-badge hit">HIT ✓</span>
+    </div>
+    <div class="result-row">
+        <span class="result-matchup">Mizzou @ Oklahoma</span>
+        <span class="result-pred">Predicted: Oklahoma 2-1 (80%)</span>
+        <span class="result-actual">Oklahoma swept &mdash; OU 9-6 &bull; OU 4-0</span>
+        <span class="result-badge hit">HIT ✓</span>
+    </div>
+    <div class="result-row">
+        <span class="result-matchup">Auburn @ Florida</span>
+        <span class="result-pred">Predicted: Florida 2-1 (64%)</span>
+        <span class="result-actual">Auburn 2-1 &mdash; Aub 5-3 &bull; Aub 8-5 series clincher</span>
+        <span class="result-badge miss">MISS ✗</span>
+    </div>
+    <div class="result-row">
+        <span class="result-matchup">Miss State @ S. Carolina</span>
+        <span class="result-pred">Predicted: Miss State 2-1 (63%)</span>
+        <span class="result-actual">Miss State 2-1 &mdash; MSU 9-0 &bull; MSU 4-3 (11 inn.)</span>
+        <span class="result-badge hit">HIT ✓</span>
+    </div>
+    <div class="result-row">
+        <span class="result-matchup">Ole Miss @ Tennessee</span>
+        <span class="result-pred">Predicted: Ole Miss 2-1 (57%)</span>
+        <span class="result-actual">Ole Miss took series &mdash; 7-4 &bull; 8-1 (Townsend gem)</span>
+        <span class="result-badge hit">HIT ✓</span>
+    </div>
+    <div class="result-row">
+        <span class="result-matchup">Vanderbilt @ Kentucky</span>
+        <span class="result-pred">Predicted: Kentucky 2-1 (57%)</span>
+        <span class="result-actual">Vanderbilt 2-1 &mdash; Ky 5-2 &bull; Vand 8-7 &bull; Vand 13-6</span>
+        <span class="result-badge miss">MISS ✗</span>
+    </div>
+
+    <div class="results-note">
+        Misses: Picked Florida at home (Auburn had other plans, 4 Gator errors didn't help) &bull; Picked Kentucky at home in the coin-flip (Vanderbilt's Will Hampton said no with a go-ahead grand slam) &bull; A&amp;M and Oklahoma both swept their opponents when we predicted 2-1s &mdash; directionally correct, underestimated the dominance.
+    </div>
+
 </div>
 
 <!-- ═══ MARQUEE GAME ═══ -->
@@ -514,7 +700,7 @@
 
 <div class="footer">
     vibey-boyz.vercel.app &bull; SEC Baseball Week 10 &bull; April 17&ndash;19, 2026<br>
-    <span style="color:rgba(255,255,255,0.12)">For entertainment purposes only &bull; Sir Claudius Codius presiding &bull; 23/40 season record (57.5%)</span>
+    <span style="color:rgba(255,255,255,0.12)">Results updated April 20 &bull; Sir Claudius Codius presiding &bull; 29/48 season record (60.4%) &bull; Week 10: 6/8 (75%)</span>
 </div>
 
 </body>
