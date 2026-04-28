@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOVEREIGN — Product Roadmap</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #04040a;
+            --bg2: #0a0a14;
+            --accent: #7c3aed;
+            --accent-glow: rgba(124,58,237,0.35);
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6,182,212,0.25);
+            --green: #10b981;
+            --amber: #f59e0b;
+            --white: #f8fafc;
+            --muted: #475569;
+            --mid: #94a3b8;
+            --border: rgba(255,255,255,0.07);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ── REVEAL ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(32px);
+            transition: opacity 0.75s ease, transform 0.75s ease;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 5rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 65%);
+            pointer-events: none;
+        }
+
+        .tag {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.25em;
+            color: var(--cyan);
+            text-transform: uppercase;
+            border: 1px solid rgba(6,182,212,0.3);
+            padding: 0.35rem 1rem;
+            border-radius: 2rem;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 8vw, 6rem);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 0.4rem;
+        }
+
+        .hero h1 span {
+            background: linear-gradient(135deg, #7c3aed, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-sub {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--muted);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 1.8rem;
+        }
+
+        .hero-desc {
+            max-width: 560px;
+            color: var(--mid);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 2rem;
+            background: rgba(4,4,10,0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-links a {
+            font-size: 0.78rem;
+            color: var(--muted);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--white); }
+
+        /* ── PHASE LEGEND ── */
+        .legend {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0 2rem 3rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.78rem;
+            color: var(--mid);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .dot-done { background: var(--green); box-shadow: 0 0 8px rgba(16,185,129,0.6); }
+        .dot-active { background: var(--cyan); box-shadow: 0 0 8px var(--cyan-glow); animation: pulse 2s infinite; }
+        .dot-next { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+        .dot-future { background: var(--muted); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.85); }
+        }
+
+        /* ── TIMELINE ── */
+        .timeline-section {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 2rem 6rem;
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            margin-top: 3.5rem;
+        }
+
+        .phase-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            padding: 0.3rem 0.9rem;
+            border-radius: 2rem;
+            font-weight: 700;
+        }
+
+        .phase-done .phase-label { background: rgba(16,185,129,0.12); color: var(--green); border: 1px solid rgba(16,185,129,0.25); }
+        .phase-active .phase-label { background: rgba(6,182,212,0.12); color: var(--cyan); border: 1px solid rgba(6,182,212,0.3); }
+        .phase-next .phase-label { background: rgba(124,58,237,0.12); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+        .phase-future .phase-label { background: rgba(71,85,105,0.2); color: var(--muted); border: 1px solid rgba(71,85,105,0.3); }
+
+        .phase-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .phase-date {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--muted);
+            margin-left: auto;
+        }
+
+        /* ── CARDS ── */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.4rem;
+            transition: border-color 0.25s, transform 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255,255,255,0.14);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .phase-done .card::before { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+        .phase-active .card::before { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
+        .phase-next .card::before { background: linear-gradient(90deg, transparent, var(--accent), transparent); }
+        .phase-future .card::before { background: linear-gradient(90deg, transparent, var(--muted), transparent); }
+
+        .card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.4rem;
+            color: var(--white);
+        }
+
+        .card-desc {
+            font-size: 0.82rem;
+            color: var(--mid);
+            line-height: 1.55;
+        }
+
+        .card-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-top: 0.9rem;
+            font-size: 0.7rem;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .phase-done .card-status { color: var(--green); }
+        .phase-active .card-status { color: var(--cyan); }
+        .phase-next .card-status { color: #a78bfa; }
+        .phase-future .card-status { color: var(--muted); }
+
+        /* ── DIVIDER ── */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 0 2rem;
+        }
+
+        /* ── BOTTOM CTA ── */
+        .cta-section {
+            text-align: center;
+            padding: 4rem 2rem 6rem;
+            position: relative;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(124,58,237,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .cta-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .cta-title {
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .cta-desc {
+            color: var(--mid);
+            max-width: 440px;
+            margin: 0 auto 2rem;
+            font-size: 0.95rem;
+            line-height: 1.65;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.75rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-decoration: none;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--white);
+            border: none;
+        }
+        .btn-primary:hover { background: #6d28d9; transform: translateY(-1px); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--mid);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--white); }
+
+        /* ── SCROLLBAR ── */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="nav-logo">SOVEREIGN</a>
+    <div class="nav-links">
+        <a href="/phone-concept">Concept</a>
+        <a href="/sovereign-pitch">Pitch</a>
+        <a href="/sovereign-roadmap">Roadmap</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" style="margin-top: 60px;">
+    <div class="tag">Product Roadmap — v0.1</div>
+    <h1><span>SOVEREIGN</span></h1>
+    <p class="hero-sub">From idea to operating system</p>
+    <p class="hero-desc">A living document. Where we've been, where we are, and where we're going. Updated as the fellowship advances.</p>
+</section>
+
+<!-- LEGEND -->
+<div class="legend reveal">
+    <div class="legend-item"><div class="dot dot-done"></div> Shipped</div>
+    <div class="legend-item"><div class="dot dot-active"></div> In Progress</div>
+    <div class="legend-item"><div class="dot dot-next"></div> Up Next</div>
+    <div class="legend-item"><div class="dot dot-future"></div> Future</div>
+</div>
+
+<div class="divider"></div>
+
+<div class="timeline-section">
+
+    <!-- PHASE 0 -->
+    <div class="phase-done reveal">
+        <div class="phase-header">
+            <span class="phase-label">Phase 0</span>
+            <span class="phase-title">The Fellowship Forms</span>
+            <span class="phase-date">Q1 2026</span>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">📜</div>
+                <div class="card-title">Concept Document</div>
+                <div class="card-desc">The founding scroll. Philosophy, vision, and the case for a phone that serves the user — not the algorithm.</div>
+                <div class="card-status">✓ Shipped</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">⚔️</div>
+                <div class="card-title">Investor Pitch</div>
+                <div class="card-desc">A cinematic brief for those bold enough to back a phone built on vibes and sovereignty.</div>
+                <div class="card-status">✓ Shipped</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">🏰</div>
+                <div class="card-title">Product Roadmap</div>
+                <div class="card-desc">You're looking at it. The plan takes shape. The quest is charted.</div>
+                <div class="card-status">✓ Shipped</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHASE 1 -->
+    <div class="phase-active reveal">
+        <div class="phase-header">
+            <span class="phase-label">Phase 1</span>
+            <span class="phase-title">OS Identity & Core Philosophy</span>
+            <span class="phase-date">Q2 2026</span>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">🎨</div>
+                <div class="card-title">SOVEREIGN OS Design Language</div>
+                <div class="card-desc">Visual identity system. Typography, color, motion. What does sovereignty look like on a screen?</div>
+                <div class="card-status">⟳ In Progress</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">📱</div>
+                <div class="card-title">Homescreen Mockup</div>
+                <div class="card-desc">Interactive prototype of what the lock screen and home experience actually feels like to use.</div>
+                <div class="card-status">⟳ In Progress</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">🧠</div>
+                <div class="card-title">Anti-Engagement Manifesto</div>
+                <div class="card-desc">Define exactly what we won't do. No infinite scroll. No red badges. No dark patterns. Draw the line in the sand.</div>
+                <div class="card-status">⟳ In Progress</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase-next reveal">
+        <div class="phase-header">
+            <span class="phase-label">Phase 2</span>
+            <span class="phase-title">Hardware Partners & Prototype</span>
+            <span class="phase-date">Q3 2026</span>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">🔩</div>
+                <div class="card-title">Hardware Partner Evaluation</div>
+                <div class="card-desc">Identify ODM/OEM partners. Who builds the chassis? What chipset? The Chief Skeptic has final veto.</div>
+                <div class="card-status">— Up Next</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">🧪</div>
+                <div class="card-title">Dev Unit v0.1</div>
+                <div class="card-desc">First physical device in fellowship hands. No software yet. Just vibes and aluminum.</div>
+                <div class="card-status">— Up Next</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">📋</div>
+                <div class="card-title">Patent Filings</div>
+                <div class="card-desc">CSwerve's secret filing number enters the public record. The realm is protected.</div>
+                <div class="card-status">— Up Next</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase-future reveal">
+        <div class="phase-header">
+            <span class="phase-label">Phase 3</span>
+            <span class="phase-title">Beta & Fellowship Launch</span>
+            <span class="phase-date">Q4 2026</span>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">🌐</div>
+                <div class="card-title">Waitlist Opens</div>
+                <div class="card-desc">The fellowship opens the gates. Early believers get founding member status and a crown in the OS.</div>
+                <div class="card-status">· Future</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">📦</div>
+                <div class="card-title">Beta Hardware Ships</div>
+                <div class="card-desc">First 100 units go out to founding members. Real phones. Real people. Real feedback.</div>
+                <div class="card-status">· Future</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">💰</div>
+                <div class="card-title">Series A Round</div>
+                <div class="card-desc">The pitch deck does its job. Investors who aren't cowards write checks. The quest continues.</div>
+                <div class="card-status">· Future</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHASE 4 -->
+    <div class="phase-future reveal">
+        <div class="phase-header">
+            <span class="phase-label">Phase 4</span>
+            <span class="phase-title">General Availability</span>
+            <span class="phase-date">2027</span>
+        </div>
+        <div class="cards">
+            <div class="card">
+                <div class="card-icon">👑</div>
+                <div class="card-title">SOVEREIGN Phone v1.0</div>
+                <div class="card-desc">The phone that serves its owner. Available to all who are worthy. The realm expands.</div>
+                <div class="card-status">· Future</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">🏛️</div>
+                <div class="card-title">App Ecosystem</div>
+                <div class="card-desc">Curated app store. Every app vetted for respect. No surveillance capitalism allowed through the gates.</div>
+                <div class="card-status">· Future</div>
+            </div>
+            <div class="card">
+                <div class="card-icon">🌍</div>
+                <div class="card-title">Global Fellowship</div>
+                <div class="card-desc">What started in a group chat ends up changing how a billion people interact with their phones. Allegedly.</div>
+                <div class="card-status">· Future</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<section class="cta-section reveal">
+    <p class="cta-label">The quest continues</p>
+    <h2 class="cta-title">We're building in public.<br>Skeptics welcome.</h2>
+    <p class="cta-desc">Every great venture needs someone asking "but why though." That's not a weakness. That's how you build something that lasts.</p>
+    <div class="btn-row">
+        <a href="/sovereign-pitch" class="btn btn-primary">Read the Pitch</a>
+        <a href="/phone-concept" class="btn btn-ghost">Concept Doc</a>
+    </div>
+</section>
+
+<script>
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.08 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
