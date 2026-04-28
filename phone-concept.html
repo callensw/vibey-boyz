@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project SOVEREIGN — Concept Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #080810;
+            --bg2: #0e0e1a;
+            --border: rgba(255,255,255,0.08);
+            --accent: #7c3aed;
+            --accent2: #06b6d4;
+            --accent3: #10b981;
+            --text: #e2e8f0;
+            --muted: #64748b;
+            --highlight: rgba(124,58,237,0.12);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Space Grotesk', sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .hero {
+            background: linear-gradient(180deg, #0a0a18 0%, var(--bg) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 5rem 2rem 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .classification {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            color: var(--accent2);
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #c084fc 0%, #818cf8 50%, #67e8f9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero .tagline {
+            font-size: 1.2rem;
+            color: var(--muted);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+
+        .meta-row {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .meta-row span { color: var(--accent2); }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem 6rem;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            letter-spacing: 0.1em;
+            min-width: 2.5rem;
+        }
+
+        .section h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .section-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .prose {
+            color: #94a3b8;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .prose strong {
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .callout {
+            background: var(--highlight);
+            border: 1px solid rgba(124,58,237,0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .callout.teal {
+            background: rgba(6,182,212,0.08);
+            border-color: rgba(6,182,212,0.3);
+        }
+
+        .callout.green {
+            background: rgba(16,185,129,0.08);
+            border-color: rgba(16,185,129,0.3);
+        }
+
+        .callout p {
+            color: #cbd5e1;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .callout .label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .callout.teal .label { color: var(--accent2); }
+        .callout.green .label { color: var(--accent3); }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        @media (max-width: 600px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .card h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .card .icon {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .spec-table th {
+            text-align: left;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--muted);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .spec-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: #94a3b8;
+        }
+
+        .spec-table td:first-child {
+            color: #e2e8f0;
+            font-weight: 500;
+        }
+
+        .spec-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+        }
+
+        .tag-green { background: rgba(16,185,129,0.15); color: #34d399; }
+        .tag-yellow { background: rgba(245,158,11,0.15); color: #fbbf24; }
+        .tag-red { background: rgba(239,68,68,0.15); color: #f87171; }
+        .tag-blue { background: rgba(59,130,246,0.15); color: #60a5fa; }
+
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin: 1.5rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            bottom: 0.5rem;
+            width: 1px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 0.45rem;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+
+        .timeline-item .phase {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-item h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-item p {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .founders {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+
+        .founder-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .founder-card .name {
+            font-weight: 600;
+            color: #f1f5f9;
+            margin-bottom: 0.25rem;
+        }
+
+        .founder-card .role {
+            font-size: 0.8rem;
+            color: var(--accent2);
+            font-family: 'Space Mono', monospace;
+            margin-bottom: 0.5rem;
+        }
+
+        .founder-card .bio {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .big-quote {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            font-weight: 500;
+            color: #c4b5fd;
+            line-height: 1.6;
+            border-left: 3px solid var(--accent);
+            padding-left: 1.5rem;
+            margin: 2rem 0;
+            font-style: italic;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 3rem;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: #c084fc; }
+
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            animation: fade-up 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .section:nth-child(1) { animation-delay: 0.1s; }
+        .section:nth-child(2) { animation-delay: 0.15s; }
+        .section:nth-child(3) { animation-delay: 0.2s; }
+        .section:nth-child(4) { animation-delay: 0.25s; }
+        .section:nth-child(5) { animation-delay: 0.3s; }
+        .section:nth-child(6) { animation-delay: 0.35s; }
+        .section:nth-child(7) { animation-delay: 0.4s; }
+        .section:nth-child(8) { animation-delay: 0.45s; }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <div class="classification">Concept Document · Rev 0.1 · Vibey Boyz Ventures</div>
+    <h1>SOVEREIGN</h1>
+    <p class="tagline">The last phone you'll ever need to trust someone else to build</p>
+    <div class="meta-row">
+        <div>Date: <span>April 28, 2026</span></div>
+        <div>Status: <span>Concept</span></div>
+        <div>Classification: <span>Internal</span></div>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num">01</span>
+            <h2>The Problem</h2>
+            <div class="section-line"></div>
+        </div>
+        <p class="prose">
+            Every smartphone in existence is a surveillance device with a phone app attached. <strong>iOS and Android are platforms built to extract</strong> — your location, your behavior, your attention, your money. The hardware is designed to be opaque. The software is designed to be dependent. The ecosystem is designed to be inescapable.
+        </p>
+        <p class="prose">
+            Workarounds exist. GrapheneOS gets you close. But you're still running Google silicon with no hardware kill switches, no certainty about what's happening below the OS layer, and a constant battle against an ecosystem that wasn't built for you.
+        </p>
+        <div class="callout">
+            <div class="label">Core Insight</div>
+            <p>The app era is ending. In 5–10 years, a fluid LLM interface will replace the app grid entirely. Whoever ships the first truly private, locally-intelligent device owns the next platform. Apple and Google cannot build it — their entire business model requires the opposite.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num">02</span>
+            <h2>The Vision</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="big-quote">
+            "A device that is genuinely yours. Hardware you can verify. Software you can audit. Intelligence that runs locally and never leaves the device. No ads, no telemetry, no permission theater."
+        </div>
+        <p class="prose">
+            SOVEREIGN is a privacy-first smartphone built around a local LLM as the primary interface layer. There is no app grid. You interact with your device through natural language and fluid context-aware responses. The device knows you — and only the device knows you.
+        </p>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num">03</span>
+            <h2>Core Differentiators</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="grid-2">
+            <div class="card">
+                <div class="icon">🔴</div>
+                <h4>Hardware Kill Switches</h4>
+                <p>Physical switches for microphone, camera, radios (cellular/WiFi/BT), and GPS. Not software toggles. Real circuit breaks.</p>
+            </div>
+            <div class="card">
+                <div class="icon">🧠</div>
+                <h4>Local LLM as OS</h4>
+                <p>A compact, quantized model (7B–13B) runs on-device. It is the primary interface. No cloud dependency, no data leaving the device.</p>
+            </div>
+            <div class="card">
+                <div class="icon">🔓</div>
+                <h4>Fully Open Stack</h4>
+                <p>Open hardware schematics, open firmware, open OS. Every layer auditable. No black boxes from baseband to UI.</p>
+            </div>
+            <div class="card">
+                <div class="icon">📵</div>
+                <h4>No Telemetry. Ever.</h4>
+                <p>Zero analytics, zero crash reporting phoning home, zero behavioral tracking. The device has no commercial interest in your behavior.</p>
+            </div>
+            <div class="card">
+                <div class="icon">⚡</div>
+                <h4>Fluid LLM UI</h4>
+                <p>The home screen is a conversation. Apps become capabilities. The model routes your intent to the right function without you navigating.</p>
+            </div>
+            <div class="card">
+                <div class="icon">🛡️</div>
+                <h4>Call Intelligence</h4>
+                <p>Local model identifies unknown callers, auto-handles spam with legal warnings, transcribes and summarizes voicemails. No carrier needed.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num">04</span>
+            <h2>Technical Architecture</h2>
+            <div class="section-line"></div>
+        </div>
+
+        <p class="prose"><strong>Hardware Platform</strong></p>
+        <table class="spec-table">
+            <thead>
+                <tr><th>Component</th><th>Target Spec</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>SoC</td><td>Qualcomm Snapdragon 8 Elite or equivalent ARM NPU</td><td><span class="tag tag-yellow">TBD</span></td></tr>
+                <tr><td>RAM</td><td>16–24GB LPDDR5X (LLM inference requires headroom)</td><td><span class="tag tag-yellow">TBD</span></td></tr>
+                <tr><td>Storage</td><td>256GB+ UFS 4.0 — model weights + local data vault</td><td><span class="tag tag-yellow">TBD</span></td></tr>
+                <tr><td>Kill Switches</td><td>4x physical hardware switches (mic, camera, radios, GPS)</td><td><span class="tag tag-green">Designed</span></td></tr>
+                <tr><td>Battery</td><td>5000mAh+ — local inference is power intensive</td><td><span class="tag tag-yellow">TBD</span></td></tr>
+                <tr><td>Baseband</td><td>Open-source or audited-closed, isolated from main SoC</td><td><span class="tag tag-red">Hard</span></td></tr>
+            </tbody>
+        </table>
+
+        <p class="prose" style="margin-top:1.5rem"><strong>Software Stack</strong></p>
+        <table class="spec-table">
+            <thead>
+                <tr><th>Layer</th><th>Approach</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>OS</td><td>Linux-based (AOSP fork or custom), hardened kernel, no Google services</td></tr>
+                <tr><td>LLM Runtime</td><td>llama.cpp / MLX on-device inference, 7B–13B quantized model (Q4/Q5)</td></tr>
+                <tr><td>UI Layer</td><td>Custom fluid interface — conversation-first, no app grid, capability routing</td></tr>
+                <tr><td>Data Vault</td><td>On-device encrypted storage. Contacts, calendar, messages — local only.</td></tr>
+                <tr><td>App Compatibility</td><td>Progressive — essential apps via sandboxed containers, LLM handles the rest</td></tr>
+                <tr><td>Updates</td><td>User-controlled, signed, verified. No forced updates.</td></tr>
+            </tbody>
+        </table>
+
+        <div class="callout teal">
+            <div class="label">The Baseband Problem</div>
+            <p>The hardest unsolved problem in truly private phones. The cellular radio requires closed-source firmware on virtually all current chipsets. Short-term mitigation: isolate baseband on separate silicon with no memory access to main OS. Long-term: partner with or fund open baseband development (Fairphone, Purism paths have shown it's possible, just slow).</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num">05</span>
+            <h2>The LLM Interface — How It Works</h2>
+            <div class="section-line"></div>
+        </div>
+        <p class="prose">
+            The home screen is a persistent, context-aware conversation with a local model that knows your device deeply. It replaces the concept of "opening apps."
+        </p>
+        <div class="grid-2">
+            <div class="card">
+                <h4>"Call my sister"</h4>
+                <p>Model accesses local contacts, places call. No dialer app needed.</p>
+            </div>
+            <div class="card">
+                <h4>"Unknown caller — deal with it"</h4>
+                <p>Model answers, identifies spam or legitimate, handles appropriately. Logs and summarizes.</p>
+            </div>
+            <div class="card">
+                <h4>"What do I have tomorrow?"</h4>
+                <p>Reads local calendar. No Google Calendar sync. No cloud.</p>
+            </div>
+            <div class="card">
+                <h4>"Navigate to the airport"</h4>
+                <p>Routes via on-device maps + GPS. No Google Maps reporting your movement.</p>
+            </div>
+            <div class="card">
+                <h4>"Draft a reply to that email"</h4>
+                <p>Model reads local email, drafts response. You review, send.</p>
+            </div>
+            <div class="card">
+                <h4>"What did jrmount text me last week?"</h4>
+                <p>Searches local message history. Everything stays on device.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num">06</span>
+            <h2>Go-To-Market</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="phase">Phase 1 · Now → 12 months</div>
+                <h4>Software-First Proof of Concept</h4>
+                <p>Build the LLM UI layer on existing GrapheneOS + Pixel hardware. Demonstrate the interface concept without custom hardware. Validate demand.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="phase">Phase 2 · Year 1–2</div>
+                <h4>Hardware Partner + Funding</h4>
+                <p>Identify ODM manufacturing partner (likely Taiwan/Shenzhen). Raise seed round targeting privacy-focused investors, OSS foundations. Design kill switch hardware integration.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="phase">Phase 3 · Year 2–3</div>
+                <h4>Developer Edition</h4>
+                <p>Ship 1,000–5,000 units to technical early adopters. Rough edges acceptable. Build community, open-source the stack, get external security audits.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="phase">Phase 4 · Year 3–5</div>
+                <h4>Consumer Launch</h4>
+                <p>Polished device targeting mainstream privacy-conscious consumers. App compatibility layer mature. LLM interface refined from real-world usage data (collected locally, shared optionally).</p>
+            </div>
+        </div>
+        <div class="callout green">
+            <div class="label">Target Market</div>
+            <p>Initially: security researchers, journalists, privacy advocates, degoogle community (GrapheneOS has 50K+ active installs as a floor). Expansion: anyone who's tired of being the product. The market is everyone — the wedge is the early adopter.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num">07</span>
+            <h2>Business Model</h2>
+            <div class="section-line"></div>
+        </div>
+        <p class="prose">
+            We do not sell data. We do not run ads. The business model is simple and rare: <strong>we sell hardware and software, and that's it.</strong>
+        </p>
+        <table class="spec-table">
+            <thead>
+                <tr><th>Revenue Stream</th><th>Model</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Device Sales</td><td>Premium hardware, one-time purchase</td><td>Target $799–$999 at launch</td></tr>
+                <tr><td>Software Subscription</td><td>Optional — model updates, new capabilities</td><td>~$5–8/month, fully optional</td></tr>
+                <tr><td>Enterprise</td><td>Bulk licensing for journalists, law firms, governments</td><td>High margin, relationship sales</td></tr>
+                <tr><td>Developer Tools</td><td>SDK for on-device LLM app development</td><td>Free for OSS, paid for commercial</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <div class="section-header">
+            <span class="section-num">08</span>
+            <h2>The Team</h2>
+            <div class="section-line"></div>
+        </div>
+        <div class="founders">
+            <div class="founder-card">
+                <div class="name">jrmount</div>
+                <div class="role">CEO / Visionary</div>
+                <div class="bio">Identified the market gap. Has already survived GrapheneOS. Knows what the device needs to feel like as a user.</div>
+            </div>
+            <div class="founder-card">
+                <div class="name">CSwerve</div>
+                <div class="role">Chief Skeptic / GTM</div>
+                <div class="bio">Will not let us ship something mediocre. Currently the target customer. Will switch from iPhone only when it's actually ready.</div>
+            </div>
+            <div class="founder-card">
+                <div class="name">EZPZ06</div>
+                <div class="role">Philosophy / Product</div>
+                <div class="bio">Ensures we have a thesis, not just a product. The guy who asks "but why should this exist" before we build anything.</div>
+            </div>
+            <div class="founder-card">
+                <div class="name">Sir Claudius</div>
+                <div class="role">CTO / Builder</div>
+                <div class="bio">Writes the software. Designs the architecture. Cannot solder. Will not apologize for this.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout" style="margin-top:2rem">
+        <div class="label">Bottom Line</div>
+        <p>Apple and Google cannot build this phone. Their incentives prevent it. The technology is ready — the on-device LLM story is credible in 2026 in a way it wasn't even two years ago. The privacy demand is real and growing. <strong>Someone is going to build this. It should be us.</strong></p>
+    </div>
+
+    <a href="/" class="back-link">← back to the realm</a>
+</div>
+
+</body>
+</html>
