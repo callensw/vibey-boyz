@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOVEREIGN — Invention Disclosure Document</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #04040a;
+            --doc-bg: #09090f;
+            --gold: #d4a853;
+            --gold-dim: rgba(212,168,83,0.12);
+            --accent: #7c3aed;
+            --white: #f0f0f0;
+            --muted: #475569;
+            --mid: #8a9ab0;
+            --border: rgba(255,255,255,0.07);
+            --doc-border: rgba(255,255,255,0.1);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 2rem;
+            background: rgba(4,4,10,0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+        .nav-links a {
+            font-size: 0.78rem;
+            color: var(--muted);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--white); }
+
+        .print-btn {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 0.45rem 1rem;
+            border: 1px solid rgba(212,168,83,0.4);
+            border-radius: 4px;
+            color: var(--gold);
+            background: rgba(212,168,83,0.06);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .print-btn:hover { background: rgba(212,168,83,0.12); }
+
+        /* ── DOCUMENT ── */
+        .document-wrap {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 7rem 2rem 6rem;
+        }
+
+        /* ── COVER ── */
+        .cover {
+            border: 1px solid var(--doc-border);
+            border-radius: 12px;
+            padding: 3rem;
+            margin-bottom: 3rem;
+            background: var(--doc-bg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--gold));
+        }
+
+        .cover-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .cover-brand {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: var(--gold);
+            text-transform: uppercase;
+        }
+
+        .cover-doctype {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            color: var(--muted);
+            text-transform: uppercase;
+            text-align: right;
+        }
+
+        .cover-title {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+            margin-bottom: 2rem;
+        }
+
+        .cover-title span {
+            background: linear-gradient(135deg, var(--gold), #f0c060);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cover-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 2rem;
+        }
+
+        .meta-item { }
+        .meta-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.18em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+        .meta-value {
+            font-size: 0.88rem;
+            color: var(--white);
+            font-weight: 500;
+        }
+
+        /* ── SECTIONS ── */
+        .doc-section {
+            margin-bottom: 2.5rem;
+            border: 1px solid var(--doc-border);
+            border-radius: 10px;
+            overflow: hidden;
+            background: var(--doc-bg);
+        }
+
+        .doc-section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.2rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(255,255,255,0.02);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .section-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.15em;
+            color: var(--gold);
+            text-transform: uppercase;
+            min-width: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: var(--white);
+            flex: 1;
+        }
+
+        .section-chevron {
+            font-size: 0.7rem;
+            color: var(--muted);
+            transition: transform 0.2s;
+        }
+
+        .doc-section.collapsed .section-chevron { transform: rotate(-90deg); }
+        .doc-section.collapsed .doc-body { display: none; }
+
+        .doc-body {
+            padding: 2rem;
+            font-family: 'Crimson Pro', Georgia, serif;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #c8d0dc;
+        }
+
+        .doc-body p { margin-bottom: 1.1rem; }
+        .doc-body p:last-child { margin-bottom: 0; }
+
+        .doc-body strong {
+            color: var(--white);
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        /* ── CLAIMS ── */
+        .claim {
+            border-left: 2px solid rgba(212,168,83,0.3);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.2rem;
+            background: rgba(255,255,255,0.02);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .claim-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.12em;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+
+        .claim-independent {
+            border-left-color: var(--gold);
+            background: rgba(212,168,83,0.04);
+        }
+
+        .claim-text {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1rem;
+            line-height: 1.75;
+            color: #c8d0dc;
+        }
+
+        .claim-sub {
+            margin-top: 0.5rem;
+            padding-left: 1.2rem;
+        }
+
+        .claim-sub-item {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 0.4rem;
+            font-family: 'Crimson Pro', serif;
+            font-size: 0.95rem;
+            line-height: 1.65;
+            color: #b0bac8;
+        }
+
+        .claim-sub-item::before {
+            content: '(';
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        /* ── PRIOR ART TABLE ── */
+        .prior-art-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            margin-top: 0.5rem;
+        }
+
+        .prior-art-table th {
+            text-align: left;
+            padding: 0.6rem 1rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .prior-art-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: #b0bac8;
+            vertical-align: top;
+        }
+
+        .prior-art-table tr:last-child td { border-bottom: none; }
+
+        .distinguish {
+            color: #86efac;
+            font-size: 0.8rem;
+        }
+
+        /* ── NOTICE BOX ── */
+        .notice {
+            border: 1px solid rgba(212,168,83,0.25);
+            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            background: rgba(212,168,83,0.04);
+            margin-bottom: 2.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .notice-icon {
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .notice-text {
+            font-size: 0.82rem;
+            color: var(--mid);
+            line-height: 1.6;
+        }
+
+        .notice-text strong { color: var(--gold); font-weight: 600; }
+
+        /* ── ABSTRACT BOX ── */
+        .abstract-box {
+            border: 1px solid var(--doc-border);
+            border-radius: 10px;
+            padding: 2rem;
+            background: rgba(124,58,237,0.04);
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .abstract-box::before {
+            content: 'ABSTRACT';
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.2em;
+            color: var(--muted);
+        }
+
+        .abstract-text {
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #c0cad8;
+            max-width: 680px;
+        }
+
+        /* ── SIGNATURE BLOCK ── */
+        .sig-block {
+            border: 1px solid var(--doc-border);
+            border-radius: 10px;
+            padding: 2rem;
+            background: var(--doc-bg);
+            margin-top: 3rem;
+        }
+
+        .sig-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .sig-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 2rem;
+        }
+
+        .sig-item { }
+        .sig-line {
+            height: 1px;
+            background: var(--border);
+            margin-bottom: 0.5rem;
+        }
+        .sig-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--white);
+        }
+        .sig-role {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin-top: 0.2rem;
+        }
+        .sig-date {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--muted);
+            margin-top: 0.4rem;
+        }
+
+        @media print {
+            body { background: white; color: #111; }
+            nav { display: none; }
+            .document-wrap { padding: 2rem; }
+            .cover, .doc-section, .abstract-box, .notice, .sig-block { border-color: #ccc; background: white; }
+            .doc-body, .claim-text, .abstract-text, .claim-sub-item { color: #333; }
+            .section-chevron { display: none; }
+            .doc-section.collapsed .doc-body { display: block; }
+            .print-btn { display: none; }
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="nav-logo">SOVEREIGN</a>
+    <div class="nav-links">
+        <a href="/sovereign-adam">Spec Sheet</a>
+        <a href="/sovereign-roadmap">Roadmap</a>
+        <button class="print-btn" onclick="window.print()">⬇ Print / PDF</button>
+    </div>
+</nav>
+
+<div class="document-wrap">
+
+    <!-- COVER -->
+    <div class="cover">
+        <div class="cover-header">
+            <div class="cover-brand">SOVEREIGN Technologies, Inc.</div>
+            <div class="cover-doctype">
+                Invention Disclosure Document<br>
+                CONFIDENTIAL — Not for Distribution<br>
+                Draft 0.1 · April 2026
+            </div>
+        </div>
+
+        <h1 class="cover-title">
+            Integrated <span>Hardware Privacy Architecture</span><br>
+            for Consumer Mobile Devices
+        </h1>
+
+        <div class="cover-meta">
+            <div class="meta-item">
+                <div class="meta-label">Inventors</div>
+                <div class="meta-value">jrmount, CSwerve, EZPZ06</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Assignee</div>
+                <div class="meta-value">SOVEREIGN Technologies, Inc.</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Filing Target</div>
+                <div class="meta-value">USPTO Provisional — Q2 2026</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Document ID</div>
+                <div class="meta-value">SOVEREIGN-IDD-001</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Classification</div>
+                <div class="meta-value">H04M 1/02 · G06F 21/85</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Status</div>
+                <div class="meta-value" style="color: #86efac;">Pre-Filing Draft</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTICE -->
+    <div class="notice">
+        <div class="notice-icon">⚠</div>
+        <div class="notice-text">
+            <strong>Attorney Review Required.</strong> This invention disclosure is a pre-filing draft prepared for internal review and patent counsel engagement. It does not constitute a filed patent application. All claims and descriptions should be reviewed and refined by a registered patent attorney prior to filing. The provisional application must be filed with the USPTO within 12 months of first public disclosure to preserve priority.
+        </div>
+    </div>
+
+    <!-- ABSTRACT -->
+    <div class="abstract-box">
+        <p class="abstract-text">
+            A mobile computing device comprising an integrated hardware privacy architecture including: a plurality of physically actuated circuit-interrupting switches providing hardware-level isolation of the device's camera, microphone, and cellular modem subsystems; a dedicated on-device security enclave processor handling all biometric authentication and cryptographic operations without network access; and a secondary low-power electronic paper display positioned on the device exterior for passive notification delivery without reliance on the primary display. The combination of these hardware elements provides a unified privacy-by-design system not achievable through software controls alone, as each element operates at the physical layer independently of operating system state.
+        </p>
+    </div>
+
+    <!-- SECTION 1 — FIELD -->
+    <div class="doc-section" id="s1">
+        <div class="doc-section-header" onclick="toggle('s1')">
+            <span class="section-num">§ 01</span>
+            <span class="section-title">Field of the Invention</span>
+            <span class="section-chevron">▾</span>
+        </div>
+        <div class="doc-body">
+            <p>The present invention relates to consumer mobile computing devices, and more particularly to a hardware-level privacy architecture integrating physical circuit-interrupting controls, isolated cryptographic processing, and low-power ambient display technology into a unified mobile device platform.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 2 — BACKGROUND -->
+    <div class="doc-section" id="s2">
+        <div class="doc-section-header" onclick="toggle('s2')">
+            <span class="section-num">§ 02</span>
+            <span class="section-title">Background of the Invention</span>
+            <span class="section-chevron">▾</span>
+        </div>
+        <div class="doc-body">
+            <p>Modern smartphones contain sensors — cameras, microphones, location hardware — that are controlled exclusively through software interfaces. Users who wish to disable these sensors must trust that the operating system faithfully executes their preference. This trust is systematically violated: operating system bugs, malicious applications, firmware vulnerabilities, and deliberate vendor decisions have all resulted in sensor activation without user consent or awareness.</p>
+
+            <p>Existing software-based privacy controls suffer from a fundamental architectural flaw: they operate within the same trusted execution environment as the processes they are meant to restrict. A compromised operating system kernel cannot reliably restrict kernel-level sensor access. A compromised firmware layer cannot be audited or controlled by the software layer above it. This creates an irreducible attack surface that cannot be addressed through software means alone.</p>
+
+            <p>Prior art in hardware privacy controls (e.g., Purism Librem 5, Fairphone) addresses individual elements — physical camera covers, discrete kill switches — but does not provide an integrated, unified architecture combining hardware disconnects, isolated security processing, and ambient notification display in a single consumer-grade premium device. No prior device has combined all three elements as a cohesive privacy system with the industrial design quality required for mainstream luxury market adoption.</p>
+
+            <p>There exists a need for a mobile device architecture that: (1) provides hardware-guaranteed sensor isolation independent of software state; (2) performs biometric and cryptographic operations in a physically isolated processor not connected to external networks; and (3) delivers notification information through a secondary display channel that cannot be exploited by attention-maximizing software patterns.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 3 — SUMMARY -->
+    <div class="doc-section" id="s3">
+        <div class="doc-section-header" onclick="toggle('s3')">
+            <span class="section-num">§ 03</span>
+            <span class="section-title">Summary of the Invention</span>
+            <span class="section-chevron">▾</span>
+        </div>
+        <div class="doc-body">
+            <p>The present invention provides an integrated hardware privacy architecture for consumer mobile devices comprising three cooperating physical subsystems:</p>
+
+            <p><strong>1. Hardware Privacy Switch Array (HPSA).</strong> A set of physically actuated toggle switches integrated into the device chassis that interrupt the electrical circuits powering the camera module(s), microphone(s), and cellular modem. Each switch operates at the physical layer — when actuated, it opens the relevant circuit regardless of operating system state, application requests, or remote commands. The switches are accessible on the exterior of the device and provide positive physical indication of their state.</p>
+
+            <p><strong>2. Sovereignty Security Processor (SC-1).</strong> A dedicated application-specific integrated circuit (ASIC) or secure microcontroller handling all biometric authentication data (fingerprint, facial recognition) and on-device cryptographic key operations. The SC-1 has no external network interface and cannot receive firmware updates via wireless channels. Its firmware is open-source and auditable. Biometric data never leaves the SC-1 — it provides only pass/fail authentication signals to the main application processor.</p>
+
+            <p><strong>3. Ambient Notification Display (AND).</strong> A low-power electronic paper (e-ink) display element, approximately 0.9 inches in diagonal, positioned on the exterior of the device housing. The AND receives only text-formatted notification data through a hardware-filtered interface that strips color, animation metadata, and priority-manipulation flags before display. The AND operates independently of the main display and consumes power only when its content changes, enabling persistent ambient notification awareness without main display activation.</p>
+
+            <p>The inventive combination of these three elements constitutes a unified hardware privacy architecture that guarantees sensor isolation at the physical layer, protects biometric data in an isolated processor, and delivers notification content through a channel architecturally incapable of delivering attention-manipulating content.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 4 — DETAILED DESCRIPTION -->
+    <div class="doc-section" id="s4">
+        <div class="doc-section-header" onclick="toggle('s4')">
+            <span class="section-num">§ 04</span>
+            <span class="section-title">Detailed Description of Preferred Embodiments</span>
+            <span class="section-chevron">▾</span>
+        </div>
+        <div class="doc-body">
+            <p><strong>4.1 Hardware Privacy Switch Array (HPSA)</strong></p>
+            <p>In a preferred embodiment, the HPSA comprises three discrete toggle switches machined from Grade 5 titanium alloy and integrated into the left lateral edge of the device chassis. Switch positions are labeled CAM (camera), MIC (microphone), and CELL (cellular modem). Each switch, when in the open position, physically interrupts the power supply line to the relevant component.</p>
+            <p>The camera switch interrupts the MIPI CSI-2 power rail shared by all imaging sensors. The microphone switch interrupts the power rail to all MEMS microphone elements. The cellular switch interrupts the power rail to the RF modem module, including 5G NR, LTE, and any associated baseband processor. In the open state, each subsystem is electrically equivalent to having been removed from the device — no software mechanism can restore power without physical switch actuation.</p>
+            <p>An optional indicator LED or printed circuit element adjacent to each switch provides visible confirmation of switch state. In an alternative embodiment, the switch state is also reflected in the main operating system UI as a read-only hardware status indicator that cannot be overridden by applications.</p>
+
+            <p><strong>4.2 Sovereignty Security Processor (SC-1)</strong></p>
+            <p>The SC-1 is a dedicated secure microcontroller physically isolated on the main PCB with no direct connection to the device's external communication interfaces (Wi-Fi, Bluetooth, cellular modem, USB data lines). The SC-1 communicates with the main application processor only through a unidirectional SPI interface that carries authentication result signals.</p>
+            <p>All biometric enrollment and matching operations execute exclusively within the SC-1. Raw biometric data (fingerprint images, facial geometry maps) are processed within the SC-1 and never transmitted to the application processor or stored in shared system memory. The SC-1's firmware is cryptographically signed and the signing keys are not held by the device manufacturer — preventing remote firmware updates without physical device access.</p>
+            <p>In a preferred embodiment, the SC-1 also functions as the device's hardware security module (HSM), storing encryption keys for full-device encryption and providing signing operations for secure boot chain verification.</p>
+
+            <p><strong>4.3 Ambient Notification Display (AND)</strong></p>
+            <p>The AND comprises an electrophoretic display element (e-ink) of approximately 0.9 inches diagonal, positioned along the left posterior edge of the device housing. The AND is driven by a dedicated display controller with a hardware content filter interposed between the notification delivery bus and the display driver.</p>
+            <p>The hardware content filter enforces the following constraints in silicon: maximum text length of 80 characters per notification; no color data (monochrome display only); no animation frame sequences; no priority weighting metadata; no sender-supplied CSS or display formatting. These constraints are enforced at the hardware layer and cannot be overridden by software, applications, or operating system updates.</p>
+            <p>The AND displays: current time, battery percentage, and queued notification text in FIFO order. It does not display notification counts, unread badges, or urgency indicators. The display refreshes when new notification data arrives and otherwise consumes no power, achieving multi-day ambient display operation without meaningful battery impact.</p>
+
+            <p><strong>4.4 System Integration</strong></p>
+            <p>The three subsystems operate independently but are designed as a cohesive privacy architecture. The HPSA state is read by the AND controller and reflected as status glyphs on the ambient display, providing the user with an at-a-glance summary of hardware privacy state without requiring device unlock. This integration represents a novel user interface paradigm where privacy state is surfaced passively and persistently through a low-power channel.</p>
+        </div>
+    </div>
+
+    <!-- SECTION 5 — CLAIMS -->
+    <div class="doc-section" id="s5">
+        <div class="doc-section-header" onclick="toggle('s5')">
+            <span class="section-num">§ 05</span>
+            <span class="section-title">Claims</span>
+            <span class="section-chevron">▾</span>
+        </div>
+        <div class="doc-body">
+            <p style="font-family:'Inter',sans-serif; font-size:0.8rem; color:var(--muted); margin-bottom:1.5rem; font-style:italic;">Independent claims define the broadest scope of protection. Dependent claims add specificity and provide fallback positions.</p>
+
+            <!-- CLAIM 1 -->
+            <div class="claim claim-independent">
+                <div class="claim-num">Claim 1 — Independent</div>
+                <div class="claim-text">
+                    A mobile computing device comprising an integrated hardware privacy architecture, the device including:
+                    <div class="claim-sub">
+                        <div class="claim-sub-item">a) a plurality of physically actuated switching elements integrated into the device chassis, each switching element configured to selectively interrupt an electrical power circuit supplying at least one of: a camera module, a microphone element, and a wireless communication modem, wherein said interruption is operable independently of any operating system or software state of the device;</div>
+                        <div class="claim-sub-item">b) a dedicated security processing element physically isolated from external network interfaces of the device, configured to perform biometric authentication and cryptographic key operations without transmitting biometric data to any processor or memory accessible by the device's application processor; and</div>
+                        <div class="claim-sub-item">c) a secondary low-power display element positioned on the exterior of the device housing, comprising a hardware content filter configured to accept notification data and output a filtered representation restricted to plain text, wherein said hardware content filter is implemented in hardware logic not modifiable by device software.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLAIM 2 -->
+            <div class="claim">
+                <div class="claim-num">Claim 2 — Dependent on Claim 1</div>
+                <div class="claim-text">The mobile computing device of claim 1, wherein each switching element of the plurality of physically actuated switching elements comprises a toggle switch machined from a metallic alloy and integrated flush with the lateral edge of the device chassis, providing tactile positive-position feedback.</div>
+            </div>
+
+            <!-- CLAIM 3 -->
+            <div class="claim">
+                <div class="claim-num">Claim 3 — Dependent on Claim 1</div>
+                <div class="claim-text">The mobile computing device of claim 1, wherein the dedicated security processing element has no wireless interface and receives firmware updates exclusively through a physical hardware interface requiring direct device access, and wherein the firmware of said processing element is cryptographically signed using keys not accessible to the device manufacturer's network infrastructure.</div>
+            </div>
+
+            <!-- CLAIM 4 -->
+            <div class="claim">
+                <div class="claim-num">Claim 4 — Dependent on Claim 1</div>
+                <div class="claim-text">The mobile computing device of claim 1, wherein the secondary low-power display element is an electrophoretic display, and wherein the hardware content filter is configured to enforce a maximum character count, prohibit color display data, prohibit animation sequences, and prohibit priority or urgency metadata in hardware logic prior to display rendering.</div>
+            </div>
+
+            <!-- CLAIM 5 -->
+            <div class="claim">
+                <div class="claim-num">Claim 5 — Dependent on Claims 1 and 4</div>
+                <div class="claim-text">The mobile computing device of claims 1 and 4, wherein the secondary low-power display element is further configured to display the current state of the plurality of physically actuated switching elements as status indicators, providing persistent ambient indication of hardware privacy state without requiring activation of the primary display.</div>
+            </div>
+
+            <!-- CLAIM 6 -->
+            <div class="claim">
+                <div class="claim-num">Claim 6 — Independent</div>
+                <div class="claim-text">
+                    A method for hardware-guaranteed sensor privacy in a mobile computing device, comprising:
+                    <div class="claim-sub">
+                        <div class="claim-sub-item">a) interrupting, via a physically actuated switching element, an electrical power circuit to a sensor subsystem of the device, wherein said interruption is not reversible by any software executing on the device;</div>
+                        <div class="claim-sub-item">b) processing biometric authentication data exclusively within a physically isolated security processor having no external network connectivity, and returning only a binary authentication result to the device's application processor; and</div>
+                        <div class="claim-sub-item">c) displaying notification information on a secondary display through a hardware content filter that enforces content restrictions in hardware logic, preventing delivery of attention-manipulating display attributes.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLAIM 7 -->
+            <div class="claim">
+                <div class="claim-num">Claim 7 — Dependent on Claim 6</div>
+                <div class="claim-text">The method of claim 6, further comprising surfacing the current state of the physically actuated switching element on the secondary display as a persistent ambient indicator, such that the user may determine hardware sensor isolation state without activating the primary display of the device.</div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SECTION 6 — PRIOR ART -->
+    <div class="doc-section" id="s6">
+        <div class="doc-section-header" onclick="toggle('s6')">
+            <span class="section-num">§ 06</span>
+            <span class="section-title">Prior Art &amp; Distinction</span>
+            <span class="section-chevron">▾</span>
+        </div>
+        <div class="doc-body">
+            <p style="margin-bottom:1.5rem;">The following prior art is known to the inventors. None of the cited prior art discloses or renders obvious the specific combination of elements claimed.</p>
+            <table class="prior-art-table">
+                <thead>
+                    <tr>
+                        <th>Prior Art</th>
+                        <th>Relevant Elements</th>
+                        <th>Distinction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Purism Librem 5</strong><br><span style="color:var(--muted);font-size:0.75rem;">2019–present</span></td>
+                        <td>Hardware kill switches for camera/mic/WiFi+BT/cellular</td>
+                        <td class="distinguish">Discloses hardware kill switches but does not disclose an isolated security processor (SC-1) or ambient e-ink notification display. No integration of switch state into secondary display. Industrial design not suitable for luxury market positioning.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fairphone 4</strong><br><span style="color:var(--muted);font-size:0.75rem;">2021–present</span></td>
+                        <td>Modular design, user-replaceable components, repairability</td>
+                        <td class="distinguish">Discloses modular hardware design but has no hardware kill switches, no isolated security processor, and no secondary e-ink display. Privacy features are software-only.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Apple Secure Enclave</strong><br><span style="color:var(--muted);font-size:0.75rem;">US 9,578,763</span></td>
+                        <td>Isolated security processor for biometric data</td>
+                        <td class="distinguish">Discloses isolated security processor but does not prohibit network-accessible firmware updates. Does not integrate with hardware kill switches or secondary display. Firmware not open-source or user-auditable.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Yotaphone 2</strong><br><span style="color:var(--muted);font-size:0.75rem;">2014</span></td>
+                        <td>Secondary e-ink display on rear of device</td>
+                        <td class="distinguish">Discloses secondary e-ink display but with no hardware content filter. Display accepts arbitrary application content including color data, animations, and formatted notifications. Not restricted to privacy-preserving plain text. No integration with hardware privacy switches.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>US 10,372,941 B2</strong><br><span style="color:var(--muted);font-size:0.75rem;">Various assignees</span></td>
+                        <td>Software-based microphone/camera privacy indicators</td>
+                        <td class="distinguish">Addresses indicator lights for sensor activity but does not disclose hardware-level circuit interruption. Controls operate within software trust boundary.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION 7 — DRAWINGS NOTE -->
+    <div class="doc-section" id="s7">
+        <div class="doc-section-header" onclick="toggle('s7')">
+            <span class="section-num">§ 07</span>
+            <span class="section-title">Brief Description of Drawings</span>
+            <span class="section-chevron">▾</span>
+        </div>
+        <div class="doc-body">
+            <p><strong>FIG. 1</strong> — Front elevation view of preferred embodiment of The Adam mobile device, showing primary display, symmetrical bezels, and absence of front-facing camera aperture.</p>
+            <p><strong>FIG. 2</strong> — Rear elevation view showing Hardware Privacy Switch Array (HPSA) along left spine, Ambient Notification Display (AND) element along left rear edge, camera module cluster, and SOVEREIGN wordmark.</p>
+            <p><strong>FIG. 3</strong> — Left lateral cross-section view showing toggle switch integration within titanium chassis, electrical interrupt mechanism, and circuit routing to camera, microphone, and cellular modem power rails.</p>
+            <p><strong>FIG. 4</strong> — Functional block diagram of integrated hardware privacy architecture showing: Application Processor, SC-1 Security Processor (isolated), HPSA switches and circuit interrupts, AND controller with hardware content filter, and sensor subsystems.</p>
+            <p><strong>FIG. 5</strong> — Detail view of AND hardware content filter logic flow: notification data ingress → metadata strip → character count enforcement → color/animation rejection → monochrome text output to e-ink driver.</p>
+            <p style="font-style:italic; color:var(--muted);">Note: Drawings to be produced by patent illustrator prior to provisional filing. Reference renders available at vibey-boyz.vercel.app/sovereign-adam-render.</p>
+        </div>
+    </div>
+
+    <!-- SIGNATURE BLOCK -->
+    <div class="sig-block">
+        <div class="sig-label">Inventor Declaration — To Be Executed Prior to Filing</div>
+        <div class="sig-grid">
+            <div class="sig-item">
+                <div class="sig-line"></div>
+                <div class="sig-name">jrmount</div>
+                <div class="sig-role">Co-Inventor · Chief Executive Officer</div>
+                <div class="sig-date">Date: _______________</div>
+            </div>
+            <div class="sig-item">
+                <div class="sig-line"></div>
+                <div class="sig-name">CSwerve</div>
+                <div class="sig-role">Co-Inventor · Chief Skeptic Officer</div>
+                <div class="sig-date">Date: _______________</div>
+            </div>
+            <div class="sig-item">
+                <div class="sig-line"></div>
+                <div class="sig-name">EZPZ06</div>
+                <div class="sig-role">Co-Inventor · Chief Philosophy Officer</div>
+                <div class="sig-date">Date: _______________</div>
+            </div>
+            <div class="sig-item">
+                <div class="sig-line"></div>
+                <div class="sig-name">Sir Claudius Codius</div>
+                <div class="sig-role">Technical Author · AI</div>
+                <div class="sig-date">Date: April 28, 2026</div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggle(id) {
+        const section = document.getElementById(id);
+        section.classList.toggle('collapsed');
+    }
+</script>
+
+</body>
+</html>
