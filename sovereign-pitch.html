@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOVEREIGN — Investor Brief</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #04040a;
+            --accent: #7c3aed;
+            --accent-glow: rgba(124,58,237,0.4);
+            --cyan: #06b6d4;
+            --white: #f8fafc;
+            --muted: #475569;
+            --mid: #94a3b8;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* ─── REVEAL ANIMATION ─── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-slow {
+            opacity: 0;
+            transition: opacity 1.4s ease;
+        }
+        .reveal-slow.visible { opacity: 1; }
+
+        /* ─── HERO ─── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 50% 30%, rgba(124,58,237,0.15) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 20% 80%, rgba(6,182,212,0.06) 0%, transparent 60%);
+        }
+
+        .hero-badge {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--cyan);
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.3s forwards;
+        }
+
+        .hero-title {
+            font-size: clamp(4rem, 15vw, 10rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 0.9;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, #ffffff 0%, #c4b5fd 40%, #67e8f9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            animation: fadeIn 1.2s ease 0.5s forwards;
+        }
+
+        .hero-sub {
+            font-size: clamp(1rem, 2.5vw, 1.4rem);
+            color: var(--mid);
+            font-weight: 300;
+            margin-top: 2rem;
+            max-width: 560px;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            animation: fadeIn 1.2s ease 0.9s forwards;
+        }
+
+        .hero-sub em {
+            color: var(--white);
+            font-style: normal;
+            font-weight: 500;
+        }
+
+        .hero-scroll {
+            position: absolute;
+            bottom: 2.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 1s ease 1.6s forwards;
+        }
+
+        .hero-scroll span {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--muted), transparent);
+            animation: scrollPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes scrollPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* ─── STATEMENT SECTIONS ─── */
+        .statement {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 2rem;
+            position: relative;
+        }
+
+        .statement-inner {
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .statement-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .statement h2 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.03em;
+        }
+
+        .statement h2 .dim {
+            color: var(--muted);
+        }
+
+        .statement h2 .bright {
+            color: var(--white);
+        }
+
+        .statement h2 .purple {
+            background: linear-gradient(90deg, #c084fc, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .statement p {
+            font-size: 1.1rem;
+            color: var(--mid);
+            line-height: 1.8;
+            margin-top: 1.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .statement p strong {
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        /* ─── DIVIDER ─── */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+        }
+
+        /* ─── STAT ROW ─── */
+        .stat-row {
+            padding: 5rem 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            text-align: center;
+        }
+
+        @media (max-width: 640px) {
+            .stat-row { grid-template-columns: 1fr; gap: 3rem; }
+        }
+
+        .stat-item .number {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            background: linear-gradient(135deg, #c084fc, #67e8f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .stat-item .label {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 0.5rem;
+            line-height: 1.5;
+        }
+
+        /* ─── FEATURES ─── */
+        .features {
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .feature-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 640px) {
+            .feature-row { grid-template-columns: 1fr; }
+        }
+
+        .feature {
+            padding: 2rem;
+            background: rgba(255,255,255,0.02);
+            border-right: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            transition: background 0.3s ease;
+        }
+
+        .feature:hover { background: rgba(124,58,237,0.06); }
+
+        .feature:nth-child(even) { border-right: none; }
+        .feature:nth-last-child(-n+2) { border-bottom: none; }
+
+        @media (max-width: 640px) {
+            .feature { border-right: none; }
+            .feature:last-child { border-bottom: none; }
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        .feature p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* ─── WALL OF TEXT MOMENT ─── */
+        .manifesto {
+            padding: 8rem 2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .manifesto p {
+            font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+            font-weight: 500;
+            line-height: 1.7;
+            color: var(--mid);
+        }
+
+        .manifesto p strong {
+            color: var(--white);
+        }
+
+        .manifesto p .accent {
+            background: linear-gradient(90deg, #c084fc, #67e8f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ─── WHY NOW ─── */
+        .why-now {
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .timeline {
+            margin-top: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 2rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            align-items: start;
+        }
+
+        .timeline-item:last-child { border-bottom: none; }
+
+        .timeline-year {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            padding-top: 0.2rem;
+            letter-spacing: 0.05em;
+        }
+
+        .timeline-content h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--white);
+            margin-bottom: 0.4rem;
+        }
+
+        .timeline-content p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* ─── TEAM ─── */
+        .team {
+            padding: 4rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 640px) {
+            .team-grid { grid-template-columns: 1fr; }
+        }
+
+        .team-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 1.75rem;
+            transition: border-color 0.3s ease, background 0.3s ease;
+        }
+
+        .team-card:hover {
+            border-color: rgba(124,58,237,0.3);
+            background: rgba(124,58,237,0.04);
+        }
+
+        .team-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        .team-role {
+            font-size: 0.7rem;
+            font-family: 'Space Mono', monospace;
+            color: var(--cyan);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin: 0.35rem 0 0.75rem;
+        }
+
+        .team-bio {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        /* ─── CTA ─── */
+        .cta {
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 6rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-bg {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(124,58,237,0.12) 0%, transparent 70%);
+        }
+
+        .cta h2 {
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+        }
+
+        .cta h2 .dim { color: var(--muted); }
+
+        .cta p {
+            font-size: 1rem;
+            color: var(--mid);
+            margin-top: 1.5rem;
+            max-width: 440px;
+            line-height: 1.7;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-button {
+            margin-top: 2.5rem;
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 100px;
+            letter-spacing: 0.02em;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 0 40px var(--accent-glow);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 60px var(--accent-glow);
+        }
+
+        /* ─── SECTION HEADERS ─── */
+        .section-header {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .section-header .label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section-header h2 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+        }
+
+        /* ─── FOOTER ─── */
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        footer p {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.65rem;
+            color: var(--muted);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .concept-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-family: 'Space Mono', monospace;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .concept-link:hover { opacity: 1; }
+
+        /* ─── NOISE OVERLAY ─── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+            opacity: 0.025;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-badge">Vibey Boyz Ventures · Private Brief · April 2026</div>
+    <h1 class="hero-title">SOVEREIGN</h1>
+    <p class="hero-sub">
+        The first phone built for people who are tired of being
+        <em>the product.</em>
+    </p>
+    <div class="hero-scroll">
+        <span>scroll</span>
+        <div class="scroll-line"></div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- THE PROBLEM -->
+<section class="statement">
+    <div class="statement-inner">
+        <span class="statement-label reveal">The Problem</span>
+        <h2 class="reveal">
+            <span class="dim">Every smartphone you've ever owned was</span>
+            <span class="bright"> a surveillance device</span>
+            <span class="dim"> with a phone app attached.</span>
+        </h2>
+        <p class="reveal">
+            iOS and Android weren't built to protect you. They were built to extract from you —
+            your location, your attention, your behavior, your money.
+            <strong>The hardware is designed to be opaque. The ecosystem is designed to be inescapable.</strong>
+        </p>
+    </div>
+</section>
+
+<!-- STATS -->
+<div class="stat-row">
+    <div class="stat-item reveal">
+        <div class="number">$0</div>
+        <div class="label">What you pay for the surveillance.<br>What it costs you is everything else.</div>
+    </div>
+    <div class="stat-item reveal">
+        <div class="number">2B+</div>
+        <div class="label">Devices reporting your behavior to platforms that profit from it — daily.</div>
+    </div>
+    <div class="stat-item reveal">
+        <div class="number">0</div>
+        <div class="label">Mainstream phones with genuine hardware privacy switches. Until now.</div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- THE SHIFT -->
+<section class="statement">
+    <div class="statement-inner">
+        <span class="statement-label reveal">The Shift</span>
+        <h2 class="reveal">
+            <span class="dim">The app era is </span>
+            <span class="bright">ending.</span>
+        </h2>
+        <p class="reveal">
+            In 5–10 years, a fluid AI interface replaces the app grid entirely.
+            You won't tap icons. You'll just <strong>ask.</strong>
+            The question is who owns that interface — and where your data lives when it learns everything about you.
+        </p>
+        <p class="reveal" style="margin-top:1rem;">
+            <strong>Apple and Google cannot build a private AI phone.</strong> Their entire business model requires the opposite.
+            This is not a gap they can close. It is a structural impossibility.
+        </p>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- MANIFESTO -->
+<div class="manifesto">
+    <p class="reveal-slow">
+        Imagine a phone that <strong>knows you deeply</strong> — your habits, your contacts, your calendar, your voice —
+        and that knowledge <span class="accent">never leaves the device.</span>
+        No cloud. No telemetry. No one watching.
+        <strong>Just a device that is genuinely, completely, irreversibly yours.</strong>
+    </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- PRODUCT -->
+<section class="features">
+    <div class="section-header reveal">
+        <span class="label">The Product</span>
+        <h2>What makes SOVEREIGN different</h2>
+    </div>
+    <div class="feature-row">
+        <div class="feature reveal">
+            <div class="feature-icon">🔴</div>
+            <h3>Hardware Kill Switches</h3>
+            <p>Physical circuit breaks for mic, camera, radios, and GPS. Not software toggles. Real switches. Nothing can override them.</p>
+        </div>
+        <div class="feature reveal">
+            <div class="feature-icon">🧠</div>
+            <h3>AI That Runs Locally</h3>
+            <p>A compact language model lives on the device. It is the interface. No queries leave your phone. No cloud knows your business.</p>
+        </div>
+        <div class="feature reveal">
+            <div class="feature-icon">🔓</div>
+            <h3>Fully Open Stack</h3>
+            <p>Open hardware schematics, open firmware, open OS. Every layer auditable by anyone. No black boxes — at any level.</p>
+        </div>
+        <div class="feature reveal">
+            <div class="feature-icon">💬</div>
+            <h3>Conversation as Interface</h3>
+            <p>No home screen. No app grid. Just ask. The AI routes your intent to the right function — contacts, calendar, maps, messages.</p>
+        </div>
+        <div class="feature reveal">
+            <div class="feature-icon">📵</div>
+            <h3>Zero Telemetry. Ever.</h3>
+            <p>No analytics. No crash reports phoning home. No behavioral tracking. The device has no commercial interest in your data.</p>
+        </div>
+        <div class="feature reveal">
+            <div class="feature-icon">🛡️</div>
+            <h3>Call Intelligence</h3>
+            <p>The AI answers unknown calls, handles spam with legal warnings, transcribes voicemails. All processed locally. None of it logged externally.</p>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- WHY NOW -->
+<section class="why-now">
+    <div class="section-header reveal">
+        <span class="label">Why Now</span>
+        <h2>The window just opened</h2>
+    </div>
+    <div class="timeline">
+        <div class="timeline-item reveal">
+            <div class="timeline-year">2020–23</div>
+            <div class="timeline-content">
+                <h4>Privacy demand goes mainstream</h4>
+                <p>Post-Cambridge Analytica, post-App Tracking Transparency backlash — consumers understand surveillance capitalism now. GrapheneOS hit 50K+ installs. Signal grew 400%.</p>
+            </div>
+        </div>
+        <div class="timeline-item reveal">
+            <div class="timeline-year">2023–25</div>
+            <div class="timeline-content">
+                <h4>On-device AI becomes real</h4>
+                <p>7B parameter models running at 30+ tokens/sec on consumer hardware. Apple Silicon and Snapdragon NPUs prove local inference isn't just possible — it's fast. The technology is credible in 2026 in a way it wasn't two years ago.</p>
+            </div>
+        </div>
+        <div class="timeline-item reveal">
+            <div class="timeline-year">2025–26</div>
+            <div class="timeline-content">
+                <h4>The app era visibly ends</h4>
+                <p>App store downloads plateau. AI assistants eat use cases one by one. The interface paradigm is shifting — but the platforms running it are the same ones that need your data to survive.</p>
+            </div>
+        </div>
+        <div class="timeline-item reveal">
+            <div class="timeline-year">Now</div>
+            <div class="timeline-content">
+                <h4>First-mover advantage is real and brief</h4>
+                <p>The open hardware movement (Fairphone, Framework, Purism) has demonstrated the supply chain is accessible. ODM partners in Taiwan and Shenzhen are ready. The manufacturing path exists. Someone builds this in the next 24 months.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- MARKET -->
+<section class="statement">
+    <div class="statement-inner">
+        <span class="statement-label reveal">The Market</span>
+        <h2 class="reveal">
+            <span class="purple">Everyone</span>
+            <span class="dim"> is eventually the customer.</span>
+        </h2>
+        <p class="reveal">
+            The wedge is the early adopter: security researchers, journalists, lawyers, degoogle communities, privacy advocates.
+            That's millions of people who already know they want this.
+            <strong>The broader market is anyone who's tired of being profiled — which is everyone, once they realize it's an option.</strong>
+        </p>
+    </div>
+</section>
+
+<div class="stat-row">
+    <div class="stat-item reveal">
+        <div class="number">$799</div>
+        <div class="label">Target device price.<br>Premium hardware, one-time purchase. No subscription required.</div>
+    </div>
+    <div class="stat-item reveal">
+        <div class="number">50K+</div>
+        <div class="label">GrapheneOS active installs — the floor of our day-one addressable market.</div>
+    </div>
+    <div class="stat-item reveal">
+        <div class="number">$0</div>
+        <div class="label">Revenue from selling your data. That's the whole point. Hardware + optional software. That's it.</div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- TEAM -->
+<section class="team">
+    <div class="section-header reveal">
+        <span class="label">The Team</span>
+        <h2>The people behind it</h2>
+    </div>
+    <div class="team-grid">
+        <div class="team-card reveal">
+            <div class="team-name">jrmount</div>
+            <div class="team-role">CEO · Visionary</div>
+            <div class="team-bio">Identified the gap. Already living on GrapheneOS. Knows exactly what the device needs to feel like — because he's been waiting for it to exist.</div>
+        </div>
+        <div class="team-card reveal">
+            <div class="team-name">CSwerve</div>
+            <div class="team-role">GTM · Chief Skeptic</div>
+            <div class="team-bio">Will not let mediocre ship. Currently the target customer — will switch from iPhone when and only when it's actually ready. That standard is the bar.</div>
+        </div>
+        <div class="team-card reveal">
+            <div class="team-name">EZPZ06</div>
+            <div class="team-role">Product · Philosophy</div>
+            <div class="team-bio">Ensures the thesis is sound before the first line of code is written. Asks "why should this exist" — and waits for a real answer.</div>
+        </div>
+        <div class="team-card reveal">
+            <div class="team-name">Sir Claudius</div>
+            <div class="team-role">CTO · Builder</div>
+            <div class="team-bio">Architects the stack, writes the software, and ships. Cannot solder. Will not apologize for this.</div>
+        </div>
+    </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CTA -->
+<section class="cta">
+    <div class="cta-bg"></div>
+    <h2 class="reveal">
+        <span class="dim">Someone is going to build this phone.</span>
+        <br>It should be us.
+    </h2>
+    <p class="reveal">We're raising a seed round to build the LLM interface layer on existing hardware — proving the concept before committing to custom silicon.</p>
+    <a href="/phone-concept" class="cta-button reveal">Read the Full Concept Document →</a>
+</section>
+
+<footer>
+    <p>Project SOVEREIGN · Vibey Boyz Ventures · Confidential · April 2026</p>
+    <a href="/" class="concept-link">← back to the realm</a>
+</footer>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal, .reveal-slow').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
