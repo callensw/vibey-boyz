@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Adam — Design Render</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #04040a;
+            --gold: #d4a853;
+            --gold-dim: rgba(212,168,83,0.18);
+            --accent: #7c3aed;
+            --cyan: #06b6d4;
+            --white: #f8fafc;
+            --muted: #475569;
+            --mid: #94a3b8;
+            --border: rgba(255,255,255,0.07);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.2rem 2rem;
+            background: rgba(4,4,10,0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-logo {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--white);
+            text-decoration: none;
+        }
+
+        .nav-links { display: flex; gap: 1.5rem; }
+        .nav-links a {
+            font-size: 0.78rem;
+            color: var(--muted);
+            text-decoration: none;
+            letter-spacing: 0.05em;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--white); }
+
+        /* ── HERO ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 7rem 2rem 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bg-glow {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(212,168,83,0.06) 0%, rgba(124,58,237,0.06) 40%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.3em;
+            color: var(--gold);
+            text-transform: uppercase;
+            border: 1px solid rgba(212,168,83,0.3);
+            padding: 0.35rem 1.1rem;
+            border-radius: 2rem;
+            margin-bottom: 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── PHONE RENDER ── */
+        .render-wrap {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .phone-container {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        /* callout lines */
+        .callout {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            pointer-events: none;
+        }
+
+        .callout-line {
+            height: 1px;
+            background: linear-gradient(90deg, rgba(212,168,83,0.6), transparent);
+            flex-shrink: 0;
+        }
+
+        .callout-right .callout-line {
+            background: linear-gradient(90deg, transparent, rgba(212,168,83,0.6));
+        }
+
+        .callout-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            flex-shrink: 0;
+            box-shadow: 0 0 6px rgba(212,168,83,0.6);
+        }
+
+        .callout-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.1em;
+            color: var(--gold);
+            text-transform: uppercase;
+            white-space: nowrap;
+            line-height: 1.3;
+        }
+
+        .callout-text span {
+            display: block;
+            color: var(--mid);
+            font-size: 0.52rem;
+            letter-spacing: 0.05em;
+            text-transform: none;
+            margin-top: 1px;
+        }
+
+        /* LEFT callouts */
+        .callout-left {
+            right: calc(100% + 8px);
+            flex-direction: row-reverse;
+        }
+        .callout-left .callout-line {
+            background: linear-gradient(90deg, transparent, rgba(212,168,83,0.6));
+        }
+        .callout-left .callout-text { text-align: right; }
+
+        /* RIGHT callouts */
+        .callout-right {
+            left: calc(100% + 8px);
+        }
+
+        /* ── SPECS SIDEBAR ── */
+        .spec-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            max-width: 240px;
+        }
+
+        .spec-row {
+            border-left: 2px solid rgba(212,168,83,0.25);
+            padding-left: 1rem;
+        }
+
+        .spec-row-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 0.2rem;
+        }
+
+        .spec-row-value {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--white);
+        }
+
+        /* ── FOOTER TEXT ── */
+        .hero-footer {
+            margin-top: 3rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-footer h1 {
+            font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            background: linear-gradient(160deg, #ffffff 0%, #d4a853 60%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 0.95;
+        }
+
+        .hero-footer p {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-top: 0.75rem;
+        }
+
+        /* ── COLORWAYS ── */
+        .colorways {
+            padding: 5rem 2rem;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .section-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.25em;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-bottom: 2.5rem;
+        }
+
+        .colorway-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .colorway-card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .colorway-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(212,168,83,0.25);
+        }
+
+        .colorway-swatch {
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .colorway-info {
+            padding: 1rem 1.2rem;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .colorway-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .colorway-desc {
+            font-size: 0.78rem;
+            color: var(--mid);
+        }
+
+        /* ── DIMENSIONS ── */
+        .dimensions {
+            padding: 4rem 2rem;
+            max-width: 960px;
+            margin: 0 auto;
+            border-top: 1px solid var(--border);
+        }
+
+        .dim-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+
+        .dim-item {
+            background: rgba(7,7,15,0.9);
+            padding: 1.5rem 1rem;
+            text-align: center;
+        }
+
+        .dim-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--gold);
+            letter-spacing: -0.02em;
+        }
+
+        .dim-unit {
+            font-size: 0.75rem;
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        .dim-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.15em;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-top: 0.4rem;
+        }
+
+        /* ── CTA ── */
+        .cta {
+            text-align: center;
+            padding: 5rem 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-block;
+            margin: 0.4rem;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            color: #000;
+        }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,168,83,0.2); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--mid);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { border-color: rgba(255,255,255,0.2); color: var(--white); }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--muted); border-radius: 2px; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/" class="nav-logo">SOVEREIGN</a>
+    <div class="nav-links">
+        <a href="/sovereign-adam">Spec Sheet</a>
+        <a href="/sovereign-roadmap">Roadmap</a>
+        <a href="/sovereign-pitch">Pitch</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="bg-glow"></div>
+    <div class="hero-label">Design Render — Draft 0.1</div>
+
+    <div class="render-wrap">
+
+        <!-- LEFT SPECS -->
+        <div class="spec-sidebar" style="text-align:right; align-items:flex-end;">
+            <div class="spec-row" style="border-left:none; border-right: 2px solid rgba(212,168,83,0.25); padding-left:0; padding-right:1rem;">
+                <div class="spec-row-label">Display</div>
+                <div class="spec-row-value">6.1" LTPO OLED</div>
+            </div>
+            <div class="spec-row" style="border-left:none; border-right: 2px solid rgba(212,168,83,0.25); padding-left:0; padding-right:1rem;">
+                <div class="spec-row-label">Chassis</div>
+                <div class="spec-row-value">Grade 5 Titanium</div>
+            </div>
+            <div class="spec-row" style="border-left:none; border-right: 2px solid rgba(212,168,83,0.25); padding-left:0; padding-right:1rem;">
+                <div class="spec-row-label">Battery</div>
+                <div class="spec-row-value">4,800 mAh</div>
+            </div>
+            <div class="spec-row" style="border-left:none; border-right: 2px solid rgba(212,168,83,0.25); padding-left:0; padding-right:1rem;">
+                <div class="spec-row-label">Processor</div>
+                <div class="spec-row-value">SD 8 Elite</div>
+            </div>
+        </div>
+
+        <!-- PHONE SVG -->
+        <div class="phone-container">
+            <svg width="220" height="440" viewBox="0 0 220 440" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bodyGrad" x1="0" y1="0" x2="220" y2="440" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#2a2a35"/>
+                        <stop offset="40%" stop-color="#1a1a22"/>
+                        <stop offset="100%" stop-color="#0e0e16"/>
+                    </linearGradient>
+                    <linearGradient id="frameGrad" x1="0" y1="0" x2="220" y2="0" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#5a5a6a"/>
+                        <stop offset="30%" stop-color="#8a8a9a"/>
+                        <stop offset="70%" stop-color="#6a6a7a"/>
+                        <stop offset="100%" stop-color="#4a4a58"/>
+                    </linearGradient>
+                    <linearGradient id="screenGrad" x1="15" y1="50" x2="205" y2="390" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#0d0d1a"/>
+                        <stop offset="100%" stop-color="#050508"/>
+                    </linearGradient>
+                    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#d4a853"/>
+                        <stop offset="100%" stop-color="#b8860b"/>
+                    </linearGradient>
+                    <linearGradient id="einkGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#1a2030"/>
+                        <stop offset="100%" stop-color="#0e1520"/>
+                    </linearGradient>
+                    <filter id="glow-gold">
+                        <feGaussianBlur stdDeviation="2" result="blur"/>
+                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="screen-glow">
+                        <feGaussianBlur stdDeviation="3" result="blur"/>
+                        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <clipPath id="phoneClip">
+                        <rect x="10" y="8" width="200" height="424" rx="28" ry="28"/>
+                    </clipPath>
+                </defs>
+
+                <!-- BODY -->
+                <rect x="10" y="8" width="200" height="424" rx="28" ry="28" fill="url(#bodyGrad)"/>
+
+                <!-- TITANIUM FRAME -->
+                <rect x="10" y="8" width="200" height="424" rx="28" ry="28" fill="none" stroke="url(#frameGrad)" stroke-width="3"/>
+
+                <!-- INNER FRAME HIGHLIGHT -->
+                <rect x="13" y="11" width="194" height="418" rx="26" ry="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+
+                <!-- SCREEN -->
+                <rect x="15" y="50" width="190" height="342" rx="4" ry="4" fill="url(#screenGrad)" filter="url(#screen-glow)"/>
+
+                <!-- SCREEN CONTENT — SOVEREIGN OS -->
+                <rect x="15" y="50" width="190" height="342" rx="4" fill="url(#screenGrad)"/>
+
+                <!-- Status bar -->
+                <text x="28" y="70" font-family="monospace" font-size="7" fill="rgba(255,255,255,0.4)" letter-spacing="0.5">9:41</text>
+                <text x="170" y="70" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.3)">●●●  ▮▮▮</text>
+
+                <!-- Wallpaper glow -->
+                <ellipse cx="110" cy="210" rx="60" ry="80" fill="rgba(124,58,237,0.07)"/>
+                <ellipse cx="110" cy="210" rx="30" ry="40" fill="rgba(212,168,83,0.05)"/>
+
+                <!-- SOVEREIGN wordmark on screen -->
+                <text x="110" y="185" font-family="monospace" font-size="9" fill="rgba(212,168,83,0.5)" text-anchor="middle" letter-spacing="3">SOVEREIGN</text>
+                <text x="110" y="200" font-family="monospace" font-size="6" fill="rgba(255,255,255,0.15)" text-anchor="middle" letter-spacing="1">OS 1.0</text>
+
+                <!-- Clock on screen -->
+                <text x="110" y="232" font-family="sans-serif" font-size="28" font-weight="700" fill="rgba(255,255,255,0.85)" text-anchor="middle">9:41</text>
+                <text x="110" y="248" font-family="sans-serif" font-size="7.5" fill="rgba(255,255,255,0.3)" text-anchor="middle">Tuesday, April 28</text>
+
+                <!-- Bottom app dock area -->
+                <rect x="35" y="350" width="150" height="28" rx="14" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.06)" stroke-width="0.5"/>
+                <circle cx="65" cy="364" r="8" fill="rgba(124,58,237,0.4)"/>
+                <circle cx="90" cy="364" r="8" fill="rgba(6,182,212,0.3)"/>
+                <circle cx="115" cy="364" r="8" fill="rgba(212,168,83,0.25)"/>
+                <circle cx="140" cy="364" r="8" fill="rgba(255,255,255,0.1)"/>
+                <circle cx="165" cy="364" r="8" fill="rgba(16,185,129,0.3)"/>
+
+                <!-- Home bar -->
+                <rect x="78" y="386" width="64" height="3" rx="2" fill="rgba(255,255,255,0.2)"/>
+
+                <!-- TOP — punch-free, clean forehead -->
+                <!-- Earpiece -->
+                <rect x="82" y="25" width="56" height="4" rx="2" fill="rgba(0,0,0,0.6)"/>
+                <rect x="83" y="26" width="54" height="2" rx="1" fill="rgba(80,80,100,0.4)"/>
+
+                <!-- Camera cluster (back-visible via notch area representation) -->
+                <circle cx="155" cy="27" r="5" fill="rgba(20,20,30,0.9)" stroke="rgba(100,100,120,0.5)" stroke-width="0.8"/>
+                <circle cx="155" cy="27" r="3" fill="rgba(30,30,40,0.95)"/>
+                <circle cx="155" cy="27" r="1.5" fill="rgba(212,168,83,0.4)"/>
+
+                <!-- RIGHT SIDE — power button -->
+                <rect x="208" y="130" width="4" height="36" rx="2" fill="#6a6a7a"/>
+                <rect x="208.5" y="131" width="3" height="34" rx="1.5" fill="rgba(255,255,255,0.15)"/>
+
+                <!-- RIGHT SIDE — volume up/down -->
+                <!-- (volume on right for Adam) -->
+
+                <!-- LEFT SIDE — KILL SWITCHES (the signature feature) -->
+                <!-- Switch 1 — Camera -->
+                <rect x="8" y="140" width="4" height="18" rx="2" fill="#5a5a6a"/>
+                <!-- Switch toggle indicator — ON (gold) -->
+                <rect x="8.5" y="141" width="3" height="7" rx="1.5" fill="#d4a853" filter="url(#glow-gold)"/>
+                <rect x="8.5" y="149" width="3" height="8" rx="1.5" fill="rgba(255,255,255,0.1)"/>
+
+                <!-- Switch 2 — Mic -->
+                <rect x="8" y="168" width="4" height="18" rx="2" fill="#5a5a6a"/>
+                <rect x="8.5" y="169" width="3" height="7" rx="1.5" fill="#d4a853" filter="url(#glow-gold)"/>
+                <rect x="8.5" y="177" width="3" height="8" rx="1.5" fill="rgba(255,255,255,0.1)"/>
+
+                <!-- Switch 3 — Cellular (toggled OFF) -->
+                <rect x="8" y="196" width="4" height="18" rx="2" fill="#5a5a6a"/>
+                <rect x="8.5" y="197" width="3" height="8" rx="1.5" fill="rgba(255,255,255,0.1)"/>
+                <rect x="8.5" y="206" width="3" height="7" rx="1.5" fill="rgba(100,100,120,0.5)"/>
+
+                <!-- BOTTOM — USB-C + headphone jack -->
+                <rect x="97" y="428" width="26" height="4" rx="2" fill="rgba(40,40,55,0.9)" stroke="rgba(100,100,120,0.4)" stroke-width="0.5"/>
+                <!-- USB-C inner -->
+                <rect x="101" y="429" width="18" height="2" rx="1" fill="rgba(80,80,100,0.5)"/>
+                <!-- Headphone jack -->
+                <circle cx="155" cy="430" r="4" fill="rgba(30,30,40,0.9)" stroke="rgba(100,100,120,0.4)" stroke-width="0.5"/>
+                <circle cx="155" cy="430" r="2" fill="rgba(20,20,30,0.95)"/>
+
+                <!-- Speaker grilles -->
+                <circle cx="63" cy="430" r="1.2" fill="rgba(80,80,100,0.5)"/>
+                <circle cx="68" cy="430" r="1.2" fill="rgba(80,80,100,0.5)"/>
+                <circle cx="73" cy="430" r="1.2" fill="rgba(80,80,100,0.5)"/>
+                <circle cx="78" cy="430" r="1.2" fill="rgba(80,80,100,0.5)"/>
+
+                <!-- BACK — E-INK STRIP (shown as subtle edge indicator) -->
+                <rect x="10" y="290" width="3" height="60" rx="1.5" fill="rgba(180,200,220,0.12)" stroke="rgba(180,200,220,0.08)" stroke-width="0.5"/>
+                <!-- E-ink text simulation -->
+                <rect x="11" y="298" width="1.5" height="4" rx="0.5" fill="rgba(180,200,220,0.3)"/>
+                <rect x="11" y="305" width="1.5" height="3" rx="0.5" fill="rgba(180,200,220,0.2)"/>
+                <rect x="11" y="310" width="1.5" height="4" rx="0.5" fill="rgba(180,200,220,0.3)"/>
+                <rect x="11" y="317" width="1.5" height="3" rx="0.5" fill="rgba(180,200,220,0.2)"/>
+
+                <!-- MicroSD slot indicator on bottom-right edge -->
+                <rect x="170" y="427" width="14" height="4.5" rx="1" fill="rgba(40,40,55,0.9)" stroke="rgba(100,100,120,0.3)" stroke-width="0.5"/>
+
+                <!-- Subtle reflection on screen -->
+                <rect x="15" y="50" width="40" height="342" rx="0" fill="url(#screenGrad)" opacity="0.03"/>
+                <line x1="15" y1="50" x2="55" y2="392" stroke="rgba(255,255,255,0.03)" stroke-width="20"/>
+
+            </svg>
+
+            <!-- CALLOUT LABELS — left side -->
+
+            <!-- Kill switch Camera — left, at y=149 (center of switch 1) -->
+            <div class="callout callout-left" style="top: 149px; left: 0;">
+                <div class="callout-text" style="text-align:right;">
+                    CAM KILL
+                    <span>Hardware switch — circuit open</span>
+                </div>
+                <div class="callout-line" style="width:28px;"></div>
+                <div class="callout-dot"></div>
+            </div>
+
+            <!-- Kill switch Mic -->
+            <div class="callout callout-left" style="top: 177px; left: 0;">
+                <div class="callout-text" style="text-align:right;">
+                    MIC KILL
+                    <span>Hardware switch — circuit open</span>
+                </div>
+                <div class="callout-line" style="width:28px;"></div>
+                <div class="callout-dot"></div>
+            </div>
+
+            <!-- Kill switch Cellular -->
+            <div class="callout callout-left" style="top: 205px; left: 0;">
+                <div class="callout-text" style="text-align:right;">
+                    CELL KILL
+                    <span>OFF — air-gapped</span>
+                </div>
+                <div class="callout-line" style="width:28px;"></div>
+                <div class="callout-dot"></div>
+            </div>
+
+            <!-- E-ink strip -->
+            <div class="callout callout-left" style="top: 316px; left: 0;">
+                <div class="callout-text" style="text-align:right;">
+                    E-INK STRIP
+                    <span>Back edge · time &amp; notifications</span>
+                </div>
+                <div class="callout-line" style="width:28px;"></div>
+                <div class="callout-dot"></div>
+            </div>
+
+            <!-- CALLOUT LABELS — right side -->
+
+            <!-- Display -->
+            <div class="callout callout-right" style="top: 80px; left: 220px;">
+                <div class="callout-dot"></div>
+                <div class="callout-line" style="width:28px;"></div>
+                <div class="callout-text">
+                    6.1" LTPO OLED
+                    <span>No notch · no hole punch</span>
+                </div>
+            </div>
+
+            <!-- Power button -->
+            <div class="callout callout-right" style="top: 147px; left: 220px;">
+                <div class="callout-dot"></div>
+                <div class="callout-line" style="width:28px;"></div>
+                <div class="callout-text">
+                    POWER / FINGERPRINT
+                    <span>SC-1 sovereignty chip</span>
+                </div>
+            </div>
+
+            <!-- USB-C -->
+            <div class="callout callout-right" style="top: 414px; left: 220px;">
+                <div class="callout-dot"></div>
+                <div class="callout-line" style="width:28px;"></div>
+                <div class="callout-text">
+                    USB-C + 3.5mm
+                    <span>Headphone jack never dies here</span>
+                </div>
+            </div>
+
+            <!-- MicroSD -->
+            <div class="callout callout-right" style="top: 400px; left: 220px; display:none;">
+            </div>
+
+        </div>
+
+        <!-- RIGHT SPECS -->
+        <div class="spec-sidebar">
+            <div class="spec-row">
+                <div class="spec-row-label">Camera</div>
+                <div class="spec-row-value">50MP + 12MP</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-row-label">Storage</div>
+                <div class="spec-row-value">512GB + microSD</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-row-label">RAM</div>
+                <div class="spec-row-value">12GB LPDDR5X</div>
+            </div>
+            <div class="spec-row">
+                <div class="spec-row-label">OS</div>
+                <div class="spec-row-value">SOVEREIGN OS 1.0</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Name below render -->
+    <div class="hero-footer">
+        <h1>The Adam</h1>
+        <p>by SOVEREIGN · Draft 0.1 · Not for distribution</p>
+    </div>
+</section>
+
+<!-- COLORWAYS -->
+<section class="colorways">
+    <div class="section-label">Colorways</div>
+    <h2 class="section-title">Two finishes. Both uncompromising.</h2>
+
+    <div class="colorway-row">
+        <div class="colorway-card">
+            <div class="colorway-swatch" style="background: linear-gradient(135deg, #0d0d12, #1a1a22);">
+                <svg width="80" height="160" viewBox="0 0 80 160">
+                    <rect x="5" y="5" width="70" height="150" rx="14" fill="#111118" stroke="#2a2a35" stroke-width="1.5"/>
+                    <rect x="8" y="22" width="64" height="118" rx="3" fill="#080810"/>
+                    <ellipse cx="40" cy="80" rx="18" ry="24" fill="rgba(124,58,237,0.08)"/>
+                    <text x="40" y="84" font-family="monospace" font-size="5" fill="rgba(255,255,255,0.2)" text-anchor="middle">SOVEREIGN</text>
+                    <!-- kill switches -->
+                    <rect x="3.5" y="52" width="2" height="8" rx="1" fill="#d4a853"/>
+                    <rect x="3.5" y="64" width="2" height="8" rx="1" fill="#d4a853"/>
+                    <rect x="3.5" y="76" width="2" height="8" rx="1" fill="rgba(255,255,255,0.2)"/>
+                </svg>
+            </div>
+            <div class="colorway-info">
+                <div class="colorway-name">Obsidian</div>
+                <div class="colorway-desc">Matte black ceramic back. Titanium frame, brushed dark. For those who don't need to be seen.</div>
+            </div>
+        </div>
+
+        <div class="colorway-card">
+            <div class="colorway-swatch" style="background: linear-gradient(135deg, #1a1a20, #2a2830);">
+                <svg width="80" height="160" viewBox="0 0 80 160">
+                    <rect x="5" y="5" width="70" height="150" rx="14" fill="#2a2830" stroke="#4a4858" stroke-width="1.5"/>
+                    <rect x="8" y="22" width="64" height="118" rx="3" fill="#0d0d14"/>
+                    <ellipse cx="40" cy="80" rx="18" ry="24" fill="rgba(212,168,83,0.07)"/>
+                    <text x="40" y="84" font-family="monospace" font-size="5" fill="rgba(212,168,83,0.3)" text-anchor="middle">SOVEREIGN</text>
+                    <rect x="3.5" y="52" width="2" height="8" rx="1" fill="#d4a853"/>
+                    <rect x="3.5" y="64" width="2" height="8" rx="1" fill="#d4a853"/>
+                    <rect x="3.5" y="76" width="2" height="8" rx="1" fill="rgba(255,255,255,0.2)"/>
+                </svg>
+            </div>
+            <div class="colorway-info">
+                <div class="colorway-name">Raw</div>
+                <div class="colorway-desc">Bare-finish titanium. Natural grain, no coating. Develops a patina over time. Gets better with age, like you.</div>
+            </div>
+        </div>
+
+        <div class="colorway-card" style="border-style: dashed; opacity: 0.5;">
+            <div class="colorway-swatch" style="background: linear-gradient(135deg, #111116, #1a1a1e);">
+                <div style="display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; gap:0.5rem;">
+                    <div style="font-size:1.5rem;">+</div>
+                    <div style="font-family:monospace; font-size:0.55rem; letter-spacing:0.15em; color:var(--muted); text-transform:uppercase;">Fellowship Vote</div>
+                </div>
+            </div>
+            <div class="colorway-info">
+                <div class="colorway-name" style="color:var(--muted);">TBD</div>
+                <div class="colorway-desc">Third colorway decided by the fellowship. Submit your pitch.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- DIMENSIONS -->
+<section class="dimensions">
+    <div class="section-label">Dimensions</div>
+    <h2 class="section-title">Exactly the right size.</h2>
+    <div class="dim-grid">
+        <div class="dim-item">
+            <div class="dim-value">158<span class="dim-unit">mm</span></div>
+            <div class="dim-label">Height</div>
+        </div>
+        <div class="dim-item">
+            <div class="dim-value">74<span class="dim-unit">mm</span></div>
+            <div class="dim-label">Width</div>
+        </div>
+        <div class="dim-item">
+            <div class="dim-value">8.4<span class="dim-unit">mm</span></div>
+            <div class="dim-label">Depth</div>
+        </div>
+        <div class="dim-item">
+            <div class="dim-value">198<span class="dim-unit">g</span></div>
+            <div class="dim-label">Weight</div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+    <p style="font-family:'Space Mono',monospace; font-size:0.62rem; letter-spacing:0.25em; color:var(--muted); text-transform:uppercase; margin-bottom:1rem;">Design subject to change</p>
+    <h2 style="font-size:clamp(1.8rem,4vw,2.8rem); font-weight:900; letter-spacing:-0.025em; margin-bottom:1rem;">The Adam is coming.</h2>
+    <p style="color:var(--mid); max-width:440px; margin:0 auto 2rem; font-size:0.95rem; line-height:1.7;">This is what it looks like when a phone is designed with conviction instead of a committee.</p>
+    <a href="/sovereign-adam" class="btn btn-gold">Full Spec Sheet</a>
+    <a href="/sovereign-roadmap" class="btn btn-ghost">View Roadmap</a>
+</section>
+
+</body>
+</html>
